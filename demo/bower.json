@@ -1,0 +1,21 @@
+{
+  "name": "metron demo",
+  "authors": [
+    "Michael Szul <michael@szul.us>"
+  ],
+  "description": "",
+  "main": "index.html",
+  "license": "MIT",
+  "homepage": "http://metron.october.codes",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "milligram": "^1.1.0"
+  }
+}

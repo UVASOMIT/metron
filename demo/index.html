@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Metron TypeScript/JavaScript Convenience Library</title>
+    <link type="text/css" href="bower_components/milligram/dist/milligram.min.css" rel="stylesheet" />
+    <script type="text/javascript" src="//google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+    <script type="text/javascript" src="../dist/gen/metron-extenders.js"></script>
+    <script type="text/javascript" src="../dist/gen/metron.js"></script>
+    <script type="text/javascript">
+    </script>
+  </head>
+  <body>
+    <section>
+      <h1>String Extensions</h1>
+      <div>
+        <code>String.lower()</code>
+        <pre>
+              <code class="language-prettyprint lang-javascript">
+              var name = "JOHN";
+              name.lower();
+              console.log(name);
+              //result: "john"
+              </code>
+            </pre>
+      </div>
+      <div>
+        <code>String.upper()</code>
+        <pre>
+              <code class="language-prettyprint lang-javascript">
+              var name = "john";
+              name.upper();
+              console.log(name);
+              //result: "JOHN"
+              </code>
+            </pre>
+      </div>
+      <div>
+        <code>String.trim()</code>
+        <pre>
+              <code class="language-prettyprint lang-javascript">
+              var name = "   John   ";
+              name.trim();
+              console.log(name);
+              //result: "John"
+              </code>
+            </pre>
+      </div>
+      <div>
+        <code>String.ltrim()</code>
+        <pre>
+              <code class="language-prettyprint lang-javascript">
+              var name = "   John   ";
+              name.ltrim();
+              console.log(name);
+              //result: "John   "
+              </code>
+            </pre>
+      </div>
+      <div>
+        <code>String.rtrim()</code>
+        <pre>
+              <code class="language-prettyprint lang-javascript">
+              var name = "   John   ";
+              name.rtrim();
+              console.log(name);
+              //result: "   John"
+              </code>
+            </pre>
+      </div>
+      <div>
+        <code>String.normalize()</code>
+        <pre>
+              <code class="language-prettyprint lang-javascript">
+              var para = "   John  Smith  from          New  Jersey  ";
+              para.normalize();
+              console.log(para);
+              //result: "John Smith from New Jersey"
+              </code>
+            </pre>
+      </div>
+      <div>
+        <code>String.startsWith()</code>
+        <pre>
+              <code class="language-prettyprint lang-javascript">
+              var name = "John";
+              console.log(name.startsWith("J"));
+              //result: true
+              </code>
+            </pre>
+      </div>
+      <div>
+        <code>String.endsWith()</code>
+        <pre>
+              <code class="language-prettyprint lang-javascript">
+              var name = "John";
+              console.log(name.endsWith("J"));
+              //result: false
+              </code>
+            </pre>
+      </div>
+      <div>
+        <code>String.capFirst()</code>
+        <pre>
+              <code class="language-prettyprint lang-javascript">
+              var name = "john";
+              name.capFirst();
+              console.log(name);
+              //result: "John"
+              </code>
+            </pre>
+      </div>
+      <div>
+        <code>String.capWords()</code>
+        <pre>
+              <code class="language-prettyprint lang-javascript">
+              var para = "john smith from the pinelands";
+              para.capWords();
+              console.log(para);
+              //result: "John Smith From The Pinelands"
+              </code>
+            </pre>
+      </div>
+      <div>
+        <code>String.truncateWords()</code>
+        <pre>
+              <code class="language-prettyprint lang-javascript">
+              var para = "John Smith from the Pinelands.";
+              para.truncateWords(2);
+              console.log(para);
+              //result: "John Smith"
+              </code>
+            </pre>
+      </div>
+      <div>
+        <code>String.truncateWordsWithHtml()</code>
+        <pre>
+              <code class="language-prettyprint lang-javascript">
+              var para = "&lt;strong&gt;John Smith&lt;/strong&gt; from the Pinelands.";
+              para.truncateWordsWithHtml(1);
+              console.log(para);
+              //result: "&lt;strong&gt;John&lt;/strong&gt;"
+              </code>
+            </pre>
+      </div>
+    </section>
+  </body>
+</html>
