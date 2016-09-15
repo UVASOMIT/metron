@@ -3,15 +3,16 @@ module.exports = function (grunt) {
         pkg: grunt.file.readJSON("package.json"),
         typescript: {
             options: {
-                module: 'commonjs', 
+                module: 'umd', 
                 target: 'es5',
                 rootDir: 'src',
                 sourceMap: true,
-                declaration: true
+                declaration: true,
+                removeComments: true
             },
             base: {
                 src: ['src/**/*.ts', "!**/*.d.ts"],
-                dest: 'dest/gen',
+                dest: 'dist/gen',
             }
         },
         uglify: {
@@ -23,7 +24,7 @@ module.exports = function (grunt) {
                 files: [
                     {
                         expand: true,
-                        cwd: "src",
+                        cwd: "dist",
                         src: ["**/*.js", "!**/*.min.js"],
                         dest: "dist",
                         ext: ".min.js"
