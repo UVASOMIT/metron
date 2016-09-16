@@ -44,6 +44,14 @@ interface Object {
     getName: () => string;
 }
 
+interface Document {
+    select: (selector: string) => Element;
+}
+
+interface Element {
+    select: (selector: string) => Element;
+}
+
 interface HTMLElement {
     clean: () => HTMLElement;
 }
@@ -306,6 +314,14 @@ Object.prototype.getName = function (): string {
     let regex: RegExp = /function (.{1,})\(/;
     let results: RegExpExecArray = regex.exec((this).constructor.toString());
     return (results && results.length > 1) ? results[1] : "";
+};
+
+Document.prototype.select = function(selector: string): Element {
+    return document.querySelector(selector);
+};
+
+Element.prototype.select = function(selector: string) : Element {
+    return this.querySelector(selector);
 };
 
 HTMLElement.prototype.clean = function(): HTMLElement {
