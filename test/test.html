@@ -5,11 +5,19 @@
         <meta name="viewport" content="width=device-width">
         <title>QUnit Testing for metron</title>
         <link rel="stylesheet" href="bower_components/qunit/qunit/qunit.css">
+        <script src="bower_components/qunit/qunit/qunit.js"></script>
+        <script src="../dist/gen/metron.extenders.js"></script>
+        <script>
+            QUnit.test( "String isNullOrEmpty", function(assert) {
+                assert.ok(String.isNullOrEmpty("Not empty") == false, "Passed!" );
+            });
+            QUnit.test( "String lower", function(assert) {
+                assert.ok( "LOWER".lower() == "lower", "Passed!" );
+            });
+        </script>
     </head>
     <body>
         <div id="qunit"></div>
         <div id="qunit-fixture"></div>
-        <script src="https://code.jquery.com/qunit/qunit/qunit.js"></script>
-        <script src="tests.js"></script>
     </body>
 </html>

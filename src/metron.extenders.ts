@@ -1,7 +1,3 @@
-interface StringConstructor {
-    isNullOrEmpty: (val: any) => boolean;
-}
-
 interface String {
     lower: () => string;
     upper: () => string;
@@ -45,10 +41,6 @@ interface Object {
 }
 
 interface Document {
-    select: (selector: string) => Element;
-}
-
-interface Element {
     select: (selector: string) => Element;
 }
 
@@ -172,7 +164,7 @@ String.prototype.escapeHtml = function (): string {
 };
 
 String.prototype.toBool = function (): boolean {
-    if (String.isNullOrEmpty(this)) {
+    if ((<any>String).isNullOrEmpty(this)) {
         return false;
     }
     else if (this.lower() === "true" || this.lower() === "1" || this.lower() === "y" || this.lower() === "t") {
@@ -205,7 +197,7 @@ String.prototype.toPhoneNumber = function (): string {
     }
 };
 
-String.prototype.isNullOrEmpty = function (val: any): boolean {
+(<any>String).isNullOrEmpty = function (val: any): boolean {
     if (val === undefined || val === null || val.trim() === '') {
         return true;
     }
@@ -318,10 +310,6 @@ Object.prototype.getName = function (): string {
 
 Document.prototype.select = function(selector: string): Element {
     return document.querySelector(selector);
-};
-
-Element.prototype.select = function(selector: string) : Element {
-    return this.querySelector(selector);
 };
 
 HTMLElement.prototype.clean = function(): HTMLElement {

@@ -1,3 +1,5 @@
+/// <reference path="metron.extenders.ts" />
+
 namespace metron {
     export namespace dictionary {
         (function () {
