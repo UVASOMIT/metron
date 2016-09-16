@@ -50,3 +50,4 @@ src/_metron.js
 src/metron.d.ts
 src/metron.extenders.js
 dist/gen/
+test/bower_components/

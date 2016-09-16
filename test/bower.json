@@ -1,0 +1,21 @@
+{
+  "name": "QUnit for metron",
+  "homepage": "https://github.com/szul/metron.v2",
+  "authors": [
+    "Michael Szul <michael@szul.us>"
+  ],
+  "description": "",
+  "main": "test.html",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "qunit": "^2.0.1"
+  }
+}
