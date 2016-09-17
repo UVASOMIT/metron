@@ -8,11 +8,21 @@
         <script src="bower_components/qunit/qunit/qunit.js"></script>
         <script src="../dist/gen/metron.extenders.js"></script>
         <script>
-            QUnit.test( "String isNullOrEmpty", function(assert) {
-                assert.ok(String.isNullOrEmpty("Not empty") == false, "Passed!" );
-            });
             QUnit.test( "String lower", function(assert) {
                 assert.ok( "LOWER".lower() == "lower", "Passed!" );
+            });
+            QUnit.test( "String upper", function(assert) {
+                assert.ok( "upper".upper() == "UPPER", "Passed!" );
+            });
+            QUnit.test( "String ltrim", function(assert) {
+                assert.ok( "    left trim".ltrim() == "left trim", "Passed!" );
+            });
+            QUnit.test( "String rtrim", function(assert) {
+                assert.ok( "right trim    ".rtrim() == "right trim", "Passed!" );
+            });
+
+            QUnit.test( "String isNullOrEmpty", function(assert) {
+                assert.ok(String.isNullOrEmpty("Not empty") == false, "Passed!" );
             });
         </script>
     </head>
