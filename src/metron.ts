@@ -1,5 +1,18 @@
 /// <reference path="metron.extenders.ts" />
 
+export type Guid = string;
+
+interface Dictionary {
+    setItem: (key: string, value: any) => void;
+    getItem: (key: string) => any;
+    hasItem: (key: string) => boolean;
+    removeItem: (key: string) => any;
+    keys: () => Array<string>;
+    values: () => Array<any>;
+    each: (callback: Function) => void;
+    clear: () => void;
+}
+
 interface Ajax {
     url: string;
     method: string;
