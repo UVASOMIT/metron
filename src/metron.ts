@@ -196,7 +196,7 @@ namespace metron {
                 }
             }
         }
-        export function ajax(url: string, method: string = "POST", data: any = {}, async: boolean = true, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
+        export function ajax(url: string, data: any = {}, method: string = "POST", async: boolean = true, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
             function _send(request: XMLHttpRequest): void {
                 request.open(method, url, async);
                 request.onreadystatechange = function() {
@@ -216,7 +216,7 @@ namespace metron {
                         }
                     }
                 };
-                request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+                request.setRequestHeader("Content-Type", contentType);
                 request.send(requestData);
             }
             let request: XMLHttpRequest = new XMLHttpRequest();
@@ -236,6 +236,18 @@ namespace metron {
                     _send(this.request);
                 }
             };
+        }
+        export function get(url: string, data: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
+            return ajax(url ,data ,"GET" ,true ,contentType, dataType, success, failure, always);
+        }
+        export function post(url: string, data: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
+            return ajax(url ,data ,"POST" ,true ,contentType, dataType, success, failure, always);
+        }
+        export function put(url: string, data: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
+            return ajax(url ,data ,"PUT" ,true ,contentType, dataType, success, failure, always);
+        }
+        export function remove(url: string, data: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
+            return ajax(url ,data ,"DELETE" ,true ,contentType, dataType, success, failure, always);
         }
     }
     export namespace observer {

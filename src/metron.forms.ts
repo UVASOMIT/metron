@@ -9,5 +9,8 @@ namespace metron {
         constructor() {
 
         }
+        private static bindAll(): void {
+            
+        }
     }
 }

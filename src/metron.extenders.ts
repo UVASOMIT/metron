@@ -41,7 +41,8 @@ interface Object {
 }
 
 interface Document {
-    select: (selector: string) => Element;
+    selectOne: (selector: string) => Element;
+    selectAll: (selector: string) => NodeListOf<Element>;
 }
 
 interface HTMLElement {
@@ -308,8 +309,12 @@ Object.prototype.getName = function (): string {
     return (results && results.length > 1) ? results[1] : "";
 };
 
-Document.prototype.select = function(selector: string): Element {
+Document.prototype.selectOne = function(selector: string): Element {
     return document.querySelector(selector);
+};
+
+Document.prototype.selectAll = function(selector: string): NodeListOf<Element> {
+    return document.querySelectorAll(selector);
 };
 
 HTMLElement.prototype.clean = function(): HTMLElement {

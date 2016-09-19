@@ -3,5 +3,8 @@ namespace metron {
         constructor() {
 
         }
+        public static bindAll(): void {
+            
+        }
     }
 }

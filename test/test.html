@@ -181,7 +181,7 @@
                 assert.ok( mockObject().isEmpty("item") == true, "Passed!" );
             });
             QUnit.test( "Document select", function(assert) {
-                assert.ok( (document.select("#qunit") != null) == true, "Passed!" );
+                assert.ok( (document.selectOne("#qunit") != null) == true, "Passed!" );
             });
             /*
              * No test for HTMLElement.prototype.clean
