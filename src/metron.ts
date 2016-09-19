@@ -197,8 +197,8 @@ namespace metron {
             }
         }
         export function ajax(url: string, data: any = {}, method: string = "POST", async: boolean = true, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
-            function _send(request: XMLHttpRequest): void {
-                request.open(method, url, async);
+            function _send(request: XMLHttpRequest, data: any): void {
+                request.open(method, url, async, data);
                 request.onreadystatechange = function() {
                     if(request.readyState === 4) {
                         if(request.status === 200) {
@@ -217,12 +217,12 @@ namespace metron {
                     }
                 };
                 request.setRequestHeader("Content-Type", contentType);
-                request.send(requestData);
+                request.send(data);
             }
             let request: XMLHttpRequest = new XMLHttpRequest();
             let requestData = metron.web.querystringify(data);
             if(success != null || failure != null || always != null) {
-                _send(request);
+                _send(request, requestData);
             }
             return {
                 url: url,
@@ -233,7 +233,7 @@ namespace metron {
                 async: async,
                 request: request,
                 send: function(): void {
-                    _send(this.request);
+                    _send(this.request, requestData);
                 }
             };
         }

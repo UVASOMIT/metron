@@ -1,4 +1,9 @@
 namespace metron {
+    export class forms {
+        public static bindAll(): void {
+            
+        }
+    }
     abstract class form {
         private _field_id: string;
         private _name: string;
@@ -8,9 +13,6 @@ namespace metron {
         private _fields: Array<string> = [];
         constructor() {
 
-        }
-        private static bindAll(): void {
-            
         }
     }
 }
