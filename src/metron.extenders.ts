@@ -187,7 +187,7 @@ String.prototype.slugify = function (lower: boolean = true): string {
     return this.normalize().replace(/[^a-z0-9]/gi, '-');
 };
 
-//toPhoneNumber() needs to be a part of some validation mechanism
+//toPhoneNumber() needs to be a part of some validation mechanism, and needs to be improved a great deal.
 String.prototype.toPhoneNumber = function (): string {
     try {
         return this.substring(0, 3) + '-' + this.substring(3, 6) + '-' + this.substring(6);
@@ -217,7 +217,7 @@ Number.prototype.toBool = function (): boolean {
     return true;
 };
 
-Number.prototype.random = function (min: number, max: number): number {
+(<any>Number).random = function (min: number, max: number): number {
     if (isNaN(min) || isNaN(max)) {
         throw 'Error: Only numbers are accepted as arguments.';
     }
