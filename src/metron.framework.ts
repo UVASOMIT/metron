@@ -4,6 +4,7 @@
 /// <reference path="metron.forms.ts" />
 
 namespace metron {
+    export var global: any = { };
     export function onready(callback: Function) {
         document.addEventListener("DOMContentLoaded", function(e) {
             if(callback != null) {
