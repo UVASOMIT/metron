@@ -1,5 +1,19 @@
 /// <reference path="metron.extenders.ts" />
 
+interface Ajax {
+    url: string;
+    method: string;
+    contentType: string;
+    dataType: string;
+    data: any;
+    async: boolean;
+    request: XMLHttpRequest;
+    success?: (callback: Function) => XMLHttpRequest;
+    error?: (callback: Function) => XMLHttpRequest;
+    always?: (callback: Function) => XMLHttpRequest;
+    send?: () => void;
+}
+
 namespace metron {
     export namespace dictionary {
         (function () {
@@ -168,6 +182,47 @@ namespace metron {
                     throw 'Error: No document object found. Environment may not contain a DOM.';
                 }
             }
+        }
+        export function ajax(url: string, method: string = "POST", data: any = {}, async: boolean = true, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
+            function _send(request: XMLHttpRequest): void {
+                request.open(method, url, async);
+                request.onreadystatechange = function() {
+                    if(request.readyState === 4) {
+                        if(request.status === 200) {
+                            if(success !== undefined) {
+                                success(request);
+                            }
+                        }
+                        if(request.status === 404 || request.status === 500) {
+                            if(failure !== undefined) {
+                                failure(request);
+                            }
+                        }
+                        if(always !== undefined) {
+                            always(request);
+                        }
+                    }
+                };
+                request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+                request.send(requestData);
+            }
+            let request: XMLHttpRequest = new XMLHttpRequest();
+            let requestData = metron.web.querystringify(data);
+            if(success != null || failure != null || always != null) {
+                _send(request);
+            }
+            return {
+                url: url,
+                method: method,
+                contentType: contentType,
+                dataType: dataType,
+                data: requestData,
+                async: async,
+                request: request,
+                send: function(): void {
+                    _send(this.request);
+                }
+            };
         }
     }
     export namespace observer {
