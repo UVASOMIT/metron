@@ -44,7 +44,12 @@ interface Document {
     selectOne: (selector: string) => Element;
     selectAll: (selector: string) => NodeListOf<Element>;
 }
-
+interface Element {
+    append: (html: string) => Element;
+    empty: () => Element;
+    removeEvent: (event: string) => Element;
+    addEvent: (event: string, callback: Function) => Element;
+}
 interface HTMLElement {
     clean: () => HTMLElement;
 }
@@ -316,7 +321,29 @@ Document.prototype.selectOne = function(selector: string): Element {
 Document.prototype.selectAll = function(selector: string): NodeListOf<Element> {
     return document.querySelectorAll(selector);
 };
-
+Element.prototype.append = function(html: string): Element {
+    var placeholder = document.createElement("div");
+    placeholder.innerHTML = html;
+    var children = placeholder.childNodes;
+    for(let i = 0; i < children.length; i++) {
+        this.append(children[i]);
+    }
+    return this;
+}
+Element.prototype.empty = function(): Element {
+    this.innerHTML = "";
+    return this;
+}
+Element.prototype.removeEvent = function(event: string): Element {
+    if(this[`on${event}`] != null) {
+        this[`on${event}`] = null;
+    }
+    return this;
+}
+Element.prototype.addEvent = function(event: string, callback:Function): Element {
+    this.addEventListener(event, callback());
+    return this;
+}
 HTMLElement.prototype.clean = function(): HTMLElement {
     this.value = this.value.replace(/\r?\n/g, "\r\n");
     return this;
