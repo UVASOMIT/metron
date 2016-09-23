@@ -17,6 +17,8 @@ interface String {
     contains: (val: string) => boolean;
     slugify: (lower?: boolean) => string;
     toPhoneNumber: () => string;
+    getValueByKey: (key: string, values: string) => string;
+    setValueByKey: (key: string, values: string, replacement: string) => string;
     isNullOrEmpty: (val: any) => boolean;
 }
 
@@ -43,13 +45,29 @@ interface Object {
 interface Document {
     selectOne: (selector: string) => Element;
     selectAll: (selector: string) => NodeListOf<Element>;
+    create: (html: string) => Element;
 }
+
+interface NodeList {
+    each: (callback: Function) => void;
+    last: () => Element;
+}
+
 interface Element {
+    attribute: (name: string, value?: string) => string & Element;
+    up: (selector: string) => Element;
+    parent: () => Element;
+    first: (selector: string) => Element;
     append: (html: string) => Element;
     empty: () => Element;
     removeEvent: (event: string) => Element;
     addEvent: (event: string, callback: Function) => Element;
+    show: () => Element;
+    hide: () => Element;
+    addClass: (className: string) => Element;
+    toString: () => string;
 }
+
 interface HTMLElement {
     clean: () => HTMLElement;
 }
@@ -62,9 +80,11 @@ String.prototype.upper = function (): string {
     return this.toUpperCase();
 };
 
+/*
 String.prototype.trim = function (): string {
     return this.replace(/^\s+|\s+$/g, "");
 };
+*/
 
 String.prototype.ltrim = function (): string {
     return this.replace(/^\s+/, "");
@@ -203,6 +223,34 @@ String.prototype.toPhoneNumber = function (): string {
     }
 };
 
+String.prototype.getValueByKey = function (key: string, values: string): string {
+    var collection: Array<string> = values.split(";");
+    for (let i = 0; i < collection.length; i++) {
+        if (collection[i].contains(":")) {
+            let pairs = collection[i].split(":");
+            if (pairs[0] == key) {
+                return pairs[1];
+            }
+        }
+    }
+    return null;
+};
+
+String.prototype.setValueByKey = function (key: string, values: string, replacement: string): string {
+    var collection: Array<string> = values.split(";");
+    var returnCollection: Array<string>;
+    for (let i = 0; i < collection.length; i++) {
+        if (collection[i].contains(":")) {
+            let pairs = collection[i].split(":");
+            if (pairs[0] == key) {
+                pairs[1] = replacement;
+            }
+            returnCollection.push(pairs.join(":"));
+        }
+    }
+    return returnCollection.join(';');
+};
+
 (<any>String).isNullOrEmpty = function (val: any): boolean {
     if (val === undefined || val === null || val.trim() === '') {
         return true;
@@ -321,6 +369,69 @@ Document.prototype.selectOne = function(selector: string): Element {
 Document.prototype.selectAll = function(selector: string): NodeListOf<Element> {
     return document.querySelectorAll(selector);
 };
+
+Document.prototype.create = function(html: string): Element {
+    var placeholder = document.createElement("div");
+    placeholder.innerHTML = html;
+    return <Element>placeholder.childNodes[0];
+};
+
+NodeList.prototype.each = function (callback: Function): void {
+    for (let i: number = 0; i < this.length; i++) {
+        callback(i, this[i]);
+    }
+};
+
+NodeList.prototype.last = function (): Element {
+    return this[this.length - 1];
+};
+
+Element.prototype.attribute = function(name: string, value?: string): string & Element {
+    if(value != null) {
+        this.setAttribute(name, value);
+        return this;
+    }
+    return this.getAttribute(name);
+};
+
+Element.prototype.parent = function(): Element {
+    return this.parentNode;
+};
+
+Element.prototype.up = function(selector: string): Element {
+    var self = this;
+    function _upper(selector: string) {
+        try {
+            let _up = self.parent().parent();
+            if(_up.selectOne(selector) != null) {
+                _upper(_up);
+            }
+            return _up.selectOne(selector);
+        }
+        catch(e) {
+            return null;
+        }
+    } 
+    if(self.closest != null) {
+        return self.closest(selector);
+    }
+    return _upper(selector);
+};
+
+Element.prototype.first = function(selector: string): Element {
+    function _decend(node: Element): Element {
+        let _currentNode = node;
+        let nodeList: NodeList = _currentNode.childNodes;
+        for(let i = 0; i < nodeList.length; i++) {
+            if(nodeList[i].nodeName.lower() === selector.lower()) {
+                return <Element>nodeList[i];
+            }
+        }
+        _decend(_currentNode);
+    }
+    return _decend(this);
+};
+
 Element.prototype.append = function(html: string): Element {
     var placeholder = document.createElement("div");
     placeholder.innerHTML = html;
@@ -329,21 +440,50 @@ Element.prototype.append = function(html: string): Element {
         this.append(children[i]);
     }
     return this;
-}
+};
+
 Element.prototype.empty = function(): Element {
     this.innerHTML = "";
     return this;
-}
+};
+
 Element.prototype.removeEvent = function(event: string): Element {
     if(this[`on${event}`] != null) {
         this[`on${event}`] = null;
     }
     return this;
-}
+};
+
 Element.prototype.addEvent = function(event: string, callback:Function): Element {
     this.addEventListener(event, callback());
     return this;
-}
+};
+
+Element.prototype.show = function(): Element {
+    let styles = this.attribute("style");
+    if(styles != null && styles != "") {
+        return this.attribute("style", styles.setValueByKey("display", styles, "block"));
+    }
+    return this.attribute("style", `${styles};display:block`);
+};
+
+Element.prototype.hide = function(): Element {
+    let styles = this.attribute("style");
+    if(styles != null && styles != "") {
+        return this.attribute("style", styles.setValueByKey("display", styles, "none"));
+    }
+    return this.attribute("style", `${styles};display:none`);
+};
+
+Element.prototype.addClass = function(className: string) : Element {
+    this.className += ` ${className}`;
+    return this;
+};
+
+Element.prototype.toString = function(): string {
+    return this.outerHTML;
+};
+
 HTMLElement.prototype.clean = function(): HTMLElement {
     this.value = this.value.replace(/\r?\n/g, "\r\n");
     return this;

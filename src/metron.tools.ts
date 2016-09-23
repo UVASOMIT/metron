@@ -36,18 +36,6 @@ namespace metron {
         export function getDataPrimary(key: string, values: string): any {
             return this.getValueByKey(key, values);
         }
-        export function getValueByKey(key: string, values: string): any {
-            var collection: Array<string> = values.split(";");
-            for (let i = 0; i < collection.length; i++) {
-                if (collection[i].contains(":")) {
-                    let pairs = collection[i].split(":");
-                    if (pairs[0] == key) {
-                        return pairs[1];
-                    }
-                }
-            }
-            return null;
-        }
         export function formatMessage(message: string, length?: number): string {
             try {
                 let len = (length != null && length > 0) ? length : 15;

@@ -5,7 +5,7 @@ namespace metron {
         public static bindAll(): void {
             let sections: NodeListOf<Element> = document.selectAll("[data-m-type='list']");
             for(let i = 0; i < sections.length; i++) {
-                let section: HTMLElement = <HTMLElement>sections[i];
+                let section: Element = <Element>sections[i];
                 
             }
         }
@@ -42,7 +42,6 @@ namespace metron {
                 self.pageListing(self.getNextPage(), callback, filters);
             });
         }
-        /*
         public createPaging(selector: string, callback: Function, totalCount, filters?: any): void {
             var self = this;
             if (self.currentPageIndex != null && self.pageSize != null) {
@@ -52,37 +51,36 @@ namespace metron {
 
                 this.setupPagingEvents(selector, callback, filters);
 
-                $(`${selector} ul.pagination > li`).each(function () {
-                    if ($(this).children("a").attr("aria-label") != "Previous" && $(this).children("a").attr("aria-label") != "Next") {
-                        $(this).remove();
+                document.selectAll(`${selector} ul.pagination > li`).each(function (idx: number, elem: Element) {
+                    if (elem.first("a").attribute("aria-label") != "Previous" && elem.first("a").attribute("aria-label") != "Next") {
+                        elem.remove();
                     }
                 });
                 for (let i = 1; i <= this.totalPageSize; i++) {
                     if (i < startPage || i > endPage) {
                         continue;
                     }
-                    let li = $("<li />");
+                    let li: Element = document.create("<li />");
                     let idx = i;
-                    let link = $(`<a>${idx}</a>`).attr({ "href": "#", "title": idx }).click(function (e) {
+                    let link: Element = document.create(`<a>${idx}</a>`).attribute("href", "#").attribute("title", <string><any>idx).addEvent("click", function (e) {
                         e.preventDefault();
-                        self.pageListing(<number><any>$(this).attr("title"), callback, filters);
+                        self.pageListing(<number><any>this.attribute("title"), callback, filters);
                     });
-                    link.appendTo(li);
-                    li.insertBefore(`${selector} ul.pagination > li:last`);
+                    li.append(link.toString());
+                    li.insertBefore(document.selectAll(`${selector} ul.pagination > li`).last());
                 }
-                $(`${selector} ul.pagination > li > a[title = ${this.currentPageIndex}]`).parent().addClass("active");
-                if ($(`${selector} ul.pagination > li`).length <= 3) {
-                    $(`${selector} ul.pagination`).closest("nav").hide();
+                document.selectOne(`${selector} ul.pagination > li > a[title = ${this.currentPageIndex}]`).parent().addClass("active");
+                if (document.selectAll(`${selector} ul.pagination > li`).length <= 3) {
+                    document.selectOne(`${selector} ul.pagination`).up("nav").hide();
                 }
                 else {
-                    $(`${selector} ul.pagination`).closest("nav").show();
+                    document.selectOne(`${selector} ul.pagination`).up("nav").show();
                 }
             }
             else {
-                $(`${selector} ul.pagination`).closest("nav").hide();
+                document.selectOne(`${selector} ul.pagination`).up("nav").hide();
             }
         }
-        */
         private calculateTotalPageSize(totalCount: number): number {
             return Math.ceil(totalCount / this.pageSize);
         }
