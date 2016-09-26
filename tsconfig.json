@@ -1,5 +1,6 @@
 {
     "files": [
-        "metron.extenders.ts"
+        "metron.extenders.ts",
+        "metron.ts"
     ]
 }

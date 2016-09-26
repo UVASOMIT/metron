@@ -2,6 +2,7 @@
 /// <reference path="metron.ts" />
 /// <reference path="metron.lists.ts" />
 /// <reference path="metron.forms.ts" />
+/// <reference path="metron.tools.ts" />
 
 namespace metron {
     export var global: any = { };

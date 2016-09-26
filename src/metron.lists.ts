@@ -1,4 +1,5 @@
 /// <reference path="metron.extenders.ts" />
+/// <reference path="metron.ts" />
 
 namespace metron {
     export class lists {
@@ -6,7 +7,8 @@ namespace metron {
             let sections: NodeListOf<Element> = document.selectAll("[data-m-type='list']");
             for(let i = 0; i < sections.length; i++) {
                 let section: Element = <Element>sections[i];
-                
+                let model: string = section.attribute("data-m-model");
+                //metron.web.ajax();
             }
         }
     }
