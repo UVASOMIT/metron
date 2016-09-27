@@ -1,33 +1,30 @@
 /// <reference path="metron.extenders.ts" />
 
-export type Guid = string;
-
-interface Dictionary {
-    setItem: (key: string, value: any) => void;
-    getItem: (key: string) => any;
-    hasItem: (key: string) => boolean;
-    removeItem: (key: string) => any;
-    keys: () => Array<string>;
-    values: () => Array<any>;
-    each: (callback: Function) => void;
-    clear: () => void;
-}
-
-interface Ajax {
-    url: string;
-    method: string;
-    contentType: string;
-    dataType: string;
-    data: any;
-    async: boolean;
-    request: XMLHttpRequest;
-    success?: (callback: Function) => XMLHttpRequest;
-    error?: (callback: Function) => XMLHttpRequest;
-    always?: (callback: Function) => XMLHttpRequest;
-    send?: () => void;
-}
-
 namespace metron {
+    export interface Dictionary {
+        setItem: (key: string, value: any) => void;
+        getItem: (key: string) => any;
+        hasItem: (key: string) => boolean;
+        removeItem: (key: string) => any;
+        keys: () => Array<string>;
+        values: () => Array<any>;
+        each: (callback: Function) => void;
+        clear: () => void;
+    }
+    export interface Ajax {
+        url: string;
+        method: string;
+        contentType: string;
+        dataType: string;
+        data: any;
+        async: boolean;
+        request: XMLHttpRequest;
+        success?: (callback: Function) => XMLHttpRequest;
+        error?: (callback: Function) => XMLHttpRequest;
+        always?: (callback: Function) => XMLHttpRequest;
+        send?: () => void;
+    }
+
     export namespace dictionary {
         (function () {
             function dictionary(obj: any): any {
@@ -310,9 +307,6 @@ namespace metron {
         })();
     }
 }
-
-export var Guid = (typeof (Guid) === 'undefined') ? metron.guid : Guid;
-export var Dictionary = (typeof (Dictionary) === 'undefined') ? metron.dictionary : Dictionary;
 
 if (typeof (document) !== 'undefined' && typeof (document.location) !== 'undefined') {
     if (typeof ((<any>document.location).querystring) === 'undefined') {
