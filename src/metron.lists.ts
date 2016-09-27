@@ -8,7 +8,9 @@ namespace metron {
             for(let i = 0; i < sections.length; i++) {
                 let section: Element = <Element>sections[i];
                 let model: string = section.attribute("data-m-model");
-                //metron.web.ajax();
+                metron.web.get(``, {}, null, "json", function(data: any) {
+                    let items = data;
+                })
             }
         }
     }

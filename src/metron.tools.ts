@@ -1,4 +1,5 @@
 /// <reference path="metron.extenders.ts" />
+/// <reference path="metron.ts" />
 
 namespace metron {
     export namespace tools {
@@ -32,6 +33,24 @@ namespace metron {
                 return "";
             }
             return url;
+        }
+        export function normalizeURL(url: string): string {
+            if(!url.endsWith("/")) {
+                return `${url}/`;
+            }
+            return url;
+        }
+        export function loadJSON(url: string, callback: Function): void {
+            if(!url.contains("://")) {
+                url = normalizeURL(document.location.href.split("?")[0]);                    
+            }
+            metron.web.get(`${url}`, {}, null, "JSON", function(xhr: XMLHttpRequest) {
+                console.log(xhr);
+            }, function(xhr: XMLHttpRequest) {
+                console.log(xhr);
+            }, function(xhr: XMLHttpRequest) {
+                console.log(xhr);
+            });
         }
         export function getDataPrimary(key: string, values: string): any {
             return this.getValueByKey(key, values);

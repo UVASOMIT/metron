@@ -8,9 +8,11 @@ namespace metron {
     export var global: any = { };
     export function onready(callback: Function) {
         document.addEventListener("DOMContentLoaded", function(e) {
-            if(callback != null) {
-                callback(e);
-            }
+            metron.tools.loadJSON("metron.json", function() {
+                if(callback != null) {
+                    callback(e);
+                }
+            });
         });
     }
     metron.onready(function(e: Event) {
