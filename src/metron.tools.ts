@@ -42,14 +42,13 @@ namespace metron {
         }
         export function loadJSON(url: string, callback: Function): void {
             if(!url.contains("://")) {
-                url = normalizeURL(document.location.href.split("?")[0]);                    
+                url = `${window.location.protocol}//${normalizeURL(window.location.host)}${url}`;
             }
             metron.web.get(`${url}`, {}, null, "JSON", function(xhr: XMLHttpRequest) {
-                console.log(xhr);
-            }, function(xhr: XMLHttpRequest) {
-                console.log(xhr);
-            }, function(xhr: XMLHttpRequest) {
-                console.log(xhr);
+                if(callback != null) {
+                    console.log(xhr.responseJSON);
+                    callback(xhr.responseJSON);
+                }
             });
         }
         export function getDataPrimary(key: string, values: string): any {

@@ -72,6 +72,10 @@ interface HTMLElement {
     clean: () => HTMLElement;
 }
 
+interface XMLHttpRequest {
+    responseJSON: () => JSON;
+}
+
 String.prototype.lower = function (): string {
     return this.toLowerCase();
 };
@@ -487,4 +491,8 @@ Element.prototype.toString = function(): string {
 HTMLElement.prototype.clean = function(): HTMLElement {
     this.value = this.value.replace(/\r?\n/g, "\r\n");
     return this;
+};
+
+XMLHttpRequest.prototype.responseJSON = function(): JSON {
+    return JSON.parse(this.responseText)
 };
