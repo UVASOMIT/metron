@@ -46,8 +46,8 @@ namespace metron {
             }
             metron.web.get(`${url}`, {}, null, "JSON", function(xhr: XMLHttpRequest) {
                 if(callback != null) {
-                    console.log(xhr.responseJSON);
-                    callback(xhr.responseJSON);
+                    console.log(xhr.responseJSON());
+                    callback(xhr.responseJSON());
                 }
             });
         }
