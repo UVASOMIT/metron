@@ -35,14 +35,14 @@ namespace metron {
             return url;
         }
         export function normalizeURL(url: string): string {
-            if(!url.endsWith("/")) {
-                return `${url}/`;
+            if(url.endsWith("/")) {
+                return url.substr(0, (url.length - 2));
             }
             return url;
         }
         export function loadJSON(url: string, callback: Function): void {
             if(!url.contains("://")) {
-                url = `${window.location.protocol}//${normalizeURL(window.location.host)}${url}`;
+                url = `${window.location.protocol}//${normalizeURL(window.location.host)}/${url}`;
             }
             metron.web.get(`${url}`, {}, null, "JSON", function(xhr: XMLHttpRequest) {
                 if(callback != null) {

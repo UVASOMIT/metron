@@ -1,5 +1,6 @@
 /// <reference path="metron.extenders.ts" />
 /// <reference path="metron.ts" />
+/// <reference path="metron.framework.ts" />
 
 namespace metron {
     export class lists {
@@ -8,7 +9,7 @@ namespace metron {
             for(let i = 0; i < sections.length; i++) {
                 let section: Element = <Element>sections[i];
                 let model: string = section.attribute("data-m-model");
-                metron.web.get(``, {}, null, "json", function(data: any) {
+                metron.web.get(`${metron.fw.getBaseUrl()}/${metron.fw.getBaseAPI()}/${model}${metron.fw.getAPIExtension()}`, {}, null, "json", function(data: any) {
                     let items = data;
                 })
             }
