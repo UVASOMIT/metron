@@ -494,5 +494,5 @@ HTMLElement.prototype.clean = function(): HTMLElement {
 };
 
 XMLHttpRequest.prototype.responseJSON = function(): JSON {
-    return JSON.parse(this.responseText)
+    return JSON.parse(this.responseText);
 };

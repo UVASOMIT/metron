@@ -8,10 +8,11 @@ namespace metron {
             let sections: NodeListOf<Element> = document.selectAll("[data-m-type='list']");
             for(let i = 0; i < sections.length; i++) {
                 let section: Element = <Element>sections[i];
-                let model: string = section.attribute("data-m-model");
+                var model: string = section.attribute("data-m-model");
                 metron.web.get(`${metron.fw.getBaseUrl()}/${metron.fw.getBaseAPI()}/${model}${metron.fw.getAPIExtension()}`, {}, null, "json", function(data: any) {
-                    let items = data;
-                })
+                    let items = metron.tools.normalizeModelItems(data, model);
+                    console.log(items);
+                });
             }
         }
     }

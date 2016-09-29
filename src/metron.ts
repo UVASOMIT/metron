@@ -1,5 +1,7 @@
 /// <reference path="metron.extenders.ts" />
 
+type AjaxRequest = string | JSON | XMLDocument;
+
 namespace metron {
     export interface Dictionary {
         setItem: (key: string, value: any) => void;
@@ -193,14 +195,26 @@ namespace metron {
                 }
             }
         }
-        export function ajax(url: string, data: any = {}, method: string = "POST", async: boolean = true, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
+        export function ajax(url: string, data: any = {}, method: string = "POST", async: boolean = true, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType: string = "text", success?: Function, failure?: Function, always?: Function): Ajax {
+            function _parseResult(request: XMLHttpRequest): AjaxRequest {
+                switch(dataType.lower()) {
+                    case "text":
+                        return request.responseText;
+                    case "json":
+                        return request.responseJSON();
+                    case "xml":
+                        return <XMLDocument>request.responseXML;
+                    default:
+                        return request.responseText;
+                }
+            }
             function _send(request: XMLHttpRequest, data: any): void {
                 request.open(method, url, async, data);
                 request.onreadystatechange = function() {
                     if(request.readyState === 4) {
                         if(request.status === 200) {
                             if(success !== undefined) {
-                                success(request);
+                                success(_parseResult(request));
                             }
                         }
                         if(request.status === 404 || request.status === 500) {

@@ -14,6 +14,12 @@ namespace metron {
             });
             return resp;
         }
+        export function normalizeModelItems(obj: any, model: string): Array<any> {
+            if(obj[model] != null) {
+                return obj[model];
+            }
+            return obj;
+        }
         export function normalizeModelData(obj: any): any {
             for (let k in obj) {
                 if (obj[k] == null || obj[k] === "null") {
@@ -44,10 +50,10 @@ namespace metron {
             if(!url.contains("://")) {
                 url = `${window.location.protocol}//${normalizeURL(window.location.host)}/${url}`;
             }
-            metron.web.get(`${url}`, {}, null, "JSON", function(xhr: XMLHttpRequest) {
+            metron.web.get(`${url}`, {}, null, "JSON", function(data: JSON) {
                 if(callback != null) {
-                    console.log(xhr.responseJSON());
-                    callback(xhr.responseJSON());
+                    console.log(data);
+                    callback(data);
                 }
             });
         }
