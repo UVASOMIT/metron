@@ -65,7 +65,10 @@ interface Element {
     show: () => Element;
     hide: () => Element;
     addClass: (className: string) => Element;
+    removeClass: (className: string) => Element;
     toString: () => string;
+    selectOne: (selector: string) => Element;
+    selectAll: (selector: string) => NodeListOf<Element>;
 }
 
 interface HTMLElement {
@@ -390,6 +393,14 @@ NodeList.prototype.last = function (): Element {
     return this[this.length - 1];
 };
 
+Element.prototype.selectOne = function(selector: string): Element {
+    return this.querySelector(selector);
+};
+
+Element.prototype.selectAll = function(selector: string): NodeListOf<Element> {
+    return this.querySelectorAll(selector);
+};
+
 Element.prototype.attribute = function(name: string, value?: string): string & Element {
     if(value != null) {
         this.setAttribute(name, value);
@@ -481,6 +492,11 @@ Element.prototype.hide = function(): Element {
 
 Element.prototype.addClass = function(className: string) : Element {
     this.className += ` ${className}`;
+    return this;
+};
+
+Element.prototype.removeClass = function(className: string) : Element {
+    this.className = (<string>this.className).replace(className, "").normalize();
     return this;
 };
 
