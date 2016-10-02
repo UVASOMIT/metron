@@ -43,8 +43,8 @@ namespace metron {
                         case "new":
                             el.addEvent("click", function (e) {
                                 e.preventDefault();
-                                metron.form.clearForm(`[data-m-type='form'][data-m-modal='${self.model}']`);
-                                let form: Element = document.selectOne(`[data-m-type='form'][data-m-modal='${self.model}']`);
+                                metron.form.clearForm(`[data-m-type='form'][data-m-model='${self.model}']`);
+                                let form: Element = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
                                 form.attribute("data-m-state", "hide");
                                 form.show();
                             });
