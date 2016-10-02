@@ -12,7 +12,7 @@ module.exports = function (grunt) {
             },
             base: {
                 src: ['src/**/*.ts', "!**/*.d.ts"],
-                dest: 'dist/gen',
+                dest: 'dist/gen/metron.js',
             }
         },
         uglify: {
