@@ -34,14 +34,14 @@ namespace metron {
         }
         private init(): void {
             var self = this;
-            let listing: Element = document.selectOne(`[data-m-type='${list}'][data-m-model='${self.model}']`);
+            let listing: Element = document.selectOne(`[data-m-type='list'][data-m-model='${self.model}']`);
             let controlBlocks: NodeListOf<Element> = listing.selectAll("[data-m-segment='controls']");
             controlBlocks.each(function(idx: number, elem: Element) {
                 let actions = elem.selectAll("[data-m-action]");
                 actions.each(function(indx: number, el: Element) {
                     switch(el.attribute("data-m-action").lower()) {
                         case "new":
-                            el.addEvent("onclick", function (e) {
+                            el.addEvent("click", function (e) {
                                 e.preventDefault();
                                 metron.form.clearForm(`[data-m-type='form'][data-m-modal'${self.model}']`);
                                 let form: Element = document.selectOne(`[data-m-type='form'][data-m-modal'${self.model}']`);

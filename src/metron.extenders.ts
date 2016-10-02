@@ -470,7 +470,7 @@ Element.prototype.removeEvent = function(event: string): Element {
 };
 
 Element.prototype.addEvent = function(event: string, callback:Function): Element {
-    this.addEventListener(event, callback());
+    this.addEventListener(event, callback);
     return this;
 };
 
