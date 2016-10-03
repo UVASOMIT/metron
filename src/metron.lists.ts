@@ -11,16 +11,14 @@ namespace metron {
             for(let i = 0; i < sections.length; i++) {
                 let section: Element = <Element>sections[i];
                 var model: string = section.attribute("data-m-model");
-                metron.web.get(`${metron.fw.getBaseUrl()}/${metron.fw.getBaseAPI()}/${model}${metron.fw.getAPIExtension()}`, {}, null, "json", function(data: any) {
-                    let items = metron.tools.normalizeModelItems(data, model);
-                    let l: list<any> = new list(model);
-                    metron.globals["lists"].push(l);
-                });
+                var l: list<any> = new list(model);
+                metron.globals["lists"].push(l);
             }
         }
     }
     export class list<T> {
         private _filters: T = null;
+        private _items: Array<T>;
         public recycleBin: Array<T> = [];
         public currentPageIndex: number = 1;
         public pageSize: number = 10;
@@ -30,7 +28,7 @@ namespace metron {
         constructor(public model: string, public listType: string = "list") {
             var self = this;
             self.init();
-            //self.callListing();
+            self.callListing();
         }
         private init(): void {
             var self = this;
@@ -53,6 +51,106 @@ namespace metron {
                             break;
                     }
                 });
+            });
+        }
+        private populateListing(data: Array<T>): void {
+            var self = this;
+            self.clearTable(`[data-m-type='list'][data-m-model='${self.model}'] table[data-m-segment='list']`);
+            self.populateTable(data, `[data-m-type='list'][data-m-model='${self.model}'] table[data-m-segment='list']`, self.formatData);
+            //self.applyViewEvents();
+            self.createPaging("#responseactions", this.callListing, (data.length > 0) ? data[0]["TotalCount"] : 0);
+        }
+        /*
+        private applyViewEvents(): void {
+          var self = this;
+          $('#responseaction-table button.view').each(function () {
+            $(this).click(function (e) {
+              e.preventDefault();
+              Base.Form.clearForm("#responseaction-modal");
+              getCallback(`${self.baseURL}/${self.baseFolder}/api/ResponseAction`, {
+                ResponseActionID: <number><any>self.getDataPrimary("ResponseActionID", $(this).data('primary'))
+                
+                }, function (data: ResponseAction) {
+                
+                      $('#ResponseAction_ResponseActionID').val(<string><any>data.ResponseActionID);
+                    
+                      $('#ResponseAction_Name').val(<string><any>data.Name);
+                    
+                      $('#ResponseAction_Description').val(<string><any>data.Description);
+                    
+                      $('#ResponseAction_DateCreated').val(<string><any>data.DateCreated);
+                    
+                      $('#ResponseAction_DateModified').val(<string><any>data.DateModified);
+                    
+                      $('#ResponseAction_ComputingID').val(<string><any>data.ComputingID);
+                    
+                      if (data.Active) {
+                      $('#ResponseAction_Active').prop('checked', true);
+                      }
+                    
+                      $('#ResponseAction_Guid').val(<string><any>data.Guid);
+                    
+                (<any>$('#responseaction-modal')).modal();
+              });
+            });
+          });
+          $('#responseaction-table button.delete').each(function () {
+            $(this).click(function (e) {
+              e.preventDefault();
+              if (confirm('Are you sure you want to delete this record?')) {
+                let elem = this;
+                
+                  let ResponseActionID = self.getDataPrimary("ResponseActionID", $(elem).data('primary'));
+                
+                deleteCallback(`${self.baseURL}/${self.baseFolder}/api/ResponseAction`, {
+                ResponseActionID: <number><any>ResponseActionID
+                  }, function (data: ResponseAction) {
+                  self.recycleBin.push(data);
+                  //$("#responseaction-controls button[title = 'Undo']").show();
+                  $(elem).closest(".arow").remove();
+                });
+              }
+            });
+          });
+          $('th[data-sort]').each(function (idx, elem) {
+              $(this).css('cursor','pointer');
+              $(this).off('click').on('click', function (e) {
+                  self.sortOrder = $(this).data('sort');
+                  if (self.sortOrderDirection == "ASC") {
+                      self.sortOrderDirection = "DESC"
+                  }
+                  else {
+                      self.sortOrderDirection = "ASC";
+                  }
+                  self.callListing(self);
+              });
+          });
+        }
+        */
+        public formatData(item: T, custom: Function): string {
+            var self = this;
+            var primaries = `${self.model}ID:${item[self.model + "ID"]};`
+            var str = `${metron.templates.list.startRow()}${metron.templates.list.getStandardActionButtonsCell(primaries)}`;
+            if (self._items.length === 0) {
+                for (let k in item) {
+                    str += metron.templates.list.getCell(item[k]);
+                }
+            }
+            else {
+                for (let i = 0; i < self._items.length; i++) {
+                    str += metron.templates.list.getCell(item[<any>self._items[i]]);
+                }
+            }
+            str += metron.templates.list.endRow();
+            return str;
+        }
+        public callListing(): void {
+            var self = this;
+            var params: any = Object.extend({ PageIndex: self.currentPageIndex, PageSize: self.pageSize, SortOrder: self.sortOrder, SortDirection: self.sortDirection }, self._filters);
+            metron.web.get(`${metron.fw.getAPIURL(self.model)}`, {}, null, "json", function(data: T) {
+                let items: Array<T> = metron.tools.normalizeModelItems(data, self.model);
+                self._items = items;
+                self.populateListing(items);
             });
         }
         public populateTable(data: Array<any>, selector: string, callback: Function): void {

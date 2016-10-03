@@ -38,6 +38,9 @@ namespace metron {
             }
             return "";
         }
+        export function getAPIURL(model: string): string {
+            return `${metron.fw.getBaseUrl()}/${metron.fw.getBaseAPI()}/${model}${metron.fw.getAPIExtension()}`;
+        }
     }
     metron.onready(function(e: Event) {
         document.selectAll("[data-m-state='hide']").each(function(idx: number, elem: Element) {

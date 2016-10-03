@@ -40,6 +40,7 @@ interface Array<T> {
 interface Object {
     isEmpty: (obj: any) => boolean;
     getName: () => string;
+    extend: (dest: any, src: any) => any;
 }
 
 interface Document {
@@ -367,6 +368,13 @@ Object.prototype.getName = function (): string {
     let regex: RegExp = /function (.{1,})\(/;
     let results: RegExpExecArray = regex.exec((this).constructor.toString());
     return (results && results.length > 1) ? results[1] : "";
+};
+
+(<any>Object).extend = function(dest: any, src: any) {
+    for (let prop in src) {
+        dest[prop] = src[prop];
+    }
+    return dest;
 };
 
 Document.prototype.selectOne = function(selector: string): Element {
