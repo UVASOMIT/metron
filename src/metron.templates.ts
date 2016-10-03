@@ -8,13 +8,13 @@ namespace metron {
             export function startRow(optionalId?: string, optionalClass?: string): string {
                 if (optionalClass || optionalId) {
                     if (!optionalId)
-                        return `<tr class="${optionalClass}">`;
+                        return `<tr class="trow ${optionalClass}">`;
                     else if (!optionalClass)
                         return `<tr id="${optionalId}">`;
                     else
                         return `<tr id="${optionalId}">`;
                 }
-                return `<tr>`;
+                return `<tr class="trow">`;
             }
             export function endRow(): string {
                 return "</tr>";
@@ -22,9 +22,9 @@ namespace metron {
             export function getStandardActionButtonsCell(primaryValues: string, listType: string = "list"): string {
                 switch (listType.lower()) {
                     case "lookup":
-                        return `<td><button title="choose" class="" data-primary="${primaryValues}">choose</button></td>`;
+                        return `<td><button title="choose" class="choose" data-primary="${primaryValues}">choose</button></td>`;
                     default:
-                        return `<td><button title="edit" class="" data-primary="${primaryValues}">edit</button><button title="delete" class="" data-primary="${primaryValues}">delete</button></td>`;
+                        return `<td><button title="edit" class="edit" data-primary="${primaryValues}">edit</button><button title="delete" class="delete" data-primary="${primaryValues}">delete</button></td>`;
                 }
             }
             export function getCell(content: string, attributes?: string): string {

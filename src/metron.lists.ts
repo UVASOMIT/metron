@@ -8,7 +8,7 @@ namespace metron {
         public static bindAll(): void {
             let sections: NodeListOf<Element> = document.selectAll("[data-m-type='list']");
             metron.globals["lists"] = [];
-            for(let i = 0; i < sections.length; i++) {
+            for (let i = 0; i < sections.length; i++) {
                 let section: Element = <Element>sections[i];
                 var model: string = section.attribute("data-m-model");
                 var l: list<any> = new list(model);
@@ -34,10 +34,10 @@ namespace metron {
             var self = this;
             let listing: Element = document.selectOne(`[data-m-type='list'][data-m-model='${self.model}']`);
             let controlBlocks: NodeListOf<Element> = listing.selectAll("[data-m-segment='controls']");
-            controlBlocks.each(function(idx: number, elem: Element) {
+            controlBlocks.each(function (idx: number, elem: Element) {
                 let actions = elem.selectAll("[data-m-action]");
-                actions.each(function(indx: number, el: Element) {
-                    switch(el.attribute("data-m-action").lower()) {
+                actions.each(function (indx: number, el: Element) {
+                    switch (el.attribute("data-m-action").lower()) {
                         case "new":
                             el.addEvent("click", function (e) {
                                 e.preventDefault();
@@ -57,76 +57,56 @@ namespace metron {
             var self = this;
             self.clearTable(`[data-m-type='list'][data-m-model='${self.model}'] table[data-m-segment='list']`);
             self.populateTable(data, `[data-m-type='list'][data-m-model='${self.model}'] table[data-m-segment='list']`, self.formatData);
-            //self.applyViewEvents();
             self.createPaging("#responseactions", this.callListing, (data.length > 0) ? data[0]["TotalCount"] : 0);
+            self.applyViewEvents();
         }
-        /*
         private applyViewEvents(): void {
-          var self = this;
-          $('#responseaction-table button.view').each(function () {
-            $(this).click(function (e) {
-              e.preventDefault();
-              Base.Form.clearForm("#responseaction-modal");
-              getCallback(`${self.baseURL}/${self.baseFolder}/api/ResponseAction`, {
-                ResponseActionID: <number><any>self.getDataPrimary("ResponseActionID", $(this).data('primary'))
-                
-                }, function (data: ResponseAction) {
-                
-                      $('#ResponseAction_ResponseActionID').val(<string><any>data.ResponseActionID);
-                    
-                      $('#ResponseAction_Name').val(<string><any>data.Name);
-                    
-                      $('#ResponseAction_Description').val(<string><any>data.Description);
-                    
-                      $('#ResponseAction_DateCreated').val(<string><any>data.DateCreated);
-                    
-                      $('#ResponseAction_DateModified').val(<string><any>data.DateModified);
-                    
-                      $('#ResponseAction_ComputingID').val(<string><any>data.ComputingID);
-                    
-                      if (data.Active) {
-                      $('#ResponseAction_Active').prop('checked', true);
-                      }
-                    
-                      $('#ResponseAction_Guid').val(<string><any>data.Guid);
-                    
-                (<any>$('#responseaction-modal')).modal();
-              });
-            });
-          });
-          $('#responseaction-table button.delete').each(function () {
-            $(this).click(function (e) {
-              e.preventDefault();
-              if (confirm('Are you sure you want to delete this record?')) {
-                let elem = this;
-                
-                  let ResponseActionID = self.getDataPrimary("ResponseActionID", $(elem).data('primary'));
-                
-                deleteCallback(`${self.baseURL}/${self.baseFolder}/api/ResponseAction`, {
-                ResponseActionID: <number><any>ResponseActionID
-                  }, function (data: ResponseAction) {
-                  self.recycleBin.push(data);
-                  //$("#responseaction-controls button[title = 'Undo']").show();
-                  $(elem).closest(".arow").remove();
+            var self = this;
+            document.selectAll(`[data-m-type='list'][data-m-model='${self.model}'] .edit`).each(function (idx: number, elem: Element) {
+                elem.addEvent("click", function (e) {
+                    e.preventDefault();
+                    metron.form.clearForm(`[data-m-type='form'][data-m-model='${self.model}']`);
+                    let parameters = {};
+                    parameters[`${self.model}ID`] = <number><any>metron.tools.getDataPrimary(`${self.model}ID`, elem.attribute("data-primary"));
+                    metron.web.get(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
+                        for (let prop in data) {
+                            (<HTMLElement>document.selectOne(`${self.model}_${prop}`)).val(data[prop]);
+                        }
+                        let form: Element = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
+                        form.attribute("data-m-state", "hide");
+                        form.show();
+                    });
                 });
-              }
             });
-          });
-          $('th[data-sort]').each(function (idx, elem) {
-              $(this).css('cursor','pointer');
-              $(this).off('click').on('click', function (e) {
-                  self.sortOrder = $(this).data('sort');
-                  if (self.sortOrderDirection == "ASC") {
-                      self.sortOrderDirection = "DESC"
-                  }
-                  else {
-                      self.sortOrderDirection = "ASC";
-                  }
-                  self.callListing(self);
-              });
-          });
+            document.selectAll(`[data-m-type='list'][data-m-model='${self.model}'] .delete`).each(function (idx: number, elem: Element) {
+                elem.addEvent("click", function (e) {
+                    e.preventDefault();
+                    if (confirm('Are you sure you want to delete this record?')) {
+                        let current = this;
+                        let parameters = {};
+                        parameters[`${self.model}ID`] = <number><any>metron.tools.getDataPrimary(`${self.model}ID`, current.attribute("data-primary"));
+                        metron.web.remove(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
+                            self.recycleBin.push(data);
+                            document.selectOne(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='undo']`).show();
+                            current.up(".trow").remove();
+                        });
+                    }
+                });
+            });
+            document.selectAll(`[data-m-type='list'][data-m-model='${self.model}'] th[data-m-action='sort']`).each(function (idx: number, elem: Element) {
+                elem.addClass("pointer");
+                elem.removeEvent("click").addEvent("click", function (e) {
+                    self.sortOrder = elem.attribute("data-m-col");
+                    if (self.sortDirection == "ASC") {
+                        self.sortDirection = "DESC"
+                    }
+                    else {
+                        self.sortDirection = "ASC";
+                    }
+                    self.callListing();
+                });
+            });
         }
-        */
         public formatData(item: T, custom: Function): string {
             var self = this;
             var primaries = `${self.model}ID:${item[self.model + "ID"]};`
@@ -147,7 +127,7 @@ namespace metron {
         public callListing(): void {
             var self = this;
             var params: any = Object.extend({ PageIndex: self.currentPageIndex, PageSize: self.pageSize, SortOrder: self.sortOrder, SortDirection: self.sortDirection }, self._filters);
-            metron.web.get(`${metron.fw.getAPIURL(self.model)}`, {}, null, "json", function(data: T) {
+            metron.web.get(`${metron.fw.getAPIURL(self.model)}`, {}, null, "json", function (data: T) {
                 let items: Array<T> = metron.tools.normalizeModelItems(data, self.model);
                 self._items = items;
                 self.populateListing(items);
