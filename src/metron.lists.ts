@@ -47,6 +47,12 @@ namespace metron {
                                 form.show();
                             });
                             break;
+                        case "undo":
+                            el.addEvent("click", function (e) {
+                                e.preventDefault();
+                                self.undoLast();
+                            });
+                            break;
                         default:
                             break;
                     }
@@ -106,6 +112,15 @@ namespace metron {
                     self.callListing();
                 });
             });
+        }
+        public undoLast(): void {
+            var self = this;
+            metron.web.post(`${metron.fw.getAPIURL(self.model)}`, self.recycleBin.pop(), null, "json", function (data: T) {
+                self.callListing();
+            });
+            if (self.recycleBin.length == 0) {
+                document.selectOne(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='undo']`).hide();
+            }
         }
         public formatData(item: T, custom: Function): string {
             var self = this;
