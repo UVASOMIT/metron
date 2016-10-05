@@ -264,7 +264,7 @@ String.prototype.setValueByKey = function (key: string, values: string, replacem
     return returnCollection.join(';');
 };
 
-(<any>String).isNullOrEmpty = function (val: any): boolean {
+String.isNullOrEmpty = function (val: any): boolean {
     if (val === undefined || val === null || val.trim() === '') {
         return true;
     }
