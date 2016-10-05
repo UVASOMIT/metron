@@ -461,12 +461,7 @@ Element.prototype.first = function(selector: string): Element {
 };
 
 Element.prototype.append = function(html: string): Element {
-    var placeholder = document.createElement("div");
-    placeholder.innerHTML = html;
-    var children = placeholder.childNodes;
-    for(let i = 0; i < children.length; i++) {
-        this.append(children[i]);
-    }
+    this.insertAdjacentHTML('beforeend', html);
     return this;
 };
 

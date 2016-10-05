@@ -84,11 +84,11 @@ namespace metron {
                 });
             });
         }
-        private populateListing(data: Array<T>): void {
+        private populateListing(): void {
             var self = this;
             self.clearTable(`[data-m-type='list'][data-m-model='${self.model}'] table[data-m-segment='list']`);
-            self.populateTable(data, `[data-m-type='list'][data-m-model='${self.model}'] table[data-m-segment='list']`, self.formatData);
-            self.createPaging("#responseactions", this.callListing, (data.length > 0) ? data[0]["TotalCount"] : 0);
+            self.populateTable(`[data-m-type='list'][data-m-model='${self.model}'] table[data-m-segment='list']`);
+            self.createPaging("[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='paging']", this.callListing, (self._items.length > 0) ? self._items[0]["TotalCount"] : 0);
             self.applyViewEvents();
         }
         private applyViewEvents(): void {
@@ -147,18 +147,13 @@ namespace metron {
                 document.selectOne(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='undo']`).hide();
             }
         }
-        public formatData(item: T, custom: Function): string {
+        public formatData(item: T): string {
             var self = this;
             var primaries = `${self.model}ID:${item[self.model + "ID"]};`
             var str = `${metron.templates.list.startRow()}${metron.templates.list.getStandardActionButtonsCell(primaries)}`;
-            if (self._items.length === 0) {
-                for (let k in item) {
+            for (let k in item) {
+                if(item.hasOwnProperty(k)) {
                     str += metron.templates.list.getCell(item[k]);
-                }
-            }
-            else {
-                for (let i = 0; i < self._items.length; i++) {
-                    str += metron.templates.list.getCell(item[<any>self._items[i]]);
                 }
             }
             str += metron.templates.list.endRow();
@@ -170,13 +165,13 @@ namespace metron {
             metron.web.get(`${metron.fw.getAPIURL(self.model)}`, {}, null, "json", function (data: T) {
                 let items: Array<T> = metron.tools.normalizeModelItems(data, self.model);
                 self._items = items;
-                self.populateListing(items);
+                self.populateListing();
             });
         }
-        public populateTable(data: Array<any>, selector: string, callback: Function): void {
+        public populateTable(selector: string): void {
             var self = this;
-            data.each(function (idx, item) {
-                document.selectOne(`${selector} tbody`).append(callback(self, item));
+            self._items.each(function (idx, item) {
+                document.selectOne(`${selector} tbody`).append(self.formatData(item));
             });
         }
         public clearTable(selector: string): void {
