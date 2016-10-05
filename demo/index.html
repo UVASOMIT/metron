@@ -10,7 +10,7 @@
     </head>
     <body data-m-root="demo">
         <section data-m-type="list" data-m-model="Post">
-            <div data-m-segment="alert"></div>
+            <div data-m-segment="alert" data-m-state="hide"></div>
             <h1>Demo CRUD Operations List</h1>
             <div data-m-segment="filters">
                 <form>
@@ -46,7 +46,7 @@
             </ul>
         </section>
         <section data-m-type="form" data-m-model="Post" data-m-state="hide">
-            <div data-m-segment="alert"></div>
+            <div data-m-segment="alert" data-m-state="hide"></div>
             <h1>Demo CRUD Operations Form</h1>
             <form>
                 <fieldset>
@@ -62,7 +62,7 @@
                     <label for="Post_IsActive" class="label-inline">Is Active</label>
                     <input type="checkbox" id="Post_IsActive" name="IsActive" />
                     <div data-m-segment="controls">
-                        <button data-m-action="save" class="button-primary">Save</button>
+                        <button data-m-action="save">Save</button>
                         <button data-m-action="cancel">Cancel</button>
                     </div>
                 </fieldset>

@@ -43,7 +43,7 @@ namespace metron {
                                 e.preventDefault();
                                 metron.form.clearForm(`[data-m-type='form'][data-m-model='${self.model}']`);
                                 let form: Element = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
-                                form.attribute("data-m-state", "hide");
+                                form.attribute("data-m-state", "show");
                                 form.show();
                             });
                             break;
@@ -52,7 +52,32 @@ namespace metron {
                                 e.preventDefault();
                                 self.undoLast();
                             });
+                            el.hide();
                             break;
+                        case "download":
+                            el.addEvent("click", function (e) {
+                                e.preventDefault();
+                                document.location.href = `${metron.fw.getAPIURL(self.model)}/download`;
+                            });
+                            break;
+                        case "submit":
+                            el.addEvent("click", function (e) {
+                                e.preventDefault();
+                                if (metron.form.isValid(`[data-m-type='form'][data-m-model='${self.model}']`)) {
+                                    let parameters: any = { };
+                                    let form: Element = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
+                                    form.selectAll("input, select, textarea").each(function(idx: number, elem: Element) {
+                                        parameters[<string>elem.attribute("name")] = (<HTMLElement>elem).val();
+                                    });
+                                    metron.web.get(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
+                                        let form: Element = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
+                                        (<HTMLElement>form.selectOne(`#${self.model}_${self.model}ID`)).val(<string><any>data[`${self.model}ID`]);
+                                        form.attribute("data-m-state", "hide");
+                                        form.hide();
+                                        self.callListing();
+                                    });
+                                }
+                            });
                         default:
                             break;
                     }

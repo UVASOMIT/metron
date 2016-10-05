@@ -19,6 +19,10 @@ interface String {
     toPhoneNumber: () => string;
     getValueByKey: (key: string, values: string) => string;
     setValueByKey: (key: string, values: string, replacement: string) => string;
+    //isNullOrEmpty: (val: any) => boolean;
+}
+
+interface StringConstructor {
     isNullOrEmpty: (val: any) => boolean;
 }
 
