@@ -19,6 +19,7 @@ namespace metron {
     export class list<T> {
         private _filters: T = null;
         private _items: Array<T>;
+        private _rowTemplate: Element;
         public recycleBin: Array<T> = [];
         public currentPageIndex: number = 1;
         public pageSize: number = 10;
@@ -93,7 +94,7 @@ namespace metron {
         }
         private applyViewEvents(): void {
             var self = this;
-            document.selectAll(`[data-m-type='list'][data-m-model='${self.model}'] .edit`).each(function (idx: number, elem: Element) {
+            document.selectAll(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='edit']`).each(function (idx: number, elem: Element) {
                 elem.addEvent("click", function (e) {
                     e.preventDefault();
                     metron.form.clearForm(`[data-m-type='form'][data-m-model='${self.model}']`);
@@ -109,7 +110,7 @@ namespace metron {
                     });
                 });
             });
-            document.selectAll(`[data-m-type='list'][data-m-model='${self.model}'] .delete`).each(function (idx: number, elem: Element) {
+            document.selectAll(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='delete']`).each(function (idx: number, elem: Element) {
                 elem.addEvent("click", function (e) {
                     e.preventDefault();
                     if (confirm('Are you sure you want to delete this record?')) {
@@ -149,15 +150,7 @@ namespace metron {
         }
         public formatData(item: T): string {
             var self = this;
-            var primaries = `${self.model}ID:${item[self.model + "ID"]};`
-            var str = `${metron.templates.list.startRow()}${metron.templates.list.getStandardActionButtonsCell(primaries)}`;
-            for (let k in item) {
-                if(item.hasOwnProperty(k)) {
-                    str += metron.templates.list.getCell(item[k]);
-                }
-            }
-            str += metron.templates.list.endRow();
-            return str;
+            return metron.templates.list.row(self._rowTemplate, item).toString();
         }
         public callListing(): void {
             var self = this;
@@ -175,6 +168,8 @@ namespace metron {
             });
         }
         public clearTable(selector: string): void {
+            var self = this;
+            self._rowTemplate = document.selectOne(`${selector} tbody tr[data-m-action='repeat']`);
             document.selectOne(`${selector} tbody`).empty();
         }
         public getRows(selector: string): number {
