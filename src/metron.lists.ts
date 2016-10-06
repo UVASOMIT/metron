@@ -195,8 +195,8 @@ namespace metron {
 
                 this.setupPagingEvents(selector, callback, filters);
 
-                document.selectAll(`${selector} ul.pagination > li`).each(function (idx: number, elem: Element) {
-                    if (elem.first("a").attribute("aria-label") != "Previous" && elem.first("a").attribute("aria-label") != "Next") {
+                document.selectAll(`${selector} > li`).each(function (idx: number, elem: Element) {
+                    if (elem.first("a").attribute("title") != "Previous" && elem.first("a").attribute("title") != "Next") {
                         elem.remove();
                     }
                 });
@@ -211,18 +211,18 @@ namespace metron {
                         self.pageListing(<number><any>this.attribute("title"), callback, filters);
                     });
                     li.append(link.toString());
-                    li.insertBefore(document.selectAll(`${selector} ul.pagination > li`).last());
+                    li.insertBefore(document.selectAll(`${selector} > li`).last());
                 }
-                document.selectOne(`${selector} ul.pagination > li > a[title = ${this.currentPageIndex}]`).parent().addClass("active");
-                if (document.selectAll(`${selector} ul.pagination > li`).length <= 3) {
-                    document.selectOne(`${selector} ul.pagination`).up("nav").hide();
+                document.selectOne(`${selector} > li > a[title = ${this.currentPageIndex}]`).parent().addClass("active");
+                if (document.selectAll(`${selector} > li`).length <= 3) {
+                    document.selectOne(`${selector}`).hide();
                 }
                 else {
-                    document.selectOne(`${selector} ul.pagination`).up("nav").show();
+                    document.selectOne(`${selector}`).show();
                 }
             }
             else {
-                document.selectOne(`${selector} ul.pagination`).up("nav").hide();
+                document.selectOne(`${selector}`).hide();
             }
         }
         private calculateTotalPageSize(totalCount: number): number {
