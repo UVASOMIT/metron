@@ -1,5 +1,5 @@
 {
-    "config.baseURL": "http://localhost:20108",
-    "config.api.dir": "demo/api",
+    "config.baseURL": "http://localhost",
+    "config.api.dir": "metron/demo/api",
     "config.api.extension": ".json"
 }

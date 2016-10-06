@@ -89,7 +89,7 @@ namespace metron {
             var self = this;
             self.clearTable(`[data-m-type='list'][data-m-model='${self.model}'] table[data-m-segment='list']`);
             self.populateTable(`[data-m-type='list'][data-m-model='${self.model}'] table[data-m-segment='list']`);
-            self.createPaging("[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='paging']", this.callListing, (self._items.length > 0) ? self._items[0]["TotalCount"] : 0);
+            self.createPaging(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='paging']`, this.callListing, (self._items.length > 0) ? self._items[0]["TotalCount"] : 0);
             self.applyViewEvents();
         }
         private applyViewEvents(): void {
@@ -177,11 +177,11 @@ namespace metron {
         }
         public setupPagingEvents(selector: string, callback: Function, filters?: any): void {
             var self = this;
-            document.selectOne(`${selector} ul.pagination > li > a[aria-label=Previous]`).removeEvent("click").addEvent("click", function (e) {
+            document.selectOne(`${selector} > li > a[title='Previous']`).removeEvent("click").addEvent("click", function (e) {
                 e.preventDefault();
                 self.pageListing(self.getPreviousPage(), callback, filters);
             });
-            document.selectOne(`${selector} ul.pagination > li > a[aria-label=Next]`).removeEvent("click").addEvent("click", function (e) {
+            document.selectOne(`${selector} > li > a[title='Next']`).removeEvent("click").addEvent("click", function (e) {
                 e.preventDefault();
                 self.pageListing(self.getNextPage(), callback, filters);
             });
@@ -213,7 +213,7 @@ namespace metron {
                     li.append(link.toString());
                     li.insertBefore(document.selectAll(`${selector} > li`).last());
                 }
-                document.selectOne(`${selector} > li > a[title = ${this.currentPageIndex}]`).parent().addClass("active");
+                document.selectOne(`${selector} > li > a[title='${this.currentPageIndex}']`).parent().addClass("active");
                 if (document.selectAll(`${selector} > li`).length <= 3) {
                     document.selectOne(`${selector}`).hide();
                 }
