@@ -150,7 +150,7 @@ namespace metron {
         }
         public formatData(item: T): string {
             var self = this;
-            return metron.templates.list.row(self._rowTemplate, item).toString();
+            return metron.templates.list.row(self._rowTemplate, item);
         }
         public callListing(): void {
             var self = this;
@@ -185,6 +185,14 @@ namespace metron {
                 e.preventDefault();
                 self.pageListing(self.getNextPage(), callback, filters);
             });
+            document.selectOne(`${selector} > li > a[title='First']`).removeEvent("click").addEvent("click", function (e) {
+                e.preventDefault();
+                self.pageListing(1, callback, filters);
+            });
+            document.selectOne(`${selector} > li > a[title='Last']`).removeEvent("click").addEvent("click", function (e) {
+                e.preventDefault();
+                self.pageListing(self.totalPageSize, callback, filters);
+            });
         }
         public createPaging(selector: string, callback: Function, totalCount, filters?: any): void {
             var self = this;
@@ -196,7 +204,7 @@ namespace metron {
                 this.setupPagingEvents(selector, callback, filters);
 
                 document.selectAll(`${selector} > li`).each(function (idx: number, elem: Element) {
-                    if (elem.first("a").attribute("title") != "Previous" && elem.first("a").attribute("title") != "Next") {
+                    if (elem.first("a").attribute("title") != "Previous" && elem.first("a").attribute("title") != "Next" && elem.first("a").attribute("title") != "First" && elem.first("a").attribute("title") != "Last") {
                         elem.remove();
                     }
                 });
@@ -210,11 +218,11 @@ namespace metron {
                         e.preventDefault();
                         self.pageListing(<number><any>this.attribute("title"), callback, filters);
                     });
-                    li.append(link.toString());
-                    li.insertBefore(document.selectAll(`${selector} > li`).last());
+                    li.append(link.asString());
+                    document.selectOne(`${selector}`).insertBefore(li, document.selectOne(`${selector} > li > a[title='Next']`).parent());
                 }
                 document.selectOne(`${selector} > li > a[title='${this.currentPageIndex}']`).parent().addClass("active");
-                if (document.selectAll(`${selector} > li`).length <= 3) {
+                if (document.selectAll(`${selector} > li`).length <= 5) {
                     document.selectOne(`${selector}`).hide();
                 }
                 else {

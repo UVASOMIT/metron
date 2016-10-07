@@ -71,7 +71,7 @@ interface Element {
     hide: () => Element;
     addClass: (className: string) => Element;
     removeClass: (className: string) => Element;
-    toString: () => string;
+    asString: () => string;
     selectOne: (selector: string) => Element;
     selectAll: (selector: string) => NodeListOf<Element>;
 }
@@ -508,7 +508,7 @@ Element.prototype.removeClass = function(className: string) : Element {
     return this;
 };
 
-Element.prototype.toString = function(): string {
+Element.prototype.asString = function(): string {
     return this.outerHTML;
 };
 

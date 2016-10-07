@@ -228,6 +228,9 @@ namespace metron {
                     }
                 };
                 request.setRequestHeader("Content-Type", contentType);
+                if(url.contains("localhost")) {
+                    request.setRequestHeader("Cache-Control", "max-age=0");
+                }
                 request.send(data);
             }
             let request: XMLHttpRequest = new XMLHttpRequest();
