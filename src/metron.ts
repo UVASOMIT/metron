@@ -228,6 +228,9 @@ namespace metron {
                     }
                 };
                 request.setRequestHeader("Content-Type", contentType);
+                if(url.contains("localhost")) {
+                    request.setRequestHeader("Cache-Control", "max-age=0");
+                }
                 request.send(data);
             }
             let request: XMLHttpRequest = new XMLHttpRequest();
@@ -256,6 +259,14 @@ namespace metron {
         }
         export function put(url: string, data: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
             return ajax(url ,data ,"PUT" ,true ,contentType, dataType, success, failure, always);
+        }
+        export function save(primary: string, url: string, data: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
+            if(String.isNullOrEmpty(primary)) {
+                return ajax(url ,data ,"POST" ,true ,contentType, dataType, success, failure, always);
+            }
+            else {
+                return ajax(url ,data ,"PUT" ,true ,contentType, dataType, success, failure, always);
+            }
         }
         export function remove(url: string, data: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
             return ajax(url ,data ,"DELETE" ,true ,contentType, dataType, success, failure, always);

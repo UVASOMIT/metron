@@ -31,5 +31,28 @@ namespace metron {
                 callback();
             }
         }
+        public static isValid(selector: string): boolean {
+            var form: Element = document.selectOne(selector);
+            var alert: Element = form.selectOne("[data-m-segment='alert']");
+            alert.hide();
+            alert.empty();
+            document.selectAll(".error").each(function (idx, elem) {
+                elem.removeClass("error");
+            });
+            var isValid: boolean = true;
+            var required: NodeListOf<Element> = form.selectAll("[required='required']");
+            required.each(function (idx: number, elem: Element) {
+                if ((<HTMLElement>elem).val() == null || (<HTMLElement>elem).val().trim() === "") {
+                    isValid = false;
+                    alert.append(`<p>[${elem.attribute("name")}] is a required field.</p>`);
+                    elem.up("div").addClass("has-error");
+                }
+            });
+            if (!isValid) {
+                alert.show();
+                window.scrollTo(0, 0);
+            }
+            return isValid;
+        }
     }
 }

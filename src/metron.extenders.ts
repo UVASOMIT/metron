@@ -19,6 +19,10 @@ interface String {
     toPhoneNumber: () => string;
     getValueByKey: (key: string, values: string) => string;
     setValueByKey: (key: string, values: string, replacement: string) => string;
+    //isNullOrEmpty: (val: any) => boolean;
+}
+
+interface StringConstructor {
     isNullOrEmpty: (val: any) => boolean;
 }
 
@@ -40,6 +44,7 @@ interface Array<T> {
 interface Object {
     isEmpty: (obj: any) => boolean;
     getName: () => string;
+    extend: (dest: any, src: any) => any;
 }
 
 interface Document {
@@ -66,13 +71,14 @@ interface Element {
     hide: () => Element;
     addClass: (className: string) => Element;
     removeClass: (className: string) => Element;
-    toString: () => string;
+    asString: () => string;
     selectOne: (selector: string) => Element;
     selectAll: (selector: string) => NodeListOf<Element>;
 }
 
 interface HTMLElement {
     clean: () => HTMLElement;
+    val: (val?: string) => string;
 }
 
 interface XMLHttpRequest {
@@ -258,7 +264,7 @@ String.prototype.setValueByKey = function (key: string, values: string, replacem
     return returnCollection.join(';');
 };
 
-(<any>String).isNullOrEmpty = function (val: any): boolean {
+String.isNullOrEmpty = function (val: any): boolean {
     if (val === undefined || val === null || val.trim() === '') {
         return true;
     }
@@ -369,6 +375,13 @@ Object.prototype.getName = function (): string {
     return (results && results.length > 1) ? results[1] : "";
 };
 
+(<any>Object).extend = function(dest: any, src: any) {
+    for (let prop in src) {
+        dest[prop] = src[prop];
+    }
+    return dest;
+};
+
 Document.prototype.selectOne = function(selector: string): Element {
     return document.querySelector(selector);
 };
@@ -448,12 +461,7 @@ Element.prototype.first = function(selector: string): Element {
 };
 
 Element.prototype.append = function(html: string): Element {
-    var placeholder = document.createElement("div");
-    placeholder.innerHTML = html;
-    var children = placeholder.childNodes;
-    for(let i = 0; i < children.length; i++) {
-        this.append(children[i]);
-    }
+    this.insertAdjacentHTML('beforeend', html);
     return this;
 };
 
@@ -500,13 +508,76 @@ Element.prototype.removeClass = function(className: string) : Element {
     return this;
 };
 
-Element.prototype.toString = function(): string {
+Element.prototype.asString = function(): string {
     return this.outerHTML;
 };
 
 HTMLElement.prototype.clean = function(): HTMLElement {
     this.value = this.value.replace(/\r?\n/g, "\r\n");
     return this;
+};
+
+HTMLElement.prototype.val = function(val?: string): string {
+    if(val != null) {
+        if(this.nodeName.lower() == "textarea") {
+            this.innerHTML = val;
+        }
+        else if(this.nodeName.lower() == "input") {
+            switch(this.attribute("type").lower()) {
+                case "text":
+                    this.attribute("value", val);
+                    break;
+                case "select":
+                    for(let i = 0; i < this.options.length; i++) {
+                        if(this.options[i].innerHTML == val) {
+                            this.selectedIndex = i;
+                            break;
+                        }
+                    }
+                    break;
+                case "checkbox":
+                    if(val.toBool()) {
+                        this.attribute("checked", "checked");
+                    }
+                    break;
+                case "radio":
+                    let name: string = this.attribute("name");
+                    let radios: NodeListOf<Element> = document.selectAll(`input[type='radio'][name='${name}']`);
+                    radios.each(function(idx: number, elem: Element) {
+                        if(elem.attribute("value") == val) {
+                            elem.attribute("checked", "checked");
+                        }
+                        else {
+                            elem.removeAttribute("checked");
+                        }
+                    });
+                    break;
+                default:
+                    throw new Error("Error: No [type] attribute on element.");
+            }
+        }
+    }
+    else {
+        if(this.nodeName.lower() == "textarea") {
+            return this.innerHTML;
+        }
+        else if(this.nodeName.lower() == "input") {
+            switch(this.attribute("type").lower()) {
+                case "text":
+                    return this.attribute("value");
+                case "select":
+                    return this.options[this.selectedIndex].value;
+                case "checkbox":
+                    return this.checked;
+                case "radio":
+                    let name: string = this.attribute("name");
+                    return (<HTMLInputElement>document.selectOne(`input[type='radio'][name='${name}']:checked`)).value;
+                default:
+                    throw new Error("Error: No [type] attribute on element.");
+            }
+        }
+    }
+    return val;
 };
 
 XMLHttpRequest.prototype.responseJSON = function(): JSON {
