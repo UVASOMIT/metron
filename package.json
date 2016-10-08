@@ -4,7 +4,7 @@
   "devDependencies": {
     "grunt": "~0.4.5",
     "grunt-contrib-uglify": "~0.9.1",
-    "typescript": "^1.8.10",
+    "typescript": "^2.0.3",
     "grunt-typescript": "^0.8.0"
   }
 }
