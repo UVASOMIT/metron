@@ -14,11 +14,19 @@ namespace metron {
             });
             return resp;
         }
-        export function normalizeModelItems(obj: any, model: string): Array<any> {
-            if(obj[model] != null) {
-                return obj[model];
+        export function normalizeModelItems(obj: any, model: string, first: boolean = false): Array<any> {
+            var result = obj;
+            if(!first) {
+                if(obj[model] != null) {
+                    result = obj[model];
+                }
             }
-            return obj;
+            else {
+                if(obj[model] != null) {
+                    result = obj[model][0];
+                }
+            }
+            return result;
         }
         export function normalizeModelData(obj: any): any {
             for (let k in obj) {
@@ -58,7 +66,7 @@ namespace metron {
             });
         }
         export function getDataPrimary(key: string, values: string): any {
-            return this.getValueByKey(key, values);
+            return values.getValueByKey(key);
         }
         export function formatMessage(message: string, length?: number): string {
             try {

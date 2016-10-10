@@ -79,6 +79,15 @@ namespace metron {
                                     });
                                 }
                             });
+                            break;
+                        case "cancel":
+                            el.addEvent("click", function (e) {
+                                metron.form.clearForm(`[data-m-type='form'][data-m-model='${self.model}']`);
+                                let form: Element = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
+                                form.attribute("data-m-state", "hide");
+                                form.hide();
+                            });
+                            break;
                         default:
                             break;
                     }
@@ -101,8 +110,11 @@ namespace metron {
                     let parameters = {};
                     parameters[`${self.model}ID`] = <number><any>metron.tools.getDataPrimary(`${self.model}ID`, elem.attribute("data-primary"));
                     metron.web.get(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
-                        for (let prop in data) {
-                            (<HTMLElement>document.selectOne(`${self.model}_${prop}`)).val(data[prop]);
+                        let item = metron.tools.normalizeModelItems(data, self.model, true);
+                        for (let prop in item) {
+                            if(item.hasOwnProperty(prop) && item[prop] != null && document.selectOne(`#${self.model}_${prop}`) != null) {
+                                (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(item[prop]);
+                            }
                         }
                         let form: Element = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
                         form.attribute("data-m-state", "hide");

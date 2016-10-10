@@ -25,9 +25,9 @@
                 </form>
             </div>
             <div data-m-segment="controls">
-                <button data-m-action="undo">Undo</button>
+                <button data-m-action="undo" class="button-outline">Undo</button>
                 <button data-m-action="new">New</button>
-                <button data-m-action="download">Download</button>
+                <button data-m-action="download" class="button-outline">Download</button>
             </div>
             <table data-m-segment="list">
                 <thead>
@@ -43,8 +43,8 @@
                 <tbody>
                     <tr data-m-action="repeat">
                         <td>
-                            <button title="edit" data-m-action="edit" data-primary="PostID:{{PostID}};">edit</button>
-                            <button title="delete" data-m-action="delete" data-primary="PostID:{{PostID}};">delete</button>
+                            <button title="edit" data-m-action="edit" data-primary="PostID:{{PostID}};" class="button-outline">edit</button>
+                            <button title="delete" data-m-action="delete" data-primary="PostID:{{PostID}};" class="button-outline">delete</button>
                         </td>
                         <td>{{PostTypeID}}</td>
                         <td>{{IsActive}}</td>
@@ -79,7 +79,7 @@
                     <input type="checkbox" id="Post_IsActive" name="IsActive" />
                     <div data-m-segment="controls">
                         <button data-m-action="save">Save</button>
-                        <button data-m-action="cancel">Cancel</button>
+                        <a data-m-action="cancel" class="button button-clear">Cancel</a>
                     </div>
                 </fieldset>
             </form>

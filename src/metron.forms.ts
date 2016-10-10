@@ -18,14 +18,14 @@ namespace metron {
             document.selectAll(".error").each(function (idx, elem) {
                 document.selectOne(elem).removeClass("error");
             });
-            document.selectOne(selector).selectAll("input, select, textarea").each(function(idx: number, elem: Element) {
+            document.selectOne(selector).selectAll("input, select").each(function(idx: number, elem: Element) {
                  elem.attribute("value", "");
+            });
+            document.selectOne(selector).selectAll("textarea").each(function(idx: number, elem: Element) {
+                 (<HTMLElement>elem).innerHTML = "";
             });
             document.selectOne(selector).selectAll("input[type='checkbox']").each(function(idx: number, elem: Element) {
                  elem.removeAttribute("checked");
-            });
-            document.selectOne(selector).selectAll("div.input-group-addon").each(function(idx: number, elem: Element) {
-                 (<HTMLElement>elem).innerHTML = "";
             });
             if (callback != null) {
                 callback();

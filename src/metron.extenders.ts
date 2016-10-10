@@ -17,8 +17,8 @@ interface String {
     contains: (val: string) => boolean;
     slugify: (lower?: boolean) => string;
     toPhoneNumber: () => string;
-    getValueByKey: (key: string, values: string) => string;
-    setValueByKey: (key: string, values: string, replacement: string) => string;
+    getValueByKey: (key: string) => string;
+    setValueByKey: (key: string, replacement: string) => string;
     //isNullOrEmpty: (val: any) => boolean;
 }
 
@@ -236,8 +236,8 @@ String.prototype.toPhoneNumber = function (): string {
     }
 };
 
-String.prototype.getValueByKey = function (key: string, values: string): string {
-    var collection: Array<string> = values.split(";");
+String.prototype.getValueByKey = function (key: string): string {
+    var collection: Array<string> = this.split(";");
     for (let i = 0; i < collection.length; i++) {
         if (collection[i].contains(":")) {
             let pairs = collection[i].split(":");
@@ -249,9 +249,9 @@ String.prototype.getValueByKey = function (key: string, values: string): string 
     return null;
 };
 
-String.prototype.setValueByKey = function (key: string, values: string, replacement: string): string {
-    var collection: Array<string> = values.split(";");
-    var returnCollection: Array<string>;
+String.prototype.setValueByKey = function (key: string, replacement: string): string {
+    var collection: Array<string> = this.split(";");
+    var returnCollection: Array<string> = [];
     for (let i = 0; i < collection.length; i++) {
         if (collection[i].contains(":")) {
             let pairs = collection[i].split(":");
@@ -485,17 +485,17 @@ Element.prototype.addEvent = function(event: string, callback:Function): Element
 Element.prototype.show = function(): Element {
     let styles = this.attribute("style");
     if(styles != null && styles != "") {
-        return this.attribute("style", styles.setValueByKey("display", styles, "block"));
+        return this.attribute("style", styles.setValueByKey("display", "block"));
     }
-    return this.attribute("style", `${styles};display:block`);
+    return this.attribute("style", `display:block`);
 };
 
 Element.prototype.hide = function(): Element {
     let styles = this.attribute("style");
     if(styles != null && styles != "") {
-        return this.attribute("style", styles.setValueByKey("display", styles, "none"));
+        return this.attribute("style", styles.setValueByKey("display", "none"));
     }
-    return this.attribute("style", `${styles};display:none`);
+    return this.attribute("style", `display:none;`);
 };
 
 Element.prototype.addClass = function(className: string) : Element {
@@ -524,6 +524,9 @@ HTMLElement.prototype.val = function(val?: string): string {
         }
         else if(this.nodeName.lower() == "input") {
             switch(this.attribute("type").lower()) {
+                case "hidden":
+                    this.attribute("value", val);
+                    break;
                 case "text":
                     this.attribute("value", val);
                     break;
@@ -536,7 +539,7 @@ HTMLElement.prototype.val = function(val?: string): string {
                     }
                     break;
                 case "checkbox":
-                    if(val.toBool()) {
+                    if(<boolean><any>val || val.toBool()) {
                         this.attribute("checked", "checked");
                     }
                     break;
@@ -563,6 +566,8 @@ HTMLElement.prototype.val = function(val?: string): string {
         }
         else if(this.nodeName.lower() == "input") {
             switch(this.attribute("type").lower()) {
+                case "hidden":
+                    return this.attribute("value");
                 case "text":
                     return this.attribute("value");
                 case "select":
