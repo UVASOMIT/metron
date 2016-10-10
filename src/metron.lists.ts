@@ -42,6 +42,7 @@ namespace metron {
                         case "new":
                             el.addEvent("click", function (e) {
                                 e.preventDefault();
+                                let f: metron.form<any> = new metron.form(self.model);
                                 metron.form.clearForm(`[data-m-type='form'][data-m-model='${self.model}']`);
                                 let form: Element = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
                                 form.attribute("data-m-state", "show");

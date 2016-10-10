@@ -11,7 +11,7 @@ namespace metron {
         private _action: string = "";
         private _method:string = "POST";
         private _fields: Array<string> = [];
-        constructor(public model: string, public asscListing: list<T>) {
+        constructor(public model: string, public asscListing?: list<T>) {
             var self = this;
             self.init();
         }
