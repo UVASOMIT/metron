@@ -16,12 +16,12 @@
                 <form>
                     <fieldset>
                         <label for="Filter_Post_PostType">PostType</label>
-                        <select id="Filter_Post_PostTypeID" name="PostTypeID" data-m-type="filter" data-m-binding="PostType" data-m-text="Name">
+                        <select id="Filter_Post_PostTypeID" name="PostTypeID" data-m-action="filter" data-m-binding="PostType" data-m-text="Name">
                             <option value=""></option>
                         </select>
                         <label for="Filter_Post_Term">Search Term</label>
-                        <input type="text" id="Filter_Post_Term" name="Term" data-m-type="filter" data-m-search="Name" />
-                        <button data-m-action="filter" title="Search" class="btn btn-default">Go</button>
+                        <input type="text" id="Filter_Post_Term" name="Term" />
+                        <button data-m-action="filter" data-m-search="Name" data-m-search-for="Filter_Post_Term" title="Search" class="btn btn-default">Go</button>
                     </fieldset>
                 </form>
             </div>

@@ -525,18 +525,10 @@ HTMLElement.prototype.val = function(val?: string): string {
         else if(this.nodeName.lower() == "input") {
             switch(this.attribute("type").lower()) {
                 case "hidden":
-                    this.attribute("value", val);
+                    this.value = val;
                     break;
                 case "text":
-                    this.attribute("value", val);
-                    break;
-                case "select":
-                    for(let i = 0; i < this.options.length; i++) {
-                        if(this.options[i].innerHTML == val) {
-                            this.selectedIndex = i;
-                            break;
-                        }
-                    }
+                    this.value = val;
                     break;
                 case "checkbox":
                     if(<boolean><any>val || val.toBool()) {
@@ -559,6 +551,14 @@ HTMLElement.prototype.val = function(val?: string): string {
                     throw new Error("Error: No [type] attribute on element.");
             }
         }
+        else if(this.nodeName.lower() == "select") {
+            for(let i = 0; i < this.options.length; i++) {
+                if(this.options[i].innerHTML == val) {
+                    this.selectedIndex = i;
+                    break;
+                }
+            }
+        }
     }
     else {
         if(this.nodeName.lower() == "textarea") {
@@ -567,11 +567,9 @@ HTMLElement.prototype.val = function(val?: string): string {
         else if(this.nodeName.lower() == "input") {
             switch(this.attribute("type").lower()) {
                 case "hidden":
-                    return this.attribute("value");
+                    return this.value
                 case "text":
-                    return this.attribute("value");
-                case "select":
-                    return this.options[this.selectedIndex].value;
+                    return this.value;
                 case "checkbox":
                     return this.checked;
                 case "radio":
@@ -580,6 +578,9 @@ HTMLElement.prototype.val = function(val?: string): string {
                 default:
                     throw new Error("Error: No [type] attribute on element.");
             }
+        }
+        else if(this.nodeName.lower() == "select") {
+            return this.options[this.selectedIndex].value;
         }
     }
     return val;

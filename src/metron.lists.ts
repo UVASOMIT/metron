@@ -29,6 +29,9 @@ namespace metron {
         public sortDirection: string = "DESC";
         constructor(public model: string, public listType: string = "list", public asscForm?: form<T>) {
             var self = this;
+            if(self._filters == null) {
+                self._filters = <any>{};
+            }
             self.init();
             self.callListing();
             if(asscForm != null) {
@@ -41,7 +44,7 @@ namespace metron {
             let f: metron.form<any> = (self.asscForm != null) ? self.asscForm : self.attachForm(new metron.form(self.model));
             let filterBlocks: NodeListOf<Element> = listing.selectAll("[data-m-segment='filters']");
             filterBlocks.each(function(idx: number, elem: Element) {
-                let filters = elem.selectAll("[data-m-type='filter']");
+                let filters = elem.selectAll("[data-m-action='filter']");
                 filters.each(function (indx: number, el: Element) {
                     if(el.attribute("data-m-binding") != null) {
                         let binding: string = el.attribute("data-m-binding");
@@ -56,8 +59,27 @@ namespace metron {
                                 }
                             });
                         });
+                        el.addEvent("change", function (e) {
+                            let fil = self._filters;
+                            fil[key] = ((<HTMLElement>this).val() == '') ? null : <any>(<HTMLElement>this).val();
+                            self._filters = fil;
+                            self.callListing();
+                        });
                     }
-                    //add events
+                    if(el.attribute("data-m-search") != null) {
+                        el.addEvent("click", function (e) {
+                            e.preventDefault();
+                            let itm: Element = this;
+                            let fil = self._filters;
+                            let terms: Array<string> = this.attribute("data-m-search").split(",");
+                            terms.each(function(i: number, term: string) {
+                                let parent: Element = itm.parent();
+                                fil[term.trim()] = ((<HTMLElement>parent.selectOne(`#${itm.attribute("data-m-search-for")}`)).val() == '') ? null : <any>(<HTMLElement>parent.selectOne(`#${itm.attribute("data-m-search-for")}`)).val();
+                            });
+                            self._filters = fil;
+                            self.callListing();
+                        });
+                    }
                 });
             });
             let controlBlocks: NodeListOf<Element> = listing.selectAll("[data-m-segment='controls']");
@@ -289,6 +311,12 @@ namespace metron {
         }
         public set form(f: metron.form<any>) {
             this._form = f;
+        }
+        public get filters(): T {
+            return this._filters;
+        }
+        public set filters(f: T) {
+            this._filters = f;
         }
     }
 }
