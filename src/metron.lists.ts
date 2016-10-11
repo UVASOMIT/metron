@@ -39,6 +39,27 @@ namespace metron {
             var self = this;
             let listing: Element = document.selectOne(`[data-m-type='list'][data-m-model='${self.model}']`);
             let f: metron.form<any> = (self.asscForm != null) ? self.asscForm : self.attachForm(new metron.form(self.model));
+            let filterBlocks: NodeListOf<Element> = listing.selectAll("[data-m-segment='filters']");
+            filterBlocks.each(function(idx: number, elem: Element) {
+                let filters = elem.selectAll("[data-m-type='filter']");
+                filters.each(function (indx: number, el: Element) {
+                    if(el.attribute("data-m-binding") != null) {
+                        let binding: string = el.attribute("data-m-binding");
+                        let key: string = el.attribute("name");
+                        let nText: string = el.attribute("data-m-text");
+                        metron.web.get(`${metron.fw.getAPIURL(binding)}`, {}, null, "json", function (data: T) {
+                            let items: Array<T> = metron.tools.normalizeModelItems(data, binding);
+                            items.each(function(i: number, item: any) {
+                                el.append(`<option value="${item[key]}">${item[nText]}</option>`);
+                                if(f.elem.selectOne(`#${self.model}_${key}`) != null) {
+                                    (<HTMLElement>f.elem.selectOne(`#${self.model}_${key}`)).append(`<option value="${item[key]}">${item[nText]}</option>`);
+                                }
+                            });
+                        });
+                    }
+                    //add events
+                });
+            });
             let controlBlocks: NodeListOf<Element> = listing.selectAll("[data-m-segment='controls']");
             controlBlocks.each(function (idx: number, elem: Element) {
                 let actions = elem.selectAll("[data-m-action]");
