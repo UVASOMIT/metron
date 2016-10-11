@@ -20,20 +20,25 @@ namespace metron {
         private _filters: T = null;
         private _items: Array<T>;
         private _rowTemplate: Element;
+        private _form: metron.form<any>;
         public recycleBin: Array<T> = [];
         public currentPageIndex: number = 1;
         public pageSize: number = 10;
         public totalPageSize: number = 0;
         public sortOrder: string = "DateCreated";
         public sortDirection: string = "DESC";
-        constructor(public model: string, public listType: string = "list") {
+        constructor(public model: string, public listType: string = "list", public asscForm?: form<T>) {
             var self = this;
             self.init();
             self.callListing();
+            if(asscForm != null) {
+                self._form = asscForm;
+            }
         }
         private init(): void {
             var self = this;
             let listing: Element = document.selectOne(`[data-m-type='list'][data-m-model='${self.model}']`);
+            let f: metron.form<any> = (self.asscForm != null) ? self.asscForm : self.attachForm(new metron.form(self.model));
             let controlBlocks: NodeListOf<Element> = listing.selectAll("[data-m-segment='controls']");
             controlBlocks.each(function (idx: number, elem: Element) {
                 let actions = elem.selectAll("[data-m-action]");
@@ -42,11 +47,9 @@ namespace metron {
                         case "new":
                             el.addEvent("click", function (e) {
                                 e.preventDefault();
-                                let f: metron.form<any> = new metron.form(self.model);
-                                metron.form.clearForm(`[data-m-type='form'][data-m-model='${self.model}']`);
-                                let form: Element = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
-                                form.attribute("data-m-state", "show");
-                                form.show();
+                                f.clearForm();
+                                f.elem.attribute("data-m-state", "show");
+                                f.elem.show();
                             });
                             break;
                         case "undo":
@@ -65,17 +68,15 @@ namespace metron {
                         case "submit":
                             el.addEvent("click", function (e) {
                                 e.preventDefault();
-                                if (metron.form.isValid(`[data-m-type='form'][data-m-model='${self.model}']`)) {
+                                if (f.isValid()) {
                                     let parameters: any = { };
-                                    let form: Element = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
-                                    form.selectAll("input, select, textarea").each(function(idx: number, elem: Element) {
+                                    f.elem.selectAll("input, select, textarea").each(function(idx: number, elem: Element) {
                                         parameters[<string>elem.attribute("name")] = (<HTMLElement>elem).val();
                                     });
                                     metron.web.get(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
-                                        let form: Element = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
-                                        (<HTMLElement>form.selectOne(`#${self.model}_${self.model}ID`)).val(<string><any>data[`${self.model}ID`]);
-                                        form.attribute("data-m-state", "hide");
-                                        form.hide();
+                                        (<HTMLElement>f.elem.selectOne(`#${self.model}_${self.model}ID`)).val(<string><any>data[`${self.model}ID`]);
+                                        f.elem.attribute("data-m-state", "hide");
+                                        f.elem.hide();
                                         self.callListing();
                                     });
                                 }
@@ -83,10 +84,9 @@ namespace metron {
                             break;
                         case "cancel":
                             el.addEvent("click", function (e) {
-                                metron.form.clearForm(`[data-m-type='form'][data-m-model='${self.model}']`);
-                                let form: Element = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
-                                form.attribute("data-m-state", "hide");
-                                form.hide();
+                                f.clearForm();
+                                f.elem.attribute("data-m-state", "hide");
+                                f.elem.hide();
                             });
                             break;
                         default:
@@ -107,7 +107,7 @@ namespace metron {
             document.selectAll(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='edit']`).each(function (idx: number, elem: Element) {
                 elem.addEvent("click", function (e) {
                     e.preventDefault();
-                    metron.form.clearForm(`[data-m-type='form'][data-m-model='${self.model}']`);
+                    self._form.clearForm();
                     let parameters = {};
                     parameters[`${self.model}ID`] = <number><any>metron.tools.getDataPrimary(`${self.model}ID`, elem.attribute("data-primary"));
                     metron.web.get(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
@@ -117,9 +117,8 @@ namespace metron {
                                 (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(item[prop]);
                             }
                         }
-                        let form: Element = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
-                        form.attribute("data-m-state", "hide");
-                        form.show();
+                        self._form.elem.attribute("data-m-state", "hide");
+                        self._form.elem.show();
                     });
                 });
             });
@@ -258,6 +257,17 @@ namespace metron {
         }
         private getNextPage(): number {
             return (this.currentPageIndex === this.totalPageSize) ? this.currentPageIndex : (parseInt(<any>this.currentPageIndex, 10) + 1);
+        }
+        private attachForm(f: metron.form<any>): metron.form<any> {
+            var self = this;
+            self._form = f;
+            return self._form;
+        }
+        public get form(): metron.form<any> {
+            return this._form;
+        }
+        public set form(f: metron.form<any>) {
+            this._form = f;
         }
     }
 }
