@@ -1,0 +1,28 @@
+{
+    "PostType": [
+        {
+            "PostTypeID": 1,
+            "Guid": null,
+            "Name": "Post",
+            "Description": "",
+            "IsActive": true,
+            "DateCreated": "2016-09-21T12:12:00.435",
+            "DateModified": "2016-09-21T12:12:00.094",
+            "US": "Michael Szul",
+            "RowNumber": 1,
+            "TotalCount": 2
+        },
+        {
+            "PostTypeID": 2,
+            "Guid": null,
+            "Name": "Article",
+            "Description": "",
+            "IsActive": true,
+            "DateCreated": "2016-09-22T07:18:23.345",
+            "DateModified": "2016-09-22T07:18:37.289",
+            "US": "Michael Szul",
+            "RowNumber": 2,
+            "TotalCount": 2
+        }
+    ]
+}
