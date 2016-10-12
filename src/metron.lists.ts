@@ -17,6 +17,7 @@ namespace metron {
         }
     }
     export class list<T> {
+        private _elem: Element;
         private _filters: T = null;
         private _items: Array<T>;
         private _rowTemplate: Element;
@@ -29,20 +30,20 @@ namespace metron {
         public sortDirection: string = "DESC";
         constructor(public model: string, public listType: string = "list", public asscForm?: form<T>) {
             var self = this;
+            if(asscForm != null) {
+                self._form = asscForm;
+            }
             if(self._filters == null) {
                 self._filters = <any>{};
             }
             self.init();
             self.callListing();
-            if(asscForm != null) {
-                self._form = asscForm;
-            }
         }
         private init(): void {
             var self = this;
-            let listing: Element = document.selectOne(`[data-m-type='list'][data-m-model='${self.model}']`);
-            let f: metron.form<any> = (self.asscForm != null) ? self.asscForm : self.attachForm(new metron.form(self.model));
-            let filterBlocks: NodeListOf<Element> = listing.selectAll("[data-m-segment='filters']");
+            self._elem = document.selectOne(`[data-m-type='list'][data-m-model='${self.model}']`);
+            let f: metron.form<any> = (self.asscForm != null) ? self.asscForm : self.attachForm(new metron.form(self.model, self));
+            let filterBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='filters']");
             filterBlocks.each(function(idx: number, elem: Element) {
                 let filters = elem.selectAll("[data-m-action='filter']");
                 filters.each(function (indx: number, el: Element) {
@@ -82,7 +83,7 @@ namespace metron {
                     }
                 });
             });
-            let controlBlocks: NodeListOf<Element> = listing.selectAll("[data-m-segment='controls']");
+            let controlBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='controls']");
             controlBlocks.each(function (idx: number, elem: Element) {
                 let actions = elem.selectAll("[data-m-action]");
                 actions.each(function (indx: number, el: Element) {
@@ -93,6 +94,8 @@ namespace metron {
                                 f.clearForm();
                                 f.elem.attribute("data-m-state", "show");
                                 f.elem.show();
+                                self._elem.attribute("data-m-state", "hide");
+                                self._elem.hide();
                             });
                             break;
                         case "undo":
@@ -160,8 +163,10 @@ namespace metron {
                                 (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(item[prop]);
                             }
                         }
-                        self._form.elem.attribute("data-m-state", "hide");
+                        self._form.elem.attribute("data-m-state", "show");
                         self._form.elem.show();
+                        self._elem.attribute("data-m-state", "hide");
+                        self._elem.hide();
                     });
                 });
             });
@@ -305,6 +310,12 @@ namespace metron {
             var self = this;
             self._form = f;
             return self._form;
+        }
+        public get elem(): Element {
+            return this._elem;
+        }
+        public set elem(f: Element) {
+            this._elem = f;
         }
         public get form(): metron.form<any> {
             return this._form;

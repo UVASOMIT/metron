@@ -6,6 +6,7 @@ namespace metron {
     }
     export class form<T> {
         private _elem: Element;
+        private _list: metron.list<any>;
         private _field_id: string;
         private _name: string;
         private _classNames: Array<string> = [];
@@ -14,6 +15,9 @@ namespace metron {
         private _fields: Array<string> = [];
         constructor(public model: string, public asscListing?: list<T>) {
             var self = this;
+            if(asscListing != null) {
+                self._list = asscListing;
+            }
             self.init();
         }
         private init(): void {
@@ -38,6 +42,8 @@ namespace metron {
                                         self._elem.hide();
                                         if(self.asscListing != null) {
                                             self.asscListing.callListing();
+                                            self._list.elem.attribute("data-m-state", "show");
+                                            self._list.elem.show();
                                         }
                                     });
                                 }
@@ -48,6 +54,10 @@ namespace metron {
                                 self.clearForm();
                                 self._elem.attribute("data-m-state", "hide");
                                 self._elem.hide();
+                                if(self._list != null) {
+                                    self._list.elem.attribute("data-m-state", "show");
+                                    self._list.elem.show();
+                                }
                             });
                             break;
                         default:
@@ -104,6 +114,12 @@ namespace metron {
         }
         public set elem(f: Element) {
             this._elem = f;
+        }
+        public get list(): metron.list<any> {
+            return this._list;
+        }
+        public set list(f: metron.list<any>) {
+            this._list = f;
         }
     }
 }

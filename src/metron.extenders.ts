@@ -553,7 +553,7 @@ HTMLElement.prototype.val = function(val?: string): string {
         }
         else if(this.nodeName.lower() == "select") {
             for(let i = 0; i < this.options.length; i++) {
-                if(this.options[i].innerHTML == val) {
+                if(this.options[i].value == val) {
                     this.selectedIndex = i;
                     break;
                 }
