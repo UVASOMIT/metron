@@ -6,10 +6,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Metron TypeScript/JavaScript Convenience Library</title>
         <link type="text/css" href="bower_components/milligram/dist/milligram.min.css" rel="stylesheet" />
+        <link type="text/css" href="app.css" rel="stylesheet" />
         <script type="text/javascript" src="../dist/gen/metron.js"></script>
     </head>
     <body data-m-root="metron/demo">
-        <section data-m-type="list" data-m-model="Post">
+        <section data-m-type="list" data-m-model="Post" data-m-state="show">
             <div data-m-segment="alert" data-m-state="hide"></div>
             <h1>Demo CRUD Operations List</h1>
             <div data-m-segment="filters">
@@ -21,7 +22,7 @@
                         </select>
                         <label for="Filter_Post_Term">Search Term</label>
                         <input type="text" id="Filter_Post_Term" name="Term" />
-                        <button data-m-action="filter" data-m-search="Name" data-m-search-for="Filter_Post_Term" title="Search" class="btn btn-default">Go</button>
+                        <button data-m-action="filter" data-m-search="Name" data-m-search-for="Filter_Post_Term" title="Search">Go</button>
                     </fieldset>
                 </form>
             </div>
@@ -56,10 +57,10 @@
                 </tbody>
             </table>
             <ul data-m-segment="paging">
-                <li><a title="First" href="#">&laquo;</a></li>
-                <li><a title="Previous" href="#">&lt;</a></li>
-                <li><a title="Next" href="#">&gt;</a></li>
-                <li><a title="Last" href="#">&raquo;</a></li>
+                <li><a title="First" href="#" class="button button-outline">&lt;&lt;</a></li>
+                <li><a title="Previous" href="#" class="button button-outline">&lt;</a></li>
+                <li><a title="Next" href="#" class="button button-outline">&gt;</a></li>
+                <li><a title="Last" href="#" class="button button-outline">&gt;&gt;</a></li>
             </ul>
         </section>
         <section data-m-type="form" data-m-model="Post" data-m-state="hide">
