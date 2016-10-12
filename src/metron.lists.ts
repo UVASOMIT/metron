@@ -292,6 +292,16 @@ namespace metron {
             else {
                 document.selectOne(`${selector}`).hide();
             }
+            self.applyPageSizeEvents(selector);
+        }
+        private applyPageSizeEvents(selector: string): void {
+            var self = this;
+            var parent = document.selectOne(`${selector}`).parent();
+            var control = parent.selectOne("[data-m-segment='controls'] [data-m-segment='paging']");
+            control.addEvent("change", function(e) {
+                self.pageSize = <number><any>(<HTMLElement>control).val();
+                self.callListing();
+            });
         }
         private calculateTotalPageSize(totalCount: number): number {
             return Math.ceil(totalCount / this.pageSize);

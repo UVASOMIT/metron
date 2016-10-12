@@ -11,6 +11,9 @@
 input[type='email']:focus, input[type='number']:focus, input[type='password']:focus, input[type='search']:focus, input[type='tel']:focus, input[type='text']:focus, input[type='url']:focus, textarea:focus, select:focus {
     border-color: #ff942b;
 }
+input[type='email']:focus, input[type='number']:focus, input[type='password']:focus, input[type='search']:focus, input[type='tel']:focus, input[type='text']:focus, input[type='url']:focus, textarea:focus, select:focus {
+    border-color: #ff942b;
+}
 [data-m-type] {
     clear: both;
     margin: auto 5rem auto 5rem;
@@ -35,6 +38,7 @@ table[data-m-segment='list'] {
 ul[data-m-segment='paging'] {
     list-style-type: none;
     margin-bottom: 15rem;
+    float: left;
 }
 ul[data-m-segment='paging'] > li {
     float: left;
@@ -43,4 +47,17 @@ ul[data-m-segment='paging'] > li {
 ul[data-m-segment='paging'] > li > a {
     padding-right: 1.5rem;
     padding-left: 1.5rem;
+}
+form[data-m-segment='controls'] {
+     float: right;
+}
+form[data-m-segment='controls'] > fieldset > label {
+    font-weight: normal;
+    float: left;
+    width: 10rem;
+    line-height: 3.8rem;
+}
+form[data-m-segment='controls'] > fieldset > select {
+    float: left;
+    width: 10rem;
 }

@@ -62,6 +62,17 @@
                 <li><a title="Next" href="#" class="button button-outline">&gt;</a></li>
                 <li><a title="Last" href="#" class="button button-outline">&gt;&gt;</a></li>
             </ul>
+            <form data-m-segment="controls">
+                <fieldset>
+                    <label for="Filter_Post_PageSize">Page Size</label>
+                    <select id="Filter_Post_PageSize" name="PageSize" data-m-segment="paging">
+                        <option value="10" selected="selected">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </fieldset>
+            </form>
         </section>
         <section data-m-type="form" data-m-model="Post" data-m-state="hide">
             <div data-m-segment="alert" data-m-state="hide"></div>
