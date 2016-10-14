@@ -1,30 +1,28 @@
-{
-    "Post": [
-        {
-            "PostID": 1,
-            "Guid": null,
-            "PostTypeID": 1,
-            "Name": "This is a demo blog post",
-            "Description": "Here is a demo description for the blog post. This can be basic markdown text.",
-            "IsActive": true,
-            "DateCreated": "2016-09-21T12:12:00.435",
-            "DateModified": "2016-09-21T12:12:00.094",
-            "US": "Michael Szul",
-            "RowNumber": 1,
-            "TotalCount": 2
-        },
-        {
-            "PostID": 2,
-            "Guid": null,
-            "PostTypeID": 1,
-            "Name": "This is a second demo blog post",
-            "Description": "Here is more of a demo description for the blog post. This is for the second blog post.",
-            "IsActive": true,
-            "DateCreated": "2016-09-22T07:18:23.345",
-            "DateModified": "2016-09-22T07:18:37.289",
-            "US": "Michael Szul",
-            "RowNumber": 2,
-            "TotalCount": 2
-        }
-    ]
-}
+[
+    {
+        "PostID": 1,
+        "Guid": null,
+        "PostTypeID": 1,
+        "Name": "This is a demo blog post",
+        "Description": "Here is a demo description for the blog post. This can be basic markdown text.",
+        "IsActive": true,
+        "DateCreated": "2016-09-21T12:12:00.435",
+        "DateModified": "2016-09-21T12:12:00.094",
+        "US": "Michael Szul",
+        "RowNumber": 1,
+        "TotalCount": 2
+    },
+    {
+        "PostID": 2,
+        "Guid": null,
+        "PostTypeID": 1,
+        "Name": "This is a second demo blog post",
+        "Description": "Here is more of a demo description for the blog post. This is for the second blog post.",
+        "IsActive": true,
+        "DateCreated": "2016-09-22T07:18:23.345",
+        "DateModified": "2016-09-22T07:18:37.289",
+        "US": "Michael Szul",
+        "RowNumber": 2,
+        "TotalCount": 2
+    }
+]

@@ -51,9 +51,8 @@ namespace metron {
                         let binding: string = el.attribute("data-m-binding");
                         let key: string = el.attribute("name");
                         let nText: string = el.attribute("data-m-text");
-                        metron.web.get(`${metron.fw.getAPIURL(binding)}`, {}, null, "json", function (data: T) {
-                            let items: Array<T> = metron.tools.normalizeModelItems(data, binding);
-                            items.each(function(i: number, item: any) {
+                        metron.web.get(`${metron.fw.getAPIURL(binding)}`, {}, null, "json", function (data: Array<T>) {
+                            data.each(function(i: number, item: any) {
                                 el.append(`<option value="${item[key]}">${item[nText]}</option>`);
                                 if(f.elem.selectOne(`#${self.model}_${key}`) != null) {
                                     (<HTMLElement>f.elem.selectOne(`#${self.model}_${key}`)).append(`<option value="${item[key]}">${item[nText]}</option>`);
@@ -119,7 +118,7 @@ namespace metron {
                                     f.elem.selectAll("input, select, textarea").each(function(idx: number, elem: Element) {
                                         parameters[<string>elem.attribute("name")] = (<HTMLElement>elem).val();
                                     });
-                                    metron.web.get(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
+                                    metron.web.save("", `${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
                                         (<HTMLElement>f.elem.selectOne(`#${self.model}_${self.model}ID`)).val(<string><any>data[`${self.model}ID`]);
                                         f.elem.attribute("data-m-state", "hide");
                                         f.elem.hide();
@@ -157,10 +156,9 @@ namespace metron {
                     let parameters = {};
                     parameters[`${self.model}ID`] = <number><any>metron.tools.getDataPrimary(`${self.model}ID`, elem.attribute("data-primary"));
                     metron.web.get(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
-                        let item = metron.tools.normalizeModelItems(data, self.model, true);
-                        for (let prop in item) {
-                            if(item.hasOwnProperty(prop) && item[prop] != null && document.selectOne(`#${self.model}_${prop}`) != null) {
-                                (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(item[prop]);
+                        for (let prop in data) {
+                            if(data.hasOwnProperty(prop) && data[prop] != null && document.selectOne(`#${self.model}_${prop}`) != null) {
+                                (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(data[prop]);
                             }
                         }
                         self._form.elem.attribute("data-m-state", "show");
@@ -215,9 +213,8 @@ namespace metron {
         public callListing(): void {
             var self = this;
             var params: any = Object.extend({ PageIndex: self.currentPageIndex, PageSize: self.pageSize, SortOrder: self.sortOrder, SortDirection: self.sortDirection }, self._filters);
-            metron.web.get(`${metron.fw.getAPIURL(self.model)}`, {}, null, "json", function (data: T) {
-                let items: Array<T> = metron.tools.normalizeModelItems(data, self.model);
-                self._items = items;
+            metron.web.get(`${metron.fw.getAPIURL(self.model)}`, {}, null, "json", function (data: Array<T>) {
+                self._items = data;
                 self.populateListing();
             });
         }
