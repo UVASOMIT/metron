@@ -20,7 +20,7 @@ namespace metron {
         private _elem: Element;
         private _filters: T = null;
         private _items: Array<T>;
-        private _rowTemplate: Element;
+        private _rowTemplate: string;
         private _form: metron.form<any>;
         public recycleBin: Array<T> = [];
         public currentPageIndex: number = 1;
@@ -156,6 +156,9 @@ namespace metron {
                     let parameters = {};
                     parameters[`${self.model}ID`] = <number><any>metron.tools.getDataPrimary(`${self.model}ID`, elem.attribute("data-primary"));
                     metron.web.get(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
+                        if(data instanceof Array) {
+                            data = data[0];
+                        }
                         for (let prop in data) {
                             if(data.hasOwnProperty(prop) && data[prop] != null && document.selectOne(`#${self.model}_${prop}`) != null) {
                                 (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(data[prop]);
@@ -176,6 +179,9 @@ namespace metron {
                         let parameters = {};
                         parameters[`${self.model}ID`] = <number><any>metron.tools.getDataPrimary(`${self.model}ID`, current.attribute("data-primary"));
                         metron.web.remove(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
+                            if(data instanceof Array) {
+                                data = data[0];
+                            }
                             self.recycleBin.push(data);
                             document.selectOne(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='undo']`).show();
                             current.up(".trow").remove();
@@ -226,7 +232,7 @@ namespace metron {
         }
         public clearTable(selector: string): void {
             var self = this;
-            self._rowTemplate = document.selectOne(`${selector} tbody tr[data-m-action='repeat']`);
+            self._rowTemplate = (<HTMLElement>document.selectOne(`${selector} tbody tr[data-m-action='repeat']`)).outerHTML;
             document.selectOne(`${selector} tbody`).empty();
         }
         public getRows(selector: string): number {

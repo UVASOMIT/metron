@@ -235,6 +235,12 @@ namespace metron {
             }
             let request: XMLHttpRequest = new XMLHttpRequest();
             let requestData = metron.web.querystringify(data);
+            if(requestData.startsWith("?")) {
+                requestData = requestData.substr(1);
+            }
+            if(requestData.endsWith("?")) {
+                requestData = requestData.substr(0, requestData.length - 2);
+            }
             if(success != null || failure != null || always != null) {
                 _send(request, requestData);
             }
@@ -252,24 +258,33 @@ namespace metron {
             };
         }
         export function get(url: string, data: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
-            return ajax(url ,data ,"GET" ,true ,contentType, dataType, success, failure, always);
+            url = `${url}${metron.web.querystringify(data)}`;
+            return ajax(url ,data ,"GET", true ,(contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, success, failure, always);
         }
         export function post(url: string, data: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
-            return ajax(url ,data ,"POST" ,true ,contentType, dataType, success, failure, always);
+            return ajax(url ,data ,"POST", true ,(contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, success, failure, always);
         }
         export function put(url: string, data: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
-            return ajax(url ,data ,"PUT" ,true ,contentType, dataType, success, failure, always);
+            return ajax(url ,data ,"PUT", true ,(contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, success, failure, always);
         }
         export function save(primary: string, url: string, data: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
             if(String.isNullOrEmpty(primary)) {
-                return ajax(url ,data ,"POST" ,true ,contentType, dataType, success, failure, always);
+                return ajax(url ,data ,"POST", true ,(contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, success, failure, always);
             }
             else {
-                return ajax(url ,data ,"PUT" ,true ,contentType, dataType, success, failure, always);
+                return ajax(url ,data ,"PUT", true ,(contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, success, failure, always);
             }
         }
         export function remove(url: string, data: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
-            return ajax(url ,data ,"DELETE" ,true ,contentType, dataType, success, failure, always);
+            url = `${url}${metron.web.querystringify(data)}`;
+            return ajax(url ,data ,"DELETE", true, (contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, function(data) {
+                if(data != null && data instanceof Array && data.length > 0) {
+                    success(data[0])
+                }
+                else {
+                    success(data);
+                }
+            }, failure, always);
         }
     }
     export namespace observer {

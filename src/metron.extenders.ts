@@ -365,8 +365,11 @@ Array.prototype.toObjectArray = function (objName: string): Array<any> {
 };
 
 //This doesn't make sense for isEmpty()
-Object.prototype.isEmpty = function (obj: string) {
-    return (Object.getOwnPropertyNames(obj).length === 0);
+Object.prototype.isEmpty = function (obj: string): boolean {
+    if(Object.getOwnPropertyNames !== undefined) {
+        return (Object.getOwnPropertyNames(obj).length === 0);
+    }
+    return false;
 };
 
 Object.prototype.getName = function (): string {
