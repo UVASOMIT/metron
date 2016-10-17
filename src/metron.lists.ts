@@ -2,6 +2,7 @@
 /// <reference path="metron.ts" />
 /// <reference path="metron.framework.ts" />
 /// <reference path="metron.forms.ts" />
+/// <reference path="metron.templates.ts" />
 
 namespace metron {
     export class lists {
@@ -110,30 +111,6 @@ namespace metron {
                                 document.location.href = `${metron.fw.getAPIURL(self.model)}/download`;
                             });
                             break;
-                        case "submit":
-                            el.addEvent("click", function (e) {
-                                e.preventDefault();
-                                if (f.isValid()) {
-                                    let parameters: any = { };
-                                    f.elem.selectAll("input, select, textarea").each(function(idx: number, elem: Element) {
-                                        parameters[<string>elem.attribute("name")] = (<HTMLElement>elem).val();
-                                    });
-                                    metron.web.save("", `${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
-                                        (<HTMLElement>f.elem.selectOne(`#${self.model}_${self.model}ID`)).val(<string><any>data[`${self.model}ID`]);
-                                        f.elem.attribute("data-m-state", "hide");
-                                        f.elem.hide();
-                                        self.callListing();
-                                    });
-                                }
-                            });
-                            break;
-                        case "cancel":
-                            el.addEvent("click", function (e) {
-                                f.clearForm();
-                                f.elem.attribute("data-m-state", "hide");
-                                f.elem.hide();
-                            });
-                            break;
                         default:
                             break;
                     }
@@ -144,7 +121,7 @@ namespace metron {
             var self = this;
             self.clearTable(`[data-m-type='list'][data-m-model='${self.model}'] table[data-m-segment='list']`);
             self.populateTable(`[data-m-type='list'][data-m-model='${self.model}'] table[data-m-segment='list']`);
-            self.createPaging(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='paging']`, this.callListing, (self._items.length > 0) ? self._items[0]["TotalCount"] : 0);
+            self.createPaging(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='paging']`, self.callListing, (self._items.length > 0) ? self._items[0]["TotalCount"] : 0);
             self.applyViewEvents();
         }
         private applyViewEvents(): void {
@@ -154,7 +131,7 @@ namespace metron {
                     e.preventDefault();
                     self._form.clearForm();
                     let parameters = {};
-                    parameters[`${self.model}ID`] = <number><any>metron.tools.getDataPrimary(`${self.model}ID`, elem.attribute("data-primary"));
+                    parameters[`${self.model}ID`] = <number><any>metron.tools.getDataPrimary(`${self.model}ID`, elem.attribute("data-m-primary"));
                     metron.web.get(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
                         if(data instanceof Array) {
                             data = data[0];
@@ -177,14 +154,14 @@ namespace metron {
                     if (confirm('Are you sure you want to delete this record?')) {
                         let current = this;
                         let parameters = {};
-                        parameters[`${self.model}ID`] = <number><any>metron.tools.getDataPrimary(`${self.model}ID`, current.attribute("data-primary"));
+                        parameters[`${self.model}ID`] = <number><any>metron.tools.getDataPrimary(`${self.model}ID`, current.attribute("data-m-primary"));
                         metron.web.remove(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
                             if(data instanceof Array) {
                                 data = data[0];
                             }
                             self.recycleBin.push(data);
+                            current.up("tr").remove();
                             document.selectOne(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='undo']`).show();
-                            current.up(".trow").remove();
                         });
                     }
                 });

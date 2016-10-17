@@ -13,6 +13,7 @@ namespace metron {
         private _action: string = "";
         private _method:string = "POST";
         private _fields: Array<string> = [];
+        private _primary: string;
         constructor(public model: string, public asscListing?: list<T>) {
             var self = this;
             if(asscListing != null) {
@@ -21,6 +22,16 @@ namespace metron {
             self.init();
         }
         private init(): void {
+            function _save(context: form<T>, data: T): void {
+                (<HTMLElement>context.elem.selectOne(`#${context.model}_${context.model}ID`)).val(<string><any>data[`${context.model}ID`]);
+                context.elem.attribute("data-m-state", "hide");
+                context.elem.hide();
+                if(context._list != null) {
+                    context._list.elem.attribute("data-m-state", "show");
+                    context._list.elem.show();
+                    context._list.callListing();
+                }
+            }
             var self = this;
             self._elem = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
             let controlBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='controls']");
@@ -28,24 +39,28 @@ namespace metron {
                 let actions = elem.selectAll("[data-m-action]");
                 actions.each(function (indx: number, el: Element) {
                     switch (el.attribute("data-m-action").lower()) {
-                        case "submit":
+                        case "save":
                             el.addEvent("click", function (e) {
                                 e.preventDefault();
                                 if (self.isValid()) {
                                     let parameters: any = { };
-                                    self._elem.selectAll("input, select, textarea").each(function(idx: number, elem: Element) {
+                                    let hasPrimary: boolean = false;
+                                    self.elem.selectAll("input, select, textarea").each(function(idx: number, elem: Element) {
                                         parameters[<string>elem.attribute("name")] = (<HTMLElement>elem).val();
-                                    });
-                                    metron.web.get(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
-                                        (<HTMLElement>self._elem.selectOne(`#${self.model}_${self.model}ID`)).val(<string><any>data[`${self.model}ID`]);
-                                        self._elem.attribute("data-m-state", "hide");
-                                        self._elem.hide();
-                                        if(self.asscListing != null) {
-                                            self.asscListing.callListing();
-                                            self._list.elem.attribute("data-m-state", "show");
-                                            self._list.elem.show();
+                                        if(elem.attribute("data-m-primary") != null && elem.attribute("data-m-primary").toBool() && (<HTMLElement>elem).val() != "") {
+                                            hasPrimary = true;
                                         }
                                     });
+                                    if(!hasPrimary) {
+                                        metron.web.post(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
+                                            _save(self, data)
+                                        });
+                                    }
+                                    else {
+                                        metron.web.put(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
+                                            _save(self, data);
+                                        });
+                                    }
                                 }
                             });
                             break;
@@ -73,7 +88,7 @@ namespace metron {
                 document.selectOne(elem).removeClass("error");
             });
             f.selectAll("input, select").each(function(idx: number, elem: Element) {
-                 elem.attribute("value", "");
+                 (<HTMLElement>elem).val("");
             });
             f.selectAll("textarea").each(function(idx: number, elem: Element) {
                  (<HTMLElement>elem).innerHTML = "";

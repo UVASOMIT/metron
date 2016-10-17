@@ -60,7 +60,6 @@ interface NodeList {
 
 interface Element {
     attribute: (name: string, value?: string) => string & Element;
-    up: (selector: string) => Element;
     parent: () => Element;
     first: (selector: string) => Element;
     append: (html: string) => Element;
@@ -74,6 +73,8 @@ interface Element {
     asString: () => string;
     selectOne: (selector: string) => Element;
     selectAll: (selector: string) => NodeListOf<Element>;
+    hasMatches: (selector: string) => boolean;
+    up: (selector: string) => Element;
 }
 
 interface HTMLElement {
@@ -429,24 +430,29 @@ Element.prototype.parent = function(): Element {
     return this.parentNode;
 };
 
-Element.prototype.up = function(selector: string): Element {
-    var self = this;
-    function _upper(selector: string) {
-        try {
-            let _up = self.parent().parent();
-            if(_up.selectOne(selector) != null) {
-                _upper(_up);
-            }
-            return _up.selectOne(selector);
-        }
-        catch(e) {
-            return null;
-        }
-    } 
-    if(self.closest != null) {
-        return self.closest(selector);
+Element.prototype.hasMatches = function(selector: string): boolean {
+    if((<any>this).matches != null) {
+        return (<any>this).matches(selector);
     }
-    return _upper(selector);
+    else if((<any>this).msMatchesSelector != null) {
+        return (<any>this).msMatchesSelector(selector);
+    }
+    return false;
+};
+
+Element.prototype.up = function (selector: string): Element {
+    var el: Element = this;
+    if((<any>el).closest != null) {
+        return (<any>el).closest(selector);
+    }
+    else {
+        while (el) {
+            if (el.hasMatches(selector)) {
+                return <Element>el;
+            }
+            el = el.parentElement;
+        }
+    }
 };
 
 Element.prototype.first = function(selector: string): Element {
@@ -535,7 +541,7 @@ HTMLElement.prototype.val = function(val?: string): string {
                     break;
                 case "checkbox":
                     if(<boolean><any>val || val.toBool()) {
-                        this.attribute("checked", "checked");
+                        this.checked = true;
                     }
                     break;
                 case "radio":
@@ -543,10 +549,10 @@ HTMLElement.prototype.val = function(val?: string): string {
                     let radios: NodeListOf<Element> = document.selectAll(`input[type='radio'][name='${name}']`);
                     radios.each(function(idx: number, elem: Element) {
                         if(elem.attribute("value") == val) {
-                            elem.attribute("checked", "checked");
+                            (<HTMLInputElement>elem).checked = true;
                         }
                         else {
-                            elem.removeAttribute("checked");
+                            (<HTMLInputElement>elem).checked = false;
                         }
                     });
                     break;
