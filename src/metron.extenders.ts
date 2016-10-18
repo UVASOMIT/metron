@@ -42,7 +42,6 @@ interface Array<T> {
 }
 
 interface Object {
-    isEmpty: (obj: any) => boolean;
     getName: () => string;
     extend: (dest: any, src: any) => any;
 }
@@ -64,6 +63,7 @@ interface Element {
     first: (selector: string) => Element;
     append: (html: string) => Element;
     empty: () => Element;
+    drop: () => Element;
     removeEvent: (event: string) => Element;
     addEvent: (event: string, callback: Function) => Element;
     show: () => Element;
@@ -365,14 +365,6 @@ Array.prototype.toObjectArray = function (objName: string): Array<any> {
     }
 };
 
-//This doesn't make sense for isEmpty()
-Object.prototype.isEmpty = function (obj: string): boolean {
-    if(Object.getOwnPropertyNames !== undefined) {
-        return (Object.getOwnPropertyNames(obj).length === 0);
-    }
-    return false;
-};
-
 Object.prototype.getName = function (): string {
     let regex: RegExp = /function (.{1,})\(/;
     let results: RegExpExecArray = regex.exec((this).constructor.toString());
@@ -479,6 +471,13 @@ Element.prototype.empty = function(): Element {
     return this;
 };
 
+Element.prototype.drop = function(): Element {
+    var self = this;
+    var parent = self.parentNode;
+    parent.removeChild(self);
+    return self;
+};
+
 Element.prototype.removeEvent = function(event: string): Element {
     if(this[`on${event}`] != null) {
         this[`on${event}`] = null;
@@ -540,7 +539,7 @@ HTMLElement.prototype.val = function(val?: string): string {
                     this.value = val;
                     break;
                 case "checkbox":
-                    if(<boolean><any>val || val.toBool()) {
+                    if (<boolean><any>val) {
                         this.checked = true;
                     }
                     break;

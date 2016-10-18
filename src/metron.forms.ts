@@ -91,10 +91,10 @@ namespace metron {
                  (<HTMLElement>elem).val("");
             });
             f.selectAll("textarea").each(function(idx: number, elem: Element) {
-                 (<HTMLElement>elem).innerHTML = "";
+                 (<HTMLElement>elem).val("");
             });
             f.selectAll("input[type='checkbox']").each(function(idx: number, elem: Element) {
-                 elem.removeAttribute("checked");
+                 (<HTMLElement>elem).val("");
             });
             if (callback != null) {
                 callback();

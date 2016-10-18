@@ -132,7 +132,7 @@ namespace metron {
                     self._form.clearForm();
                     let parameters = {};
                     parameters[`${self.model}ID`] = <number><any>metron.tools.getDataPrimary(`${self.model}ID`, elem.attribute("data-m-primary"));
-                    metron.web.get(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
+                    metron.web.get(`${metron.fw.getAPIURL(self.model)}${metron.web.querystringify(parameters)}`, parameters, null, "json", function (data: T) {
                         if(data instanceof Array) {
                             data = data[0];
                         }
@@ -155,12 +155,12 @@ namespace metron {
                         let current = this;
                         let parameters = {};
                         parameters[`${self.model}ID`] = <number><any>metron.tools.getDataPrimary(`${self.model}ID`, current.attribute("data-m-primary"));
-                        metron.web.remove(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
+                        metron.web.remove(`${metron.fw.getAPIURL(self.model)}${metron.web.querystringify(parameters)}`, parameters, null, "json", function (data: T) {
                             if(data instanceof Array) {
                                 data = data[0];
                             }
                             self.recycleBin.push(data);
-                            current.up("tr").remove();
+                            current.up("tr").drop();
                             document.selectOne(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='undo']`).show();
                         });
                     }
@@ -195,8 +195,8 @@ namespace metron {
         }
         public callListing(): void {
             var self = this;
-            var params: any = Object.extend({ PageIndex: self.currentPageIndex, PageSize: self.pageSize, SortOrder: self.sortOrder, SortDirection: self.sortDirection }, self._filters);
-            metron.web.get(`${metron.fw.getAPIURL(self.model)}`, {}, null, "json", function (data: Array<T>) {
+            var parameters: any = Object.extend({ PageIndex: self.currentPageIndex, PageSize: self.pageSize, SortOrder: self.sortOrder, SortDirection: self.sortDirection }, self._filters);
+            metron.web.get(`${metron.fw.getAPIURL(self.model)}${metron.web.querystringify(parameters)}`, {}, null, "json", function (data: Array<T>) {
                 self._items = data;
                 self.populateListing();
             });
@@ -209,7 +209,9 @@ namespace metron {
         }
         public clearTable(selector: string): void {
             var self = this;
-            self._rowTemplate = (<HTMLElement>document.selectOne(`${selector} tbody tr[data-m-action='repeat']`)).outerHTML;
+            if(String.isNullOrEmpty(self._rowTemplate)) {
+                self._rowTemplate = (<HTMLElement>document.selectOne(`${selector} tbody tr[data-m-action='repeat']`)).outerHTML;
+            }
             document.selectOne(`${selector} tbody`).empty();
         }
         public getRows(selector: string): number {
