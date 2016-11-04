@@ -3,12 +3,18 @@
 /// <reference path="metron.lists.ts" />
 /// <reference path="metron.forms.ts" />
 /// <reference path="metron.tools.ts" />
+/// <reference path="metron.templates.ts" />
 
 namespace metron {
     export var globals: any = { };
     export function onready(callback: Function) {
         document.addEventListener("DOMContentLoaded", function(e) {
-            let root: string = (document.selectOne("body[data-m-root]") != null)  ? `${document.selectOne("body[data-m-root]").attribute("data-m-root")}` : "";
+            let page: string = document.documentElement.outerHTML;
+            let root: string = metron.fw.getApplicationRoot(page);
+            if(metron.templates.master.hasMaster(page)) {
+                metron.templates.master.loadMaster(page);
+            }
+            //
             metron.tools.loadJSON(`${root}/metron.json`, function(configData: JSON) {
                 for(let obj in configData) {
                     globals[obj] = configData[obj];
@@ -20,6 +26,13 @@ namespace metron {
         });
     }
     export namespace fw {
+        export function getApplicationRoot(page: string): string {
+            let root: string = (document.selectOne("body[data-m-root]") != null)  ? `${document.selectOne("body[data-m-root]").attribute("data-m-root")}` : "";
+            if(root == "") {
+                root = metron.tools.getMatching(page, /\{\{m:master=\"(.*)\"\}\}/g);
+            }
+            return root;
+        }
         export function getBaseUrl(): string {
             if(metron.globals["config.baseURL"] != null) {
                 return ((<string>metron.globals["config.baseURL"]).endsWith("/")) ? (<string>metron.globals["config.baseURL"]).substr(0, (<string>metron.globals["config.baseURL"]).length - 2) : `${metron.globals["config.baseURL"]}`;

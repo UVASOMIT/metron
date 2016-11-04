@@ -8,7 +8,8 @@ module.exports = function (grunt) {
                 rootDir: 'src',
                 sourceMap: true,
                 declaration: true,
-                removeComments: true
+                removeComments: true,
+                watch: true
             },
             base: {
                 src: ['src/**/*.ts', "!**/*.d.ts"],

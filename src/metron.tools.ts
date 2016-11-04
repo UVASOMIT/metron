@@ -65,6 +65,13 @@ namespace metron {
                 }
             });
         }
+        export function getMatching(text: string, regex: RegExp) {
+            let match = regex.exec(text);
+            if(match[1] !== undefined) {
+                return match[1];
+            }
+            return null;
+        }
         export function getDataPrimary(key: string, values: string): any {
             return values.getValueByKey(key);
         }

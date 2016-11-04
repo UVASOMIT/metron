@@ -6,7 +6,8 @@
                 "outFile": "dist/gen/metron.js",
                 "sourceMap": true,
                 "declaration": true,
-                "removeComments": true
+                "removeComments": true,
+                "watch": true
             },
     "files": [
         "src/metron.extenders.ts",
