@@ -21,16 +21,22 @@ namespace metron {
                 return false;
             }
             export function loadMaster(page: string): void {
-                let fileName = metron.tools.getMatching(page, /\{\{m:master=\"(.*)\"\}\}/g);
-                //let result = metron.templates.master.merge(match[0]);
-                //Load template file
+                let root: string = metron.tools.getMatching(page, /\{\{m:root=\"(.*)\"\}\}/g);
+                let fileName: string = metron.tools.getMatching(page, /\{\{m:master=\"(.*)\"\}\}/g);
+                metron.web.load(`${root}/${fileName}`, {}, "text/html", "text",  (resp: string) => {
+                    metron.templates.master.merge(resp);
+                },
+                (err) => {
+                    document.documentElement.append(`<h1>Error: Failed to load [${root}/${fileName}].</h1><p>${err}</p>`);
+                });
             }
             export function merge(template: string): void {
-                let placeholder: Element = document.createElement("root");
+                let placeholder: Element = document.createElement("html");
                 let content = document.documentElement.outerHTML;
                 placeholder.append(template.replace("{{m:content}}", content));
                 document.documentElement.empty();
                 document.documentElement.append((<HTMLElement>placeholder).innerHTML);
+                console.log(document.documentElement.outerHTML);
             }
         }
     }

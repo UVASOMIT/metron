@@ -14,7 +14,7 @@ namespace metron {
             if(metron.templates.master.hasMaster(page)) {
                 metron.templates.master.loadMaster(page);
             }
-            //
+            console.log(root);
             metron.tools.loadJSON(`${root}/metron.json`, function(configData: JSON) {
                 for(let obj in configData) {
                     globals[obj] = configData[obj];
