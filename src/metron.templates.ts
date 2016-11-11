@@ -1,3 +1,4 @@
+/// <reference path="metron.extenders.ts" />
 
 namespace metron {
     export namespace templates {
@@ -31,12 +32,30 @@ namespace metron {
                 });
             }
             export function merge(template: string): void {
+                function _copyAttributes(src: Node, elemName: string) {
+                    for(let i = 0; i < src.attributes.length; i++) {
+                        document.documentElement.querySelector(elemName).attribute(src.attributes[i].name, src.attributes[i].value);
+                    }
+                }
                 let placeholder: Element = document.createElement("html");
-                let content = document.documentElement.outerHTML;
-                placeholder.append(template.replace("{{m:content}}", content));
+                let content = getContentRoot();
+                (<HTMLElement>placeholder).innerHTML = `<metron>${template.replace("{{m:content}}", content).replace(/head/g, "mhead").replace(/body/g, "mbody")}</metron>`;
                 document.documentElement.empty();
-                document.documentElement.append((<HTMLElement>placeholder).innerHTML);
-                console.log(document.documentElement.outerHTML);
+                if(document.documentElement.hasChildNodes()) {
+                    (<HTMLElement>document.querySelector("head")).innerHTML = (<HTMLElement>placeholder.querySelector("mhead")).innerHTML;
+                    _copyAttributes(placeholder.querySelector("mhead"), "head");
+                    (<HTMLElement>document.querySelector("body")).innerHTML = (<HTMLElement>placeholder.querySelector("mbody")).innerHTML;
+                    _copyAttributes(placeholder.querySelector("mbody"), "body");
+                }
+                else {
+                    document.documentElement.append((<HTMLElement>placeholder).innerHTML);
+                }
+            }
+            export function getContentRoot(): string {
+                if(document.documentElement.querySelector("body") != null) {
+                    return (<HTMLElement>document.documentElement.querySelector("body")).innerHTML.replace(/\{\{m:root=\"(.*)\"\}\}/g, "").replace(/\{\{m:master=\"(.*)\"\}\}/g, "");
+                }
+                return document.documentElement.innerHTML.replace(/\{\{m:root=\"(.*)\"\}\}/g, "").replace(/\{\{m:master=\"(.*)\"\}\}/g, "");
             }
         }
     }

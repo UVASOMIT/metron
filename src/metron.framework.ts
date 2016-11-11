@@ -9,12 +9,10 @@ namespace metron {
     export var globals: any = { };
     export function onready(callback: Function) {
         document.addEventListener("DOMContentLoaded", function(e) {
-            let page: string = document.documentElement.outerHTML;
-            let root: string = metron.fw.getApplicationRoot(page);
-            if(metron.templates.master.hasMaster(page)) {
-                metron.templates.master.loadMaster(page);
+            if(metron.templates.master.hasMaster(document.documentElement.outerHTML)) {
+                metron.templates.master.loadMaster(document.documentElement.outerHTML);
             }
-            console.log(root);
+            let root: string = metron.fw.getApplicationRoot(document.documentElement.outerHTML);
             metron.tools.loadJSON(`${root}/metron.json`, function(configData: JSON) {
                 for(let obj in configData) {
                     globals[obj] = configData[obj];
