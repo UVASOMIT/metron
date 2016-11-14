@@ -25,10 +25,8 @@ namespace metron {
                         .replace(/!\[([^\]]*)]\(([^(]+)\)/g, '<img alt="$1" src="$2">')
                         .replace(/\[([^\]]+)]\(([^(]+)\)/g, (<any>'$1').link('$2'))
                         .replace(/`([^`]+)`/g, '<code>$1</code>')
-                        //.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-                        //.replace(/\*([^*]+)\*/g, '<em>$1</em>')
-                        .replace(/(\*\*|__)(?=\S)([^\r]*?\S[*_]*)\1/g, '<strong>$2</strong>')
-                        .replace(/(\*|_)(?=\S)([^\r]*?\S)\1/g, '<em>$2</em>');
+                        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\*([^*]+)\*/g, '<em>$1</em>')
                 }
 
                 src.replace(/^\s+|\r|\s+$/g, "").replace(/\t/g, "    ").split(/\n\n+/).forEach(function(b: string, f: number, R: Array<string>) {

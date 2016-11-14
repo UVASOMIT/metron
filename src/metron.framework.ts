@@ -12,6 +12,9 @@ namespace metron {
             if(metron.templates.master.hasMaster(document.documentElement.outerHTML)) {
                 metron.templates.master.loadMaster(document.documentElement.outerHTML);
             }
+            document.querySelectorAll("[data-m-type='markdown']").each(function (idx: number, elem: Element) {
+                (<HTMLElement>elem).innerHTML = metron.templates.markdown.toHTML((<HTMLElement>elem).innerHTML);
+            });
             let root: string = metron.fw.getApplicationRoot(document.documentElement.outerHTML);
             metron.tools.loadJSON(`${root}/metron.json`, function(configData: JSON) {
                 for(let obj in configData) {
