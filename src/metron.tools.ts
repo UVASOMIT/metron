@@ -68,6 +68,9 @@ namespace metron {
         export function getMatching(text: string, regex: RegExp) {
             let match = regex.exec(text);
             if(match[1] !== undefined) {
+                if(match[1].contains("\"")) { //Edge isn't handling regex matches correctly
+                    return match[1].split("\"")[0];
+                }
                 return match[1];
             }
             return null;
