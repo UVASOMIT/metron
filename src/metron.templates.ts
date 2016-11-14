@@ -71,7 +71,7 @@ namespace metron {
                 }
                 let placeholder: Element = document.createElement("html");
                 let content = getContentRoot();
-                (<HTMLElement>placeholder).innerHTML = `<metron>${template.replace("{{m:content}}", content).replace(/head/g, "mhead").replace(/body/g, "mbody")}</metron>`;
+                (<HTMLElement>placeholder).innerHTML = `<metron>${template.replace("{{m:content}}", content).replace(/head/g, "mhead").replace(/body/g, "mbody").replace(/mheader/g, "header")}</metron>`;
                 document.documentElement.empty();
                 if(document.documentElement.hasChildNodes()) {
                     (<HTMLElement>document.querySelector("head")).innerHTML = (<HTMLElement>placeholder.querySelector("mhead")).innerHTML;
