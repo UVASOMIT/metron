@@ -14,8 +14,8 @@ namespace metron {
                 return result;
             }
         }
-        export namespace markdown { //Adapted from Mathieu 'p01' Henri: https://github.com/p01/mmd.js/blob/master/mmd.js
-            export function toHTML(src: string): string {
+        export namespace markdown {
+            export function toHTML(src: string): string { //Adapted from Mathieu 'p01' Henri: https://github.com/p01/mmd.js/blob/master/mmd.js
                 let html: string = "";
                 function escape(text: string): string {
                     return new Option(text).innerHTML;
