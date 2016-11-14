@@ -29,13 +29,13 @@ namespace metron {
                         .replace(/\*([^*]+)\*/g, '<em>$1</em>')
                 }
 
-                src.replace(/^\s+|\r|\s+$/g, "").replace(/\t/g, "    ").split(/\n\n+/).forEach(function(b: string, f: number, R: Array<string>) {
+                src.replace(/&gt;/g, ">").replace(/^\s+|\r|\s+$/g, "").replace(/\t/g, "    ").split(/\n\n+/).forEach(function(b: string, f: number, R: Array<string>) {
                     f = <number><any>b[0];
                     R= {
                         '*':[/\n\* /, "<ul><li>", "</li></ul>"],
                         '1':[/\n[1-9]\d*\.? /, "<ol><li>", "</li></ol>"],
                         ' ':[/\n    /, "<pre><code>", "</pre></code>", "\n"],
-                        '>':[/\n> /, "<blockquote>", "</blockquote>", "\n"]
+                        '>':[/\n> /, "<blockquote>", "</blockquote>", "\n"],
                     }[f];
                     html += R ? R[1] + ("\n" + b)
                         .split(R[0])

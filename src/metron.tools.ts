@@ -60,7 +60,6 @@ namespace metron {
             }
             metron.web.load(`${url}`, {}, null, "JSON", function(data: JSON) {
                 if(callback != null) {
-                    console.log(data);
                     callback(data);
                 }
             });
