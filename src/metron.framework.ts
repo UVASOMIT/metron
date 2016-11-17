@@ -8,25 +8,23 @@
 namespace metron {
     export var globals: any = { };
     export function onready(callback: Function) {
-        if(document !== undefined) {
-            document.addEventListener("DOMContentLoaded", function(e) {
-                if(metron.templates.master.hasMaster(document.documentElement.outerHTML)) {
-                    metron.templates.master.loadMaster(document.documentElement.outerHTML);
-                }
-                document.querySelectorAll("[data-m-type='markdown']").each(function (idx: number, elem: Element) {
-                    (<HTMLElement>elem).innerHTML = metron.templates.markdown.toHTML((<HTMLElement>elem).innerHTML);
-                });
-                let root: string = metron.fw.getApplicationRoot(document.documentElement.outerHTML);
-                metron.tools.loadJSON(`${root}/metron.json`, function(configData: JSON) {
-                    for(let obj in configData) {
-                        globals[obj] = configData[obj];
-                    }
-                    if(callback != null) {
-                        callback(e);
-                    }
-                });
+        document.addEventListener("DOMContentLoaded", function(e) {
+            if(metron.templates.master.hasMaster(document.documentElement.outerHTML)) {
+                metron.templates.master.loadMaster(document.documentElement.outerHTML);
+            }
+            document.querySelectorAll("[data-m-type='markdown']").each(function (idx: number, elem: Element) {
+                (<HTMLElement>elem).innerHTML = metron.templates.markdown.toHTML((<HTMLElement>elem).innerHTML);
             });
-        }
+            let root: string = metron.fw.getApplicationRoot(document.documentElement.outerHTML);
+            metron.tools.loadJSON(`${root}/metron.json`, function(configData: JSON) {
+                for(let obj in configData) {
+                    globals[obj] = configData[obj];
+                }
+                if(callback != null) {
+                    callback(e);
+                }
+            });
+        });
     }
     export namespace fw {
         export function getApplicationRoot(page: string): string {
