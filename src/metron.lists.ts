@@ -182,7 +182,7 @@ namespace metron {
         }
         public undoLast(): void {
             var self = this;
-            metron.web.post(`${metron.fw.getAPIURL(self.model)}`, self.recycleBin.pop(), null, "json", function (data: T) {
+            metron.web.post(`${metron.fw.getAPIURL(self.model)}/undo`, self.recycleBin.pop(), null, "json", function (data: T) {
                 self.callListing();
             });
             if (self.recycleBin.length == 0) {
