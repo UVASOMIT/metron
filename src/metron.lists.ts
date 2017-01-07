@@ -12,8 +12,8 @@ namespace metron {
             metron.globals["lists"] = [];
             for (let i = 0; i < sections.length; i++) {
                 let section: Element = <Element>sections[i];
-                var model: string = section.attribute("data-m-model");
-                var l: list<any> = new list(model).init();
+                let model: string = section.attribute("data-m-model");
+                let l: list<any> = new list(model).init();
                 metron.globals["lists"].push(l);
             }
         }
@@ -43,8 +43,8 @@ namespace metron {
         public init(): list<T> {
             var self = this;
             self._elem = document.selectOne(`[data-m-type='list'][data-m-model='${self.model}']`);
-            let f: metron.form<any> = (self.asscForm != null) ? self.asscForm : self.attachForm(new metron.form(self.model, self).init());
-            let filterBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='filters']");
+            var f: metron.form<any> = (self.asscForm != null) ? self.asscForm : self.attachForm(new metron.form(self.model, self).init());
+            var filterBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='filters']");
             filterBlocks.each(function(idx: number, elem: Element) {
                 let filters = elem.selectAll("[data-m-action='filter']");
                 filters.each(function (indx: number, el: Element) {
@@ -83,7 +83,7 @@ namespace metron {
                     }
                 });
             });
-            let controlBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='controls']");
+            var controlBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='controls']");
             controlBlocks.each(function (idx: number, elem: Element) {
                 let actions = elem.selectAll("[data-m-action]");
                 actions.each(function (indx: number, el: Element) {
@@ -96,6 +96,9 @@ namespace metron {
                                 f.elem.show();
                                 self._elem.attribute("data-m-state", "hide");
                                 self._elem.hide();
+                                if((<any>self).new_m_inject != null) {
+                                    (<any>self).new_m_inject();
+                                }
                             });
                             break;
                         case "undo":
@@ -108,6 +111,9 @@ namespace metron {
                         case "download":
                             el.addEvent("click", function (e) {
                                 e.preventDefault();
+                                if((<any>self).download_m_inject != null) {
+                                    (<any>self).download_m_inject();
+                                }
                                 document.location.href = `${metron.fw.getAPIURL(self.model)}/download`;
                             });
                             break;
@@ -117,6 +123,9 @@ namespace metron {
                 });
             });
             self.callListing();
+            if((<any>self).init_m_inject != null) {
+                (<any>self).init_m_inject();
+            }
             return self;
         }
         private populateListing(): void {
@@ -125,6 +134,9 @@ namespace metron {
             self.populateTable(`[data-m-type='list'][data-m-model='${self.model}'] table[data-m-segment='list']`);
             self.createPaging(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='paging']`, self.callListing, (self._items.length > 0) ? self._items[0]["TotalCount"] : 0);
             self.applyViewEvents();
+            if((<any>self).populateListing_m_inject != null) {
+                (<any>self).populateListing_m_inject();
+            }
         }
         private applyViewEvents(): void {
             var self = this;
@@ -181,6 +193,9 @@ namespace metron {
                     self.callListing();
                 });
             });
+            if((<any>self).applyViewEvents_m_inject != null) {
+                (<any>self).applyViewEvents_m_inject();
+            }
         }
         public undoLast(): void {
             var self = this;
@@ -189,6 +204,9 @@ namespace metron {
             });
             if (self.recycleBin.length == 0) {
                 document.selectOne(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='undo']`).hide();
+            }
+            if((<any>self).undoLast_m_inject != null) {
+                (<any>self).undoLast_m_inject();
             }
         }
         public formatData(item: T): string {
@@ -201,6 +219,9 @@ namespace metron {
             metron.web.get(`${metron.fw.getAPIURL(self.model)}${metron.web.querystringify(parameters)}`, {}, null, "json", function (data: Array<T>) {
                 self._items = data;
                 self.populateListing();
+                if((<any>self).callListing_m_inject != null) {
+                    (<any>self).callListing_m_inject();
+                }
             });
         }
         public populateTable(selector: string): void {

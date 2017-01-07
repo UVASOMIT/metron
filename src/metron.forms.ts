@@ -4,7 +4,7 @@ namespace metron {
             
         }
     }
-    export class form<T> {
+    export class form<T> extends base {
         private _elem: Element;
         private _list: metron.list<any>;
         private _field_id: string;
@@ -15,6 +15,7 @@ namespace metron {
         private _fields: Array<string> = [];
         private _primary: string;
         constructor(public model: string, public asscListing?: list<T>) {
+            super();
             var self = this;
             if(asscListing != null) {
                 self._list = asscListing;
@@ -33,7 +34,7 @@ namespace metron {
             }
             var self = this;
             self._elem = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
-            let controlBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='controls']");
+            var controlBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='controls']");
             controlBlocks.each(function (idx: number, elem: Element) {
                 let actions = elem.selectAll("[data-m-action]");
                 actions.each(function (indx: number, el: Element) {
@@ -53,11 +54,17 @@ namespace metron {
                                     if(!hasPrimary) {
                                         metron.web.post(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
                                             _save(self, data)
+                                            if((<any>self).post_m_inject != null) {
+                                                (<any>self).post_m_inject();
+                                            }
                                         });
                                     }
                                     else {
                                         metron.web.put(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
                                             _save(self, data);
+                                            if((<any>self).put_m_inject != null) {
+                                                (<any>self).put_m_inject();
+                                            }
                                         });
                                     }
                                 }
@@ -72,6 +79,9 @@ namespace metron {
                                     self._list.elem.attribute("data-m-state", "show");
                                     self._list.elem.show();
                                 }
+                                if((<any>self).cancel_m_inject != null) {
+                                    (<any>self).cancel_m_inject();
+                                }
                             });
                             break;
                         default:
@@ -79,6 +89,9 @@ namespace metron {
                     }
                 });
             });
+            if((<any>self).init_m_inject != null) {
+                (<any>self).init_m_inject();
+            }
             return self;
         }
         public clearForm(selector?: string, callback?: Function): void {
