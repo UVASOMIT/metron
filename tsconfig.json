@@ -13,6 +13,7 @@
         "src/metron.extenders.ts",
         "src/metron.ts",
         "src/metron.tools.ts",
+        "src/metron.base.ts",
         "src/metron.framework.ts",
         "src/metron.lists.ts",
         "src/metron.forms.ts",
