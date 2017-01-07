@@ -1,5 +1,6 @@
 /// <reference path="metron.extenders.ts" />
 /// <reference path="metron.ts" />
+/// <reference path="metron.base.ts" />
 /// <reference path="metron.framework.ts" />
 /// <reference path="metron.forms.ts" />
 /// <reference path="metron.templates.ts" />
@@ -12,12 +13,12 @@ namespace metron {
             for (let i = 0; i < sections.length; i++) {
                 let section: Element = <Element>sections[i];
                 var model: string = section.attribute("data-m-model");
-                var l: list<any> = new list(model);
+                var l: list<any> = new list(model).init();
                 metron.globals["lists"].push(l);
             }
         }
     }
-    export class list<T> {
+    export class list<T> extends base {
         private _elem: Element;
         private _filters: T = null;
         private _items: Array<T>;
@@ -30,6 +31,7 @@ namespace metron {
         public sortOrder: string = "DateCreated";
         public sortDirection: string = "DESC";
         constructor(public model: string, public listType: string = "list", public asscForm?: form<T>) {
+            super();
             var self = this;
             if(asscForm != null) {
                 self._form = asscForm;
@@ -37,13 +39,11 @@ namespace metron {
             if(self._filters == null) {
                 self._filters = <any>{};
             }
-            self.init();
-            self.callListing();
         }
-        private init(): void {
+        public init(): list<T> {
             var self = this;
             self._elem = document.selectOne(`[data-m-type='list'][data-m-model='${self.model}']`);
-            let f: metron.form<any> = (self.asscForm != null) ? self.asscForm : self.attachForm(new metron.form(self.model, self));
+            let f: metron.form<any> = (self.asscForm != null) ? self.asscForm : self.attachForm(new metron.form(self.model, self).init());
             let filterBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='filters']");
             filterBlocks.each(function(idx: number, elem: Element) {
                 let filters = elem.selectAll("[data-m-action='filter']");
@@ -116,6 +116,8 @@ namespace metron {
                     }
                 });
             });
+            self.callListing();
+            return self;
         }
         private populateListing(): void {
             var self = this;

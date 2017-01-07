@@ -19,9 +19,8 @@ namespace metron {
             if(asscListing != null) {
                 self._list = asscListing;
             }
-            self.init();
         }
-        private init(): void {
+        public init(): form<T> {
             function _save(context: form<T>, data: T): void {
                 (<HTMLElement>context.elem.selectOne(`#${context.model}_${context.model}ID`)).val(<string><any>data[`${context.model}ID`]);
                 context.elem.attribute("data-m-state", "hide");
@@ -80,6 +79,7 @@ namespace metron {
                     }
                 });
             });
+            return self;
         }
         public clearForm(selector?: string, callback?: Function): void {
             var self = this;

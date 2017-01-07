@@ -57,10 +57,13 @@ namespace metron {
         }
     }
     metron.onready(function(e: Event) {
+        let wantsAutoload: boolean = ((document.selectOne("[data-m-autoload]") != null) && (document.selectOne("[data-m-autoload]").attribute("data-m-autoload") == "true"));
         document.selectAll("[data-m-state='hide']").each(function(idx: number, elem: Element) {
             elem.hide();
         });
-        metron.lists.bindAll();
-        metron.forms.bindAll();
+        if(wantsAutoload) {
+            metron.lists.bindAll();
+            metron.forms.bindAll();
+        }
     });
 }

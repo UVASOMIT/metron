@@ -45,9 +45,5 @@ Temporary Items
 node_modules/
 demo/static/bower_components/
 .vscode/
-src/metron.js
-src/_metron.js
-src/metron.d.ts
-src/metron.extenders.js
 dist/gen/
 test/bower_components/
