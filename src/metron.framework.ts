@@ -30,7 +30,7 @@ namespace metron {
         export function getApplicationRoot(page: string): string {
             let root: string = (document.selectOne("body[data-m-root]") != null)  ? `${document.selectOne("body[data-m-root]").attribute("data-m-root")}` : null;
             if(root == null) {
-                root = metron.tools.getMatching(page, /\{\{m:master=\"(.*)\"\}\}/g);
+                root = metron.tools.getMatching(page, /\{\{m:root=\"(.*)\"\}\}/g);
             }
             return root;
         }
