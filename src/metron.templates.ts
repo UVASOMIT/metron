@@ -48,7 +48,7 @@ namespace metron {
         }
         export namespace master {
             export function hasMaster(page: string): boolean {
-                if(page.match(/\{\{m:master=\"(.*)\"\}\}/g).length > 0) {
+                if(page.match(/\{\{m:master=\"(.*)\"\}\}/g) != null && page.match(/\{\{m:master=\"(.*)\"\}\}/g).length > 0) {
                     return true;
                 }
                 return false;
