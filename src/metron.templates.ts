@@ -8,7 +8,7 @@ namespace metron {
                 for (let k in item) {
                     if(item.hasOwnProperty(k)) {
                         let replacement = `{{${k}}}`;
-                        result = result.replace(new RegExp(replacement, "g"), item[k]);
+                        result = result.replace(new RegExp(replacement, "g"), <string><any>item[k]);
                     }
                 }
                 return result;
@@ -22,11 +22,12 @@ namespace metron {
                 }
                 function inlineEscape(str: string) {
                     return escape(str)
-                        .replace(/!\[([^\]]*)]\(([^(]+)\)/g, '<img alt="$1" src="$2">')
+                        .replace(/!\[([^\]]*)]\(([^(]+)\)/g, '<img alt="$1" src="$2" />')
                         .replace(/\[([^\]]+)]\(([^(]+)\)/g, (<any>'$1').link('$2'))
                         .replace(/`([^`]+)`/g, '<code>$1</code>')
                         .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
                         .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+                        .replace(/  \n/g, '<br />')
                 }
 
                 src.replace(/&gt;/g, ">").replace(/^\s+|\r|\s+$/g, "").replace(/\t/g, "    ").split(/\n\n+/).forEach(function(b: string, f: number, R: Array<string>) {
