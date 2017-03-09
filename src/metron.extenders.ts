@@ -19,7 +19,6 @@ interface String {
     toPhoneNumber: () => string;
     getValueByKey: (key: string) => string;
     setValueByKey: (key: string, replacement: string) => string;
-    //isNullOrEmpty: (val: any) => boolean;
 }
 
 interface StringConstructor {
@@ -94,11 +93,9 @@ String.prototype.upper = function (): string {
     return this.toUpperCase();
 };
 
-/*
 String.prototype.trim = function (): string {
     return this.replace(/^\s+|\s+$/g, "");
 };
-*/
 
 String.prototype.ltrim = function (): string {
     return this.replace(/^\s+/, "");
@@ -117,7 +114,7 @@ String.prototype.startsWith = function (part: string): boolean {
 };
 
 String.prototype.endsWith = function (part: string): boolean {
-    return this.slice(-part.length) == part;
+    return this.slice(part.length) == part;
 };
 
 String.prototype.capFirst = function (): string {
