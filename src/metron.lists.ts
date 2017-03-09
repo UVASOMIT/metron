@@ -152,12 +152,12 @@ namespace metron {
                         }
                         for (let prop in data) {
                             if(data.hasOwnProperty(prop) && data[prop] != null && document.selectOne(`#${self.model}_${prop}`) != null) {
-                                (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(data[prop]);
+                                (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(<any>data[prop]);
                             }
                         }
                         self._form.elem.attribute("data-m-state", "show");
-                        self._form.elem.show();
                         self._elem.attribute("data-m-state", "hide");
+                        self._form.elem.show();
                         self._elem.hide();
                     });
                 });
@@ -229,6 +229,9 @@ namespace metron {
             self._items.each(function (idx, item) {
                 document.selectOne(`${selector} tbody`).append(self.formatData(item));
             });
+            var tbody = document.selectOne(`${selector} tbody`);
+            tbody.attribute("data-m-state", "show");
+            tbody.show("inline-grid");
         }
         public clearTable(selector: string): void {
             var self = this;

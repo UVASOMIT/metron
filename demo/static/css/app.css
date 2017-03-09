@@ -61,3 +61,6 @@ form[data-m-segment='controls'] > fieldset > select {
     float: left;
     width: 10rem;
 }
+.pointer {
+    cursor: pointer;
+}

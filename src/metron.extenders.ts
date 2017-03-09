@@ -66,7 +66,7 @@ interface Element {
     drop: () => Element;
     removeEvent: (event: string) => Element;
     addEvent: (event: string, callback: Function) => Element;
-    show: () => Element;
+    show: (t?: string) => Element;
     hide: () => Element;
     addClass: (className: string) => Element;
     removeClass: (className: string) => Element;
@@ -373,7 +373,9 @@ Object.prototype.getName = function (): string {
 
 (<any>Object).extend = function(dest: any, src: any) {
     for (let prop in src) {
-        dest[prop] = src[prop];
+        if(src.hasOwnProperty(prop)) {
+            dest[prop] = src[prop];
+        }
     }
     return dest;
 };
@@ -490,12 +492,12 @@ Element.prototype.addEvent = function(event: string, callback:Function): Element
     return this;
 };
 
-Element.prototype.show = function(): Element {
+Element.prototype.show = function(t: string = "block"): Element {
     let styles = this.attribute("style");
     if(styles != null && styles != "") {
-        return this.attribute("style", styles.setValueByKey("display", "block"));
+        return this.attribute("style", styles.setValueByKey("display", t));
     }
-    return this.attribute("style", `display:block`);
+    return this.attribute("style", `display:${t}`);
 };
 
 Element.prototype.hide = function(): Element {
