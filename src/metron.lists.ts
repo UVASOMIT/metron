@@ -130,8 +130,8 @@ namespace metron {
         }
         private populateListing(): void {
             var self = this;
-            self.clearTable(`[data-m-type='list'][data-m-model='${self.model}'] table[data-m-segment='list']`);
-            self.populateTable(`[data-m-type='list'][data-m-model='${self.model}'] table[data-m-segment='list']`);
+            self.clearTable(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='list']`);
+            self.populateTable(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='list']`);
             self.createPaging(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='paging']`, self.callListing, (self._items.length > 0) ? self._items[0]["TotalCount"] : 0);
             self.applyViewEvents();
             if((<any>self).populateListing_m_inject != null) {
@@ -227,21 +227,26 @@ namespace metron {
         public populateTable(selector: string): void {
             var self = this;
             self._items.each(function (idx, item) {
-                document.selectOne(`${selector} tbody`).append(self.formatData(item));
+                document.selectOne(`${selector} [data-m-type='table-body']`).append(self.formatData(item));
             });
-            var tbody = document.selectOne(`${selector} tbody`);
+            var tbody = document.selectOne(`${selector} [data-m-type='table-body']`);
             tbody.attribute("data-m-state", "show");
-            tbody.show("inline-grid");
+            if(tbody.nodeName.lower() == "tbody") {
+                tbody.show("inline-grid");
+            }
+            else {
+                tbody.show();
+            }
         }
         public clearTable(selector: string): void {
             var self = this;
             if(String.isNullOrEmpty(self._rowTemplate)) {
-                self._rowTemplate = (<HTMLElement>document.selectOne(`${selector} tbody tr[data-m-action='repeat']`)).outerHTML;
+                self._rowTemplate = (<HTMLElement>document.selectOne(`${selector} [data-m-type='table-body'] [data-m-action='repeat']`)).outerHTML;
             }
-            document.selectOne(`${selector} tbody`).empty();
+            document.selectOne(`${selector} [data-m-type='table-body']`).empty();
         }
         public getRows(selector: string): number {
-            return document.selectAll(`${selector} tbody tr`).length;
+            return document.selectAll(`${selector} [data-m-type='table-body'] [data-m-type='row']`).length;
         }
         public setupPagingEvents(selector: string, callback: Function, filters?: any): void {
             var self = this;

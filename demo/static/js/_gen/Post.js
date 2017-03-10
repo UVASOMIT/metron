@@ -3,8 +3,8 @@
 ;
 metron.onready(function () {
     var post = new metron.list("Post");
-    post.inject("overwrite", "init", function () {
-        console.log("Inside of an inject that does an overwrite.");
+    post.inject("append", "init", function () {
+        console.log("Inside of an inject that does an append.");
     });
     post.init();
 });

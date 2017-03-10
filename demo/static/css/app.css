@@ -16,7 +16,7 @@ select:focus {
 }
 [data-m-type] {
     clear: both;
-    margin: auto 5rem auto 5rem;
+    /*margin: auto 5rem auto 5rem;*/
 }
 [data-m-type='form'] > * {
     margin: auto 15rem auto 15rem;
@@ -32,8 +32,19 @@ div[data-m-segment='filters'] {
 div[data-m-segment='controls'] {
     float: right;
 }
-table[data-m-segment='list'] {
+[data-m-segment='list'] {
+    width: 100%;
     margin: 15rem auto 5rem auto;
+}
+[data-m-segment='list'] .container {
+    max-width: none;
+}
+[data-m-segment='list'] .row {
+    border-bottom: 0.1rem solid #e1e1e1;
+    padding: 1.2rem 1.5rem;
+}
+[data-m-col], [data-m-type='list-menu'] {
+    font-weight: 600;
 }
 ul[data-m-segment='paging'] {
     list-style-type: none;
@@ -63,4 +74,67 @@ form[data-m-segment='controls'] > fieldset > select {
 }
 .pointer {
     cursor: pointer;
+}
+
+/* Larger than mobile screen */
+@media (min-width: 1.0rem) {
+    .xs-hide {
+        display: none;
+    }
+    .sm-hide {
+        display: inherit;
+    }
+    .md-hide {
+        display: inherit;
+    }
+    .lg-hide {
+        display: inherit;
+    }
+}
+
+@media (min-width: 40.0rem) {
+    .xs-hide {
+        display: inherit;
+    }
+    .sm-hide {
+        display: none;
+    }
+    .md-hide {
+        display: inherit;
+    }
+    .lg-hide {
+        display: inherit;
+    }
+}
+
+/* Larger than tablet screen */
+@media (min-width: 80.0rem) {
+    .xs-hide {
+        display: inherit;
+    }
+    .sm-hide {
+        display: inherit;
+    }
+    .md-hide {
+        display: none;
+    }
+    .lg-hide {
+        display: inherit;
+    }
+}
+
+/* Larger than desktop screen */
+@media (min-width: 120.0rem) {
+    .xs-hide {
+        display: inherit;
+    }
+    .sm-hide {
+        display: inherit;
+    }
+    .md-hide {
+        display: inherit;
+    }
+    .lg-hide {
+        display: none;
+    }
 }

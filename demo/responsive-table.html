@@ -32,31 +32,31 @@
                 <button data-m-action="new">New</button>
                 <button data-m-action="download" class="button-outline">Download</button>
             </div>
-            <table data-m-segment="list">
-                <thead>
-                    <tr>
-                        <th data-m-type="list-menu" class="column">Menu</th>
-                        <th data-m-action="sort" data-m-col="PostTypeID" class="column">Post Type</th>
-                        <th data-m-action="sort" data-m-col="Active" class="column">Active?</th>
-                        <th data-m-action="sort" data-m-col="Name" class="column">Name</th>
-                        <th data-m-action="sort" data-m-col="DateCreated" class="column">Date Created</th>
-                        <th data-m-action="sort" data-m-col="DateModified" class="column">Date Modified</th>
-                    </tr>
-                </thead>
-                <tbody data-m-type="table-body" data-m-state="hide">
-                    <tr data-m-type="row" data-m-action="repeat">
-                        <td>
+            <div data-m-segment="list">
+                <div class="container xs-hide">
+                    <div class="row">
+                        <div data-m-type="list-menu" class="column">Menu</div>
+                        <div data-m-action="sort" data-m-col="PostTypeID" class="column">Post Type</div>
+                        <div data-m-action="sort" data-m-col="Active" class="column">Active?</div>
+                        <div data-m-action="sort" data-m-col="Name" class="column">Name</div>
+                        <div data-m-action="sort" data-m-col="DateCreated" class="column">Date Created</div>
+                        <div data-m-action="sort" data-m-col="DateModified" class="column">Date Modified</div>
+                    </div>
+                </div>
+                <div data-m-type="table-body" data-m-state="hide" class="container">
+                    <div data-m-type="row" data-m-action="repeat" class="row">
+                        <div class="column">
                             <button title="edit" data-m-action="edit" data-m-primary="PostID:{{PostID}};" class="button-outline">edit</button>
                             <button title="delete" data-m-action="delete" data-m-primary="PostID:{{PostID}};" class="button-outline">delete</button>
-                        </td>
-                        <td>{{PostTypeID}}</td>
-                        <td>{{Active}}</td>
-                        <td>{{Name}}</td>
-                        <td>{{DateCreated}}</td>
-                        <td>{{DateModified}}</td>
-                    </tr>
-                </tbody>
-            </table>
+                        </div>
+                        <div class="column">{{PostTypeID}}</div>
+                        <div class="column">{{Active}}</div>
+                        <div class="column">{{Name}}</div>
+                        <div class="column">{{DateCreated}}</div>
+                        <div class="column">{{DateModified}}</div>
+                    </div>
+                </div>
+            </div>
             <ul data-m-segment="paging">
                 <li><a title="First" href="#" class="button button-outline">&lt;&lt;</a></li>
                 <li><a title="Previous" href="#" class="button button-outline">&lt;</a></li>
