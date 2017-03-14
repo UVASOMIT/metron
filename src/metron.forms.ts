@@ -34,63 +34,65 @@ namespace metron {
             }
             var self = this;
             self._elem = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
-            var controlBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='controls']");
-            controlBlocks.each(function (idx: number, elem: Element) {
-                let actions = elem.selectAll("[data-m-action]");
-                actions.each(function (indx: number, el: Element) {
-                    switch (el.attribute("data-m-action").lower()) {
-                        case "save":
-                            el.addEvent("click", function (e) {
-                                e.preventDefault();
-                                if (self.isValid()) {
-                                    let parameters: any = { };
-                                    let hasPrimary: boolean = false;
-                                    self.elem.selectAll("input, select, textarea").each(function(idx: number, elem: Element) {
-                                        parameters[<string>elem.attribute("name")] = (<HTMLElement>elem).val();
-                                        if(elem.attribute("data-m-primary") != null && elem.attribute("data-m-primary").toBool() && (<HTMLElement>elem).val() != "") {
-                                            hasPrimary = true;
+            if(self._elem != null) {
+                var controlBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='controls']");
+                controlBlocks.each(function (idx: number, elem: Element) {
+                    let actions = elem.selectAll("[data-m-action]");
+                    actions.each(function (indx: number, el: Element) {
+                        switch (el.attribute("data-m-action").lower()) {
+                            case "save":
+                                el.addEvent("click", function (e) {
+                                    e.preventDefault();
+                                    if (self.isValid()) {
+                                        let parameters: any = { };
+                                        let hasPrimary: boolean = false;
+                                        self.elem.selectAll("input, select, textarea").each(function(idx: number, elem: Element) {
+                                            parameters[<string>elem.attribute("name")] = (<HTMLElement>elem).val();
+                                            if(elem.attribute("data-m-primary") != null && elem.attribute("data-m-primary").toBool() && (<HTMLElement>elem).val() != "") {
+                                                hasPrimary = true;
+                                            }
+                                        });
+                                        if(!hasPrimary) {
+                                            metron.web.post(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
+                                                _save(self, data)
+                                                if((<any>self).post_m_inject != null) {
+                                                    (<any>self).post_m_inject();
+                                                }
+                                            });
                                         }
-                                    });
-                                    if(!hasPrimary) {
-                                        metron.web.post(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
-                                            _save(self, data)
-                                            if((<any>self).post_m_inject != null) {
-                                                (<any>self).post_m_inject();
-                                            }
-                                        });
+                                        else {
+                                            metron.web.put(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
+                                                _save(self, data);
+                                                if((<any>self).put_m_inject != null) {
+                                                    (<any>self).put_m_inject();
+                                                }
+                                            });
+                                        }
                                     }
-                                    else {
-                                        metron.web.put(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
-                                            _save(self, data);
-                                            if((<any>self).put_m_inject != null) {
-                                                (<any>self).put_m_inject();
-                                            }
-                                        });
+                                });
+                                break;
+                            case "cancel":
+                                el.addEvent("click", function (e) {
+                                    self.clearForm();
+                                    self._elem.attribute("data-m-state", "hide");
+                                    self._elem.hide();
+                                    if(self._list != null) {
+                                        self._list.elem.attribute("data-m-state", "show");
+                                        self._list.elem.show();
                                     }
-                                }
-                            });
-                            break;
-                        case "cancel":
-                            el.addEvent("click", function (e) {
-                                self.clearForm();
-                                self._elem.attribute("data-m-state", "hide");
-                                self._elem.hide();
-                                if(self._list != null) {
-                                    self._list.elem.attribute("data-m-state", "show");
-                                    self._list.elem.show();
-                                }
-                                if((<any>self).cancel_m_inject != null) {
-                                    (<any>self).cancel_m_inject();
-                                }
-                            });
-                            break;
-                        default:
-                            break;
-                    }
+                                    if((<any>self).cancel_m_inject != null) {
+                                        (<any>self).cancel_m_inject();
+                                    }
+                                });
+                                break;
+                            default:
+                                break;
+                        }
+                    });
                 });
-            });
-            if((<any>self).init_m_inject != null) {
-                (<any>self).init_m_inject();
+                if((<any>self).init_m_inject != null) {
+                    (<any>self).init_m_inject();
+                }
             }
             return self;
         }
