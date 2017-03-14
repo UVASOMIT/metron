@@ -272,18 +272,18 @@ namespace metron {
         public createPaging(selector: string, callback: Function, totalCount, filters?: any): void {
             var self = this;
             if (self.currentPageIndex != null && self.pageSize != null) {
-                this.totalPageSize = this.calculateTotalPageSize(totalCount);
+                self.totalPageSize = self.calculateTotalPageSize(totalCount);
                 var startPage: number = ((parseInt(this.currentPageIndex.toString(), 10) - 5) < 1) ? 1 : (parseInt(this.currentPageIndex.toString(), 10) - 5);
                 var endPage: number = ((parseInt(this.currentPageIndex.toString(), 10) + 5) > this.totalPageSize) ? this.totalPageSize : (parseInt(this.currentPageIndex.toString(), 10) + 5);
 
-                this.setupPagingEvents(selector, callback, filters);
+                self.setupPagingEvents(selector, callback, filters);
 
                 document.selectAll(`${selector} > li`).each(function (idx: number, elem: Element) {
                     if (elem.first("a").attribute("title") != "Previous" && elem.first("a").attribute("title") != "Next" && elem.first("a").attribute("title") != "First" && elem.first("a").attribute("title") != "Last") {
                         elem.remove();
                     }
                 });
-                for (let i = 1; i <= this.totalPageSize; i++) {
+                for (let i = 1; i <= self.totalPageSize; i++) {
                     if (i < startPage || i > endPage) {
                         continue;
                     }
@@ -296,7 +296,9 @@ namespace metron {
                     li.append(link.asString());
                     document.selectOne(`${selector}`).insertBefore(li, document.selectOne(`${selector} > li > a[title='Next']`).parent());
                 }
-                document.selectOne(`${selector} > li > a[title='${this.currentPageIndex}']`).parent().addClass("active");
+                if(self.totalPageSize > 0) {
+                    document.selectOne(`${selector} > li > a[title='${self.currentPageIndex}']`).parent().addClass("active");
+                }
                 if (document.selectAll(`${selector} > li`).length <= 5) {
                     document.selectOne(`${selector}`).hide();
                 }
