@@ -537,6 +537,9 @@ HTMLElement.prototype.val = function(val?: string): string {
                 case "text":
                     this.value = val;
                     break;
+                case "datetime-local":
+                    this.value = val;
+                    break;
                 case "checkbox":
                     if (<boolean><any>val) {
                         this.checked = true;
@@ -576,6 +579,8 @@ HTMLElement.prototype.val = function(val?: string): string {
                 case "hidden":
                     return this.value
                 case "text":
+                    return this.value;
+                case "datetime-local":
                     return this.value;
                 case "checkbox":
                     return this.checked;
