@@ -130,16 +130,6 @@ namespace metron {
             }
             return self;
         }
-        private populateListing(): void {
-            var self = this;
-            self.clearTable(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='list']`);
-            self.populateTable(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='list']`);
-            self.createPaging(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='paging']`, self.callListing, (self._items.length > 0) ? self._items[0]["TotalCount"] : 0);
-            self.applyViewEvents();
-            if((<any>self).populateListing_m_inject != null) {
-                (<any>self).populateListing_m_inject();
-            }
-        }
         private applyViewEvents(): void {
             var self = this;
             document.selectAll(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='edit']`).each(function (idx: number, elem: Element) {
@@ -197,6 +187,16 @@ namespace metron {
             });
             if((<any>self).applyViewEvents_m_inject != null) {
                 (<any>self).applyViewEvents_m_inject();
+            }
+        }
+        public populateListing(): void {
+            var self = this;
+            self.clearTable(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='list']`);
+            self.populateTable(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='list']`);
+            self.createPaging(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='paging']`, self.callListing, (self._items.length > 0) ? self._items[0]["TotalCount"] : 0);
+            self.applyViewEvents();
+            if ((<any>self).populateListing_m_inject != null) {
+                (<any>self).populateListing_m_inject();
             }
         }
         public undoLast(): void {

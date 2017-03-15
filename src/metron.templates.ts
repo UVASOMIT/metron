@@ -79,15 +79,15 @@ namespace metron {
                     var result = `${h}:${mm} ${ampm}`;
                     return result;
                 }
-                function formatBoolean(b: boolean): string {
-                    if (b) {
+                function formatBoolean(b: string): string {
+                    if (b.toBool()) {
                         return "yes";
                     }
                     return "no";
                 }
                 switch (type.lower()) {
                     case "yesno":
-                        return formatBoolean(<boolean><any>val);
+                        return formatBoolean(val);
                     case "datetime":
                         return formatDate(val);
                     case "time":

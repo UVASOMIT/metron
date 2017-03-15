@@ -29,7 +29,7 @@ namespace metron {
                 if(context._list != null) {
                     context._list.elem.attribute("data-m-state", "show");
                     context._list.elem.show();
-                    context._list.callListing();
+                    context._list.populateListing();
                 }
             }
             var self = this;
