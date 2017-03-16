@@ -17,6 +17,7 @@
         "src/metron.framework.ts",
         "src/metron.lists.ts",
         "src/metron.forms.ts",
+        "src/metron.views.ts",
         "src/metron.templates.ts"
     ]
 }

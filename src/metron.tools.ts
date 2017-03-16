@@ -36,6 +36,33 @@ namespace metron {
             }
             return obj;
         }
+        export function formatOptions(attr: string): any {
+            var pairs = attr.split(";");
+            if (pairs[pairs.length - 1].trim() == "") {
+                pairs.pop();
+            }
+            var result = "";
+            for (let i = 0; i < pairs.length; i++) {
+                let p = pairs[i].split(":");
+                try {
+                    result += `"${p[0].trim()}":"${p[1].trim()}"`;
+                    if (i != (pairs.length - 1)) {
+                        result += ",";
+                    }
+                }
+                catch (e) {
+                    throw new Error("Error: Invalid key/value pair!");
+                }
+            }
+            var response = null;
+            try {
+                response = JSON.parse(`{${result}}`);
+            }
+            catch (e) {
+                throw new Error("Error: Invalid JSON for options!");
+            }
+            return response;
+        }
         export function cleanURL(url: string): string {
             if (url.startsWith("//")) {
                 url = url.substring(1);
@@ -88,6 +115,9 @@ namespace metron {
             }
             return message;
         }
+        export function formatDecimal(num: number): string {
+            return num.toFixed(2);
+        }
         export function formatDate(datetime: string): string {
             if (datetime != null && datetime.indexOf("T") != -1) {
                 return datetime.split("T")[0];
@@ -95,13 +125,33 @@ namespace metron {
             return "";
         }
         export function formatDateTime(datetime: string): string {
-            if (datetime != null && datetime.indexOf("T") != -1) {
-                return datetime.replace("T", " ").split(".")[0];
+            if (datetime != null) {
+                let d = new Date(datetime);
+                let m = d.getMonth() + 1;
+                let mm = m < 10 ? "0" + m : m;
+                let dd = d.getDay();
+                let ddd = dd < 10 ? "0" + dd : dd;
+                let y = d.getFullYear();
+                let time = formatTime(d);
+                return `${mm}-${ddd}-${y} ${time}`;
             }
             return "";
         }
-        export function formatDecimal(num: number): string {
-            return num.toFixed(2);
+        export function formatTime(datetime: Date): string {
+            var h = datetime.getHours();
+            var m = datetime.getMinutes();
+            var ampm = h >= 12 ? "pm" : "am";
+            h = h % 12;
+            h = h ? h : 12;
+            var mm = m < 10 ? "0" + m : m;
+            var result = `${h}:${mm} ${ampm}`;
+            return result;
+        }
+        export function formatBoolean(b: string): string {
+            if (b.toBool()) {
+                return "yes";
+            }
+            return "no";
         }
     }
 }

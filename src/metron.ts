@@ -114,8 +114,11 @@ namespace metron {
             }
             return url + '?' + paramPairs.join('&');
         }
-        export function querystring(obj: any): Array<string> {
+        export function querystring(obj?: any): Array<string>|string {
             if (typeof (document) !== 'undefined') {
+                if(obj == null && document.location.search != "") {
+                    return document.location.search.substring(1);
+                }
                 if (typeof (obj) === 'string' && arguments.length === 1) {
                     let result: Array<any> = [];
                     let match: RegExpExecArray;

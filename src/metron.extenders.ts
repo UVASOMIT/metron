@@ -64,7 +64,7 @@ interface Element {
     empty: () => Element;
     drop: () => Element;
     removeEvent: (event: string) => Element;
-    addEvent: (event: string, callback: Function) => Element;
+    addEvent: (event: string, callback: Function, overwrite?: boolean) => Element;
     show: (t?: string) => Element;
     hide: () => Element;
     addClass: (className: string) => Element;
@@ -477,15 +477,28 @@ Element.prototype.drop = function(): Element {
     return self;
 };
 
-Element.prototype.removeEvent = function(event: string): Element {
-    if(this[`on${event}`] != null) {
-        this[`on${event}`] = null;
+Element.prototype.removeEvent = function (event: string): Element {
+    let evt = this[`on${event}`] || this[`${event}`];
+    try {
+        this.removeEventListener(event, evt);
     }
+    catch (e) { }
+    try {
+        this.detachEvent(`on${event}`, evt);
+    }
+    catch (e) { }
+    this[`on${event}`] = null;
+    this[`${event}`] = null;
     return this;
 };
 
-Element.prototype.addEvent = function(event: string, callback:Function): Element {
-    this.addEventListener(event, callback);
+Element.prototype.addEvent = function (event: string, callback: Function, overwrite: boolean = false): Element {
+    if (overwrite) {
+        this[`on${event}`] = callback;
+    }
+    else {
+        this.addEventListener(event, callback);
+    }
     return this;
 };
 
@@ -507,6 +520,7 @@ Element.prototype.hide = function(): Element {
 
 Element.prototype.addClass = function(className: string) : Element {
     this.className += ` ${className}`;
+    this.className = this.className.trim();
     return this;
 };
 

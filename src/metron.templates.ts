@@ -3,34 +3,8 @@
 namespace metron {
     export namespace templates {
         export namespace list {
-            export function row<T>(template: string, item: T): string {
-                function formatOptions(attr: string): any {
-                    var pairs = attr.split(";");
-                    if (pairs[pairs.length - 1].trim() == ";") {
-                        pairs.pop();
-                    }
-                    var result = "";
-                    for (let i = 0; i < pairs.length; i++) {
-                        let p = pairs[i].split(":");
-                        try {
-                            result += `"${p[0].trim()}":"${p[1].trim()}"`;
-                            if (i != (pairs.length - 1)) {
-                                result += ",";
-                            }
-                        }
-                        catch (e) {
-                            throw new Error("Error: Invalid key/value pair!");
-                        }
-                    }
-                    var response = null;
-                    try {
-                        response = JSON.parse(`{${result}}`);
-                    }
-                    catch (e) {
-                        throw new Error("Error: Invalid JSON for options!");
-                    }
-                    return response;
-                }
+            export function row<T>(template: string, item: T, isTable: boolean = true): string {
+                
                 var result = template;
                 for (let k in item) {
                     if (item.hasOwnProperty(k)) {
@@ -38,62 +12,24 @@ namespace metron {
                         result = result.replace(new RegExp(replacement, "g"), (<string><any>item[k] != null && <string><any>item[k] != "null") ? <string><any>item[k] : "");
                     }
                 }
-                var doc = document.createElement("tr");
+                var doc = document.createElement((isTable ? "tr" : "div"));
                 doc.innerHTML = result;
                 doc.selectAll("[data-m-format]").each((idx: number, elem: HTMLElement) => {
-                    let options = (elem.attribute("data-m-options") != null) ? formatOptions(elem.attribute("data-m-options")) : null;
+                    let options = (elem.attribute("data-m-options") != null) ? metron.tools.formatOptions(elem.attribute("data-m-options")) : null;
                     elem.innerText = format(elem.attribute("data-m-format"), elem.innerText, options);
                 });
                 return doc.innerHTML;
             }
             export function format(type: string, val: string, options?: any): string {
-                function formatMessage(message: string, length?: number): string {
-                    if (message != null) {
-                        let len = (length != null && length > 0) ? length : 15;
-                        if (message.split(" ").length > len) {
-                            return message.truncateWords(len) + '...';
-                        }
-                    }
-                    return message;
-                }
-                function formatDate(datetime: string): string {
-                    if (datetime != null) {
-                        let d = new Date(datetime);
-                        let m = d.getMonth() + 1;
-                        let mm = m < 10 ? "0" + m : m;
-                        let dd = d.getDay();
-                        let ddd = dd < 10 ? "0" + dd : dd;
-                        let y = d.getFullYear();
-                        let time = formatTime(d);
-                        return `${mm}-${ddd}-${y} ${time}`;
-                    }
-                    return "";
-                }
-                function formatTime(datetime: Date): string {
-                    var h = datetime.getHours();
-                    var m = datetime.getMinutes();
-                    var ampm = h >= 12 ? "pm" : "am";
-                    h = h % 12;
-                    h = h ? h : 12;
-                    var mm = m < 10 ? "0" + m : m;
-                    var result = `${h}:${mm} ${ampm}`;
-                    return result;
-                }
-                function formatBoolean(b: string): string {
-                    if (b.toBool()) {
-                        return "yes";
-                    }
-                    return "no";
-                }
                 switch (type.lower()) {
                     case "yesno":
-                        return formatBoolean(val);
+                        return metron.tools.formatBoolean(val);
                     case "datetime":
-                        return formatDate(val);
+                        return metron.tools.formatDateTime(val);
                     case "time":
-                        return formatTime(<Date><any>val);
+                        return metron.tools.formatTime(<Date><any>val);
                     case "formatMessage":
-                        return formatMessage(val, options["length"]);
+                        return metron.tools.formatMessage(val, options["length"]);
                     default:
                         return metron.globals[type](val, options);
                 }

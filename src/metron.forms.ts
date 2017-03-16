@@ -1,3 +1,5 @@
+/// <reference path="metron.base.ts" />
+
 namespace metron {
     export class forms {
         public static bindAll(): void {
@@ -148,8 +150,8 @@ namespace metron {
         public get list(): metron.list<any> {
             return this._list;
         }
-        public set list(f: metron.list<any>) {
-            this._list = f;
+        public set list(l: metron.list<any>) {
+            this._list = l;
         }
     }
 }
