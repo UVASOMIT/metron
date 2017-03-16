@@ -115,7 +115,7 @@ namespace metron {
                                     if((<any>self).download_m_inject != null) {
                                         (<any>self).download_m_inject();
                                     }
-                                    document.location.href = `${metron.fw.getAPIURL(self.model)}/download`;
+                                    document.location.href = `${metron.fw.getBaseUrl()}/${self.model}/download`;
                                 });
                                 break;
                             default:
