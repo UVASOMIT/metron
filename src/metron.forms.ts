@@ -25,13 +25,13 @@ namespace metron {
         }
         public init(): form<T> {
             function _save(context: form<T>, data: T): void {
-                (<HTMLElement>context.elem.selectOne(`#${context.model}_${context.model}ID`)).val(<string><any>data[`${context.model}ID`]);
+                (<HTMLElement>context.elem.selectOne(`#${context.model}_${context.model}ID`)).val(<string><any>data[`${context.model}ID`]); //Can't look for ID here--need to loop through empty values.
                 context.elem.attribute("data-m-state", "hide");
                 context.elem.hide();
                 if(context._list != null) {
                     context._list.elem.attribute("data-m-state", "show");
                     context._list.elem.show();
-                    context._list.populateListing();
+                    context._list.callListing();
                 }
             }
             var self = this;

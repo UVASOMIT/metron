@@ -8,6 +8,9 @@
 .button.button-clear, button.button-clear, input[type='button'].button-clear, input[type='reset'].button-clear, input[type='submit'].button-clear {
     color: #ff942b;
 }
+a {
+  color: #ff942b;
+}
 input[type='datetime-local'] {
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -99,6 +102,36 @@ form[data-m-segment='controls'] > fieldset > select {
 }
 .pointer {
     cursor: pointer;
+}
+.callout {
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid #eee;
+    border-left-width: 5px;
+    border-radius: 3px;
+    border-left-color: #ff942b;
+}
+.callout h1
+,.callout h2
+,.callout h3
+,.callout h4
+,.callout h5
+,.callout h6
+ {
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+
+.callout p:last-child {
+    margin-bottom: 0;
+}
+
+.callout code {
+    border-radius: 3px;
+}
+
+.callout + .callout {
+    margin-top: -5px;
 }
 
 /* Larger than mobile screen */
