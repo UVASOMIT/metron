@@ -133,6 +133,9 @@ form[data-m-segment='controls'] > fieldset > select {
 .callout + .callout {
     margin-top: -5px;
 }
+div.awesomplete {
+    display: block !important;
+}
 
 /* Larger than mobile screen */
 @media (min-width: 1.0rem) {
