@@ -7,7 +7,7 @@
 /// <reference path="metron.templates.ts" />
 
 namespace metron {
-    export var globals: any = {};
+    export var globals: any = { actions: {} };
     export function onready(callback: Function) {
         document.addEventListener("DOMContentLoaded", function (e) {
             if (metron.templates.master.hasMaster(document.documentElement.outerHTML)) {
