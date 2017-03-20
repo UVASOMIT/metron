@@ -545,15 +545,6 @@ HTMLElement.prototype.val = function(val?: string): string {
         }
         else if(this.nodeName.lower() == "input") {
             switch(this.attribute("type").lower()) {
-                case "hidden":
-                    this.value = val;
-                    break;
-                case "text":
-                    this.value = val;
-                    break;
-                case "datetime-local":
-                    this.value = val;
-                    break;
                 case "checkbox":
                     if (<boolean><any>val) {
                         this.checked = true;
@@ -572,7 +563,8 @@ HTMLElement.prototype.val = function(val?: string): string {
                     });
                     break;
                 default:
-                    throw new Error("Error: No [type] attribute on element.");
+                    this.value = val;
+                    break;
             }
         }
         else if(this.nodeName.lower() == "select") {
@@ -590,19 +582,13 @@ HTMLElement.prototype.val = function(val?: string): string {
         }
         else if(this.nodeName.lower() == "input") {
             switch(this.attribute("type").lower()) {
-                case "hidden":
-                    return this.value
-                case "text":
-                    return this.value;
-                case "datetime-local":
-                    return this.value;
                 case "checkbox":
                     return this.checked;
                 case "radio":
                     let name: string = this.attribute("name");
                     return (<HTMLInputElement>document.selectOne(`input[type='radio'][name='${name}']:checked`)).value;
                 default:
-                    throw new Error("Error: No [type] attribute on element.");
+                    return this.value;
             }
         }
         else if(this.nodeName.lower() == "select") {
