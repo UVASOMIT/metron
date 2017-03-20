@@ -12,9 +12,11 @@ namespace metron {
             metron.globals["lists"] = [];
             for (let i = 0; i < sections.length; i++) {
                 let section: Element = <Element>sections[i];
-                let model: string = section.attribute("data-m-model");
-                let l: list<any> = new list(model).init();
-                metron.globals["lists"].push(l);
+                if (section.attribute("data-m-autoload") == null || section.attribute("data-m-autoload") == "true") {
+                    let model: string = section.attribute("data-m-model");
+                    let l: list<any> = new list(model).init();
+                    metron.globals["lists"].push(l);
+                }
             }
         }
     }
@@ -33,30 +35,30 @@ namespace metron {
         constructor(public model: string, public listType: string = "list", public asscForm?: form<T>) {
             super();
             var self = this;
-            if(asscForm != null) {
+            if (asscForm != null) {
                 self._form = asscForm;
             }
-            if(self._filters == null) {
+            if (self._filters == null) {
                 self._filters = <any>{};
             }
         }
         public init(): list<T> {
             var self = this;
             self._elem = document.selectOne(`[data-m-type='list'][data-m-model='${self.model}']`);
-            if(self._elem != null) {
+            if (self._elem != null) {
                 var f: metron.form<any> = (self.asscForm != null) ? self.asscForm : self.attachForm(new metron.form(self.model, self).init());
                 var filterBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='filters']");
-                filterBlocks.each(function(idx: number, elem: Element) {
+                filterBlocks.each(function (idx: number, elem: Element) {
                     let filters = elem.selectAll("[data-m-action='filter']");
                     filters.each(function (indx: number, el: Element) {
-                        if(el.attribute("data-m-binding") != null) {
+                        if (el.attribute("data-m-binding") != null) {
                             let binding: string = el.attribute("data-m-binding");
                             let key: string = el.attribute("name");
                             let nText: string = el.attribute("data-m-text");
                             metron.web.get(`${metron.fw.getAPIURL(binding)}`, {}, null, "json", function (data: Array<T>) {
-                                data.each(function(i: number, item: any) {
+                                data.each(function (i: number, item: any) {
                                     el.append(`<option value="${item[key]}">${item[nText]}</option>`);
-                                    if(f.elem.selectOne(`#${self.model}_${key}`) != null) {
+                                    if (f.elem.selectOne(`#${self.model}_${key}`) != null) {
                                         (<HTMLElement>f.elem.selectOne(`#${self.model}_${key}`)).append(`<option value="${item[key]}">${item[nText]}</option>`);
                                     }
                                 });
@@ -68,13 +70,13 @@ namespace metron {
                                 self.callListing();
                             });
                         }
-                        if(el.attribute("data-m-search") != null) {
+                        if (el.attribute("data-m-search") != null) {
                             el.addEvent("click", function (e) {
                                 e.preventDefault();
                                 let itm: Element = this;
                                 let fil = self._filters;
                                 let terms: Array<string> = this.attribute("data-m-search").split(",");
-                                terms.each(function(i: number, term: string) {
+                                terms.each(function (i: number, term: string) {
                                     let parent: Element = itm.parent();
                                     fil[term.trim()] = ((<HTMLElement>parent.selectOne(`#${itm.attribute("data-m-search-for")}`)).val() == '') ? null : <any>(<HTMLElement>parent.selectOne(`#${itm.attribute("data-m-search-for")}`)).val();
                                 });
@@ -97,7 +99,7 @@ namespace metron {
                                     f.elem.show();
                                     self._elem.attribute("data-m-state", "hide");
                                     self._elem.hide();
-                                    if((<any>self).new_m_inject != null) {
+                                    if ((<any>self).new_m_inject != null) {
                                         (<any>self).new_m_inject();
                                     }
                                 });
@@ -112,7 +114,7 @@ namespace metron {
                             case "download":
                                 el.addEvent("click", function (e) {
                                     e.preventDefault();
-                                    if((<any>self).download_m_inject != null) {
+                                    if ((<any>self).download_m_inject != null) {
                                         (<any>self).download_m_inject();
                                     }
                                     document.location.href = `${metron.fw.getBaseUrl()}/${self.model}/download`;
@@ -124,7 +126,7 @@ namespace metron {
                     });
                 });
                 self.callListing();
-                if((<any>self).init_m_inject != null) {
+                if ((<any>self).init_m_inject != null) {
                     (<any>self).init_m_inject();
                 }
             }
@@ -138,13 +140,13 @@ namespace metron {
                     self._form.clearForm();
                     let parameters = metron.tools.formatOptions(elem.attribute("data-m-primary"));
                     //parameters[`${self.model}ID`] = <number><any>metron.tools.getDataPrimary(`${self.model}ID`, elem.attribute("data-m-primary"));
-                    
+
                     metron.web.get(`${metron.fw.getAPIURL(self.model)}${metron.web.querystringify(parameters)}`, parameters, null, "json", function (data: T) {
-                        if(data instanceof Array) {
+                        if (data instanceof Array) {
                             data = data[0];
                         }
                         for (let prop in data) {
-                            if(data.hasOwnProperty(prop) && data[prop] != null && document.selectOne(`#${self.model}_${prop}`) != null) {
+                            if (data.hasOwnProperty(prop) && data[prop] != null && document.selectOne(`#${self.model}_${prop}`) != null) {
                                 (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(<any>data[prop]);
                             }
                         }
@@ -163,7 +165,7 @@ namespace metron {
                         let parameters = metron.tools.formatOptions(elem.attribute("data-m-primary"));
                         //parameters[`${self.model}ID`] = <number><any>metron.tools.getDataPrimary(`${self.model}ID`, current.attribute("data-m-primary"));
                         metron.web.remove(`${metron.fw.getAPIURL(self.model)}${metron.web.querystringify(parameters)}`, parameters, null, "json", function (data: T) {
-                            if(data instanceof Array) {
+                            if (data instanceof Array) {
                                 data = data[0];
                             }
                             self.recycleBin.push(data);
@@ -186,7 +188,7 @@ namespace metron {
                     self.callListing();
                 }, true);
             });
-            if((<any>self).applyViewEvents_m_inject != null) {
+            if ((<any>self).applyViewEvents_m_inject != null) {
                 (<any>self).applyViewEvents_m_inject();
             }
         }
@@ -208,7 +210,7 @@ namespace metron {
             if (self.recycleBin.length == 0) {
                 document.selectOne(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='undo']`).hide();
             }
-            if((<any>self).undoLast_m_inject != null) {
+            if ((<any>self).undoLast_m_inject != null) {
                 (<any>self).undoLast_m_inject();
             }
         }
@@ -222,7 +224,7 @@ namespace metron {
             metron.web.get(`${metron.fw.getAPIURL(self.model)}${metron.web.querystringify(parameters)}`, {}, null, "json", function (data: Array<T>) {
                 self._items = data;
                 self.populateListing();
-                if((<any>self).callListing_m_inject != null) {
+                if ((<any>self).callListing_m_inject != null) {
                     (<any>self).callListing_m_inject();
                 }
             });
@@ -235,7 +237,7 @@ namespace metron {
                 document.selectOne(`${selector} [data-m-type='table-body']`).append(self.formatData(item, isTable));
             });
             tbody.attribute("data-m-state", "show");
-            if(isTable) {
+            if (isTable) {
                 tbody.show("inline-grid");
             }
             else {
@@ -244,7 +246,7 @@ namespace metron {
         }
         public clearTable(selector: string): void {
             var self = this;
-            if(String.isNullOrEmpty(self._rowTemplate)) {
+            if (String.isNullOrEmpty(self._rowTemplate)) {
                 self._rowTemplate = (<HTMLElement>document.selectOne(`${selector} [data-m-type='table-body'] [data-m-action='repeat']`)).outerHTML;
             }
             document.selectOne(`${selector} [data-m-type='table-body']`).empty();
@@ -298,7 +300,7 @@ namespace metron {
                     li.append(link.asString());
                     document.selectOne(`${selector}`).insertBefore(li, document.selectOne(`${selector} > li > a[title='Next']`).parent());
                 }
-                if(self.totalPageSize > 0) {
+                if (self.totalPageSize > 0) {
                     document.selectOne(`${selector} > li > a[title='${self.currentPageIndex}']`).parent().addClass("active");
                 }
                 if (document.selectAll(`${selector} > li`).length <= 5) {
@@ -317,7 +319,7 @@ namespace metron {
             var self = this;
             var parent = document.selectOne(`${selector}`).parent();
             var control = parent.selectOne("[data-m-segment='controls'] [data-m-segment='paging']");
-            control.addEvent("change", function(e) {
+            control.addEvent("change", function (e) {
                 self.pageSize = <number><any>(<HTMLElement>control).val();
                 self.callListing();
             });
