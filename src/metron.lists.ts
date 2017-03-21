@@ -47,45 +47,11 @@ namespace metron {
             var self = this;
             self._elem = document.selectOne(`[data-m-type='list'][data-m-model='${self.model}']`);
             if (self._elem != null) {
-                var f: metron.form<any> = (self.asscForm != null) ? self.asscForm : self.attachForm(new metron.form(self.model, self).init());
-                var filterBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='filters']");
+                let f: metron.form<any> = (self.asscForm != null) ? self.asscForm : self.attachForm(new metron.form(self.model, self).init());
+                let filterBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='filters']");
                 filterBlocks.each(function (idx: number, elem: Element) {
                     let filters = elem.selectAll("[data-m-action='filter']");
-                    filters.each(function (indx: number, el: Element) {
-                        if (el.attribute("data-m-binding") != null) {
-                            let binding: string = el.attribute("data-m-binding");
-                            let key: string = el.attribute("name");
-                            let nText: string = el.attribute("data-m-text");
-                            metron.web.get(`${metron.fw.getAPIURL(binding)}`, {}, null, "json", function (data: Array<T>) {
-                                data.each(function (i: number, item: any) {
-                                    el.append(`<option value="${item[key]}">${item[nText]}</option>`);
-                                    if (f.elem.selectOne(`#${self.model}_${key}`) != null) {
-                                        (<HTMLElement>f.elem.selectOne(`#${self.model}_${key}`)).append(`<option value="${item[key]}">${item[nText]}</option>`);
-                                    }
-                                });
-                            });
-                            el.addEvent("change", function (e) {
-                                let fil = self._filters;
-                                fil[key] = ((<HTMLElement>this).val() == '') ? null : <any>(<HTMLElement>this).val();
-                                self._filters = fil;
-                                self.callListing();
-                            });
-                        }
-                        if (el.attribute("data-m-search") != null) {
-                            el.addEvent("click", function (e) {
-                                e.preventDefault();
-                                let itm: Element = this;
-                                let fil = self._filters;
-                                let terms: Array<string> = this.attribute("data-m-search").split(",");
-                                terms.each(function (i: number, term: string) {
-                                    let parent: Element = itm.parent();
-                                    fil[term.trim()] = ((<HTMLElement>parent.selectOne(`#${itm.attribute("data-m-search-for")}`)).val() == '') ? null : <any>(<HTMLElement>parent.selectOne(`#${itm.attribute("data-m-search-for")}`)).val();
-                                });
-                                self._filters = fil;
-                                self.callListing();
-                            });
-                        }
-                    });
+                    self.loadFilters(f, filters);
                 });
                 var controlBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='controls']");
                 controlBlocks.each(function (idx: number, elem: Element) {
@@ -100,9 +66,6 @@ namespace metron {
                                     f.elem.show();
                                     self._elem.attribute("data-m-state", "hide");
                                     self._elem.hide();
-                                    if ((<any>self).new_m_inject != null) {
-                                        (<any>self).new_m_inject();
-                                    }
                                 });
                                 break;
                             case "undo":
@@ -115,13 +78,16 @@ namespace metron {
                             case "download":
                                 el.addEvent("click", function (e) {
                                     e.preventDefault();
-                                    if ((<any>self).download_m_inject != null) {
-                                        (<any>self).download_m_inject();
-                                    }
                                     document.location.href = `${metron.fw.getBaseUrl()}/${self.model}/download`;
                                 });
                                 break;
                             default:
+                                if (metron.globals.actions != null && metron.globals.actions[el.attribute("data-m-action").lower()] != null) {
+                                    el.addEvent("click", function (e) {
+                                        e.preventDefault();
+                                        metron.globals.actions[el.attribute("data-m-action").lower()](self);
+                                    });
+                                }
                                 break;
                         }
                     });
@@ -132,6 +98,53 @@ namespace metron {
                 }
             }
             return self;
+        }
+        private loadFilters(f: metron.form<T>, filters: NodeListOf<Element>): void {
+            var self = this;
+            let len = filters.length;
+            let alen = 0;
+            filters.each(function (indx: number, el: Element) {
+                if (el.attribute("data-m-binding") != null) {
+                    let binding: string = el.attribute("data-m-binding");
+                    let key: string = el.attribute("name");
+                    let nText: string = el.attribute("data-m-text");
+                    metron.web.get(`${metron.fw.getAPIURL(binding)}`, {}, null, "json", function (data: Array<T>) {
+                        data.each(function (i: number, item: any) {
+                            el.append(`<option value="${item[key]}">${item[nText]}</option>`);
+                            if (f.elem.selectOne(`#${self.model}_${key}`) != null) {
+                                (<HTMLElement>f.elem.selectOne(`#${self.model}_${key}`)).append(`<option value="${item[key]}">${item[nText]}</option>`);
+                            }
+                        });
+                    }, null, function() {
+                        alen++;
+                        if(len == alen) {
+                            if ((<any>self).loadFilters_m_inject != null) {
+                                (<any>self).loadFilters_m_inject();
+                            }
+                        }
+                    });
+                    el.addEvent("change", function (e) {
+                        let fil = self._filters;
+                        fil[key] = ((<HTMLElement>this).val() == '') ? null : <any>(<HTMLElement>this).val();
+                        self._filters = fil;
+                        self.callListing();
+                    });
+                }
+                if (el.attribute("data-m-search") != null) {
+                    el.addEvent("click", function (e) {
+                        e.preventDefault();
+                        let itm: Element = this;
+                        let fil = self._filters;
+                        let terms: Array<string> = this.attribute("data-m-search").split(",");
+                        terms.each(function (i: number, term: string) {
+                            let parent: Element = itm.parent();
+                            fil[term.trim()] = ((<HTMLElement>parent.selectOne(`#${itm.attribute("data-m-search-for")}`)).val() == '') ? null : <any>(<HTMLElement>parent.selectOne(`#${itm.attribute("data-m-search-for")}`)).val();
+                        });
+                        self._filters = fil;
+                        self.callListing();
+                    });
+                }
+            });
         }
         private applyViewEvents(): void {
             var self = this;

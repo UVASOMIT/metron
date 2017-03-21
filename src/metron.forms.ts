@@ -44,7 +44,7 @@ namespace metron {
                                 el.addEvent("click", function (e) {
                                     e.preventDefault();
                                     if (self.isValid()) {
-                                        let parameters: any = {};
+                                        let parameters: any = { };
                                         let hasPrimary: boolean = false;
                                         self.elem.selectAll("input, select, textarea").each(function (idx: number, elem: Element) {
                                             parameters[<string>elem.attribute("name")] = (<HTMLElement>elem).val();
@@ -55,17 +55,11 @@ namespace metron {
                                         if (!hasPrimary) {
                                             metron.web.post(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
                                                 self.save(self, data)
-                                                if ((<any>self).post_m_inject != null) {
-                                                    (<any>self).post_m_inject();
-                                                }
                                             });
                                         }
                                         else {
                                             metron.web.put(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
                                                 self.save(self, data);
-                                                if ((<any>self).put_m_inject != null) {
-                                                    (<any>self).put_m_inject();
-                                                }
                                             });
                                         }
                                     }
@@ -79,9 +73,6 @@ namespace metron {
                                     if (self._list != null) {
                                         self._list.elem.attribute("data-m-state", "show");
                                         self._list.elem.show();
-                                    }
-                                    if ((<any>self).cancel_m_inject != null) {
-                                        (<any>self).cancel_m_inject();
                                     }
                                 });
                                 break;
