@@ -114,11 +114,8 @@ namespace metron {
             }
             return url + '?' + paramPairs.join('&');
         }
-        export function querystring(obj?: any): Array<string>|string {
+        export function querystring(obj?: any): Array<string> | string {
             if (typeof (document) !== 'undefined') {
-                if(obj == null && document.location.search != "") {
-                    return document.location.search.substring(1);
-                }
                 if (typeof (obj) === 'string' && arguments.length === 1) {
                     let result: Array<any> = [];
                     let match: RegExpExecArray;
@@ -131,8 +128,11 @@ namespace metron {
                 else if (typeof (obj) === 'string' && arguments.length > 1) {
                     return [parseUrl(obj, arguments[1])];
                 }
-                else {
+                else if (obj != null) {
                     return [parseUrl(document.location.href, obj)];
+                }
+                else {
+                    return document.location.search.substring(1);
                 }
             }
             else {

@@ -3,6 +3,10 @@
 
 namespace metron {
     export namespace tools {
+        export enum OptionTypes {
+             QUERYSTRING = 1
+            ,KEYVALUE = 2
+        }
         export function reduceObject<T>(key: string, obj: T[]): Array<any> {
             let resp = [];
             obj.forEach(function (val, idx) {
@@ -36,14 +40,26 @@ namespace metron {
             }
             return obj;
         }
-        export function formatOptions(attr: string): any {
-            var pairs = attr.split(";");
+        export function formatOptions(attr: string, opt: OptionTypes = OptionTypes.KEYVALUE): any {
+            var pairDivider;
+            var optDivider;
+            switch(opt) {
+                case OptionTypes.QUERYSTRING:
+                    pairDivider = "&";
+                    optDivider = "=";
+                    break;
+                default:
+                    pairDivider = ";";
+                    optDivider = ":";
+                    break;
+            }
+            var pairs = attr.split(pairDivider);
             if (pairs[pairs.length - 1].trim() == "") {
                 pairs.pop();
             }
             var result = "";
             for (let i = 0; i < pairs.length; i++) {
-                let p = pairs[i].split(":");
+                let p = pairs[i].split(optDivider);
                 try {
                     result += `"${p[0].trim()}":"${p[1].trim()}"`;
                     if (i != (pairs.length - 1)) {

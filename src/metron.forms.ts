@@ -3,24 +3,32 @@
 namespace metron {
     export class forms {
         public static bindAll(): void {
-
+            let sections: NodeListOf<Element> = document.selectAll("[data-m-type='form']");
+            metron.globals["forms"] = [];
+            for (let i = 0; i < sections.length; i++) {
+                let section: Element = <Element>sections[i];
+                if (section.attribute("data-m-autoload") == null || section.attribute("data-m-autoload") == "true") {
+                    let model: string = section.attribute("data-m-model");
+                    let f: form<any> = new form(model).init();
+                    metron.globals["forms"].push(f);
+                }
+            }
         }
     }
     export class form<T> extends base {
         private _elem: Element;
         private _list: metron.list<any>;
-        private _field_id: string;
-        private _name: string;
-        private _classNames: Array<string> = [];
-        private _action: string = "";
-        private _method: string = "POST";
         private _fields: Array<string> = [];
-        private _primary: string;
         constructor(public model: string, public asscListing?: list<T>) {
             super();
             var self = this;
             if (asscListing != null) {
                 self._list = asscListing;
+            }
+            var qs: string = <string><any>metron.web.querystring();
+            if(qs != "") {
+                let parameters = metron.tools.formatOptions(qs.substr(1), metron.tools.OptionTypes.QUERYSTRING);
+                self.loadForm(parameters);
             }
         }
         public init(): form<T> {
@@ -28,9 +36,9 @@ namespace metron {
             self._elem = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
             if (self._elem != null) {
                 var controlBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='controls']");
-                controlBlocks.each(function (idx: number, elem: Element) {
+                controlBlocks.each((idx: number, elem: Element) => {
                     let actions = elem.selectAll("[data-m-action]");
-                    actions.each(function (indx: number, el: Element) {
+                    actions.each((indx: number, el: Element) => {
                         switch (el.attribute("data-m-action").lower()) {
                             case "save":
                                 el.addEvent("click", function (e) {
@@ -105,6 +113,25 @@ namespace metron {
                 context._list.elem.show();
                 context._list.callListing();
             }
+        }
+        public loadForm(parameters: any): void {
+            var self = this;
+            metron.web.get(`${metron.fw.getAPIURL(self.model)}${metron.web.querystringify(parameters)}`, parameters, null, "json", function (data: T) {
+                if (data instanceof Array) {
+                    data = data[0];
+                }
+                for (let prop in data) {
+                    if (data.hasOwnProperty(prop) && data[prop] != null && document.selectOne(`#${self.model}_${prop}`) != null) {
+                        (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(<any>data[prop]);
+                    }
+                }
+                self._elem.attribute("data-m-state", "show");
+                self._elem.show();
+                if(self._list != null) {
+                    self._list.elem.attribute("data-m-state", "hide");
+                    self._list.elem.hide();
+                }
+            });
         }
         public clearForm(selector?: string, callback?: Function): void {
             var self = this;

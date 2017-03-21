@@ -22,7 +22,7 @@ namespace metron {
     }
     export class list<T> extends base {
         private _elem: Element;
-        private _filters: T = null;
+        private _filters: any = { };
         private _items: Array<T>;
         private _rowTemplate: string;
         private _form: metron.form<any>;
@@ -38,8 +38,9 @@ namespace metron {
             if (asscForm != null) {
                 self._form = asscForm;
             }
-            if (self._filters == null) {
-                self._filters = <any>{};
+            var qs: string = <string><any>metron.web.querystring();
+            if(qs != "") {
+                self._filters = metron.tools.formatOptions(qs.substr(1), metron.tools.OptionTypes.QUERYSTRING);
             }
         }
         public init(): list<T> {
@@ -139,22 +140,7 @@ namespace metron {
                     e.preventDefault();
                     self._form.clearForm();
                     let parameters = metron.tools.formatOptions(elem.attribute("data-m-primary"));
-                    //parameters[`${self.model}ID`] = <number><any>metron.tools.getDataPrimary(`${self.model}ID`, elem.attribute("data-m-primary"));
-
-                    metron.web.get(`${metron.fw.getAPIURL(self.model)}${metron.web.querystringify(parameters)}`, parameters, null, "json", function (data: T) {
-                        if (data instanceof Array) {
-                            data = data[0];
-                        }
-                        for (let prop in data) {
-                            if (data.hasOwnProperty(prop) && data[prop] != null && document.selectOne(`#${self.model}_${prop}`) != null) {
-                                (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(<any>data[prop]);
-                            }
-                        }
-                        self._form.elem.attribute("data-m-state", "show");
-                        self._elem.attribute("data-m-state", "hide");
-                        self._form.elem.show();
-                        self._elem.hide();
-                    });
+                    self._form.loadForm(parameters);
                 });
             });
             document.selectAll(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='delete']`).each(function (idx: number, elem: Element) {
@@ -163,7 +149,6 @@ namespace metron {
                     if (confirm('Are you sure you want to delete this record?')) {
                         let current = this;
                         let parameters = metron.tools.formatOptions(elem.attribute("data-m-primary"));
-                        //parameters[`${self.model}ID`] = <number><any>metron.tools.getDataPrimary(`${self.model}ID`, current.attribute("data-m-primary"));
                         metron.web.remove(`${metron.fw.getAPIURL(self.model)}${metron.web.querystringify(parameters)}`, parameters, null, "json", function (data: T) {
                             if (data instanceof Array) {
                                 data = data[0];
