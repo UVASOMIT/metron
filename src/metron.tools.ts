@@ -2,9 +2,6 @@
 /// <reference path="metron.ts" />
 
 namespace metron {
-    export interface Async {
-        then(callback: Function): void;
-    }
     export namespace tools {
         export enum OptionTypes {
             QUERYSTRING = 1

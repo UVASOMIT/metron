@@ -4,7 +4,6 @@ namespace metron {
     export namespace templates {
         export namespace list {
             export function row<T>(template: string, item: T, isTable: boolean = true): string {
-                
                 var result = template;
                 for (let k in item) {
                     if (item.hasOwnProperty(k)) {
@@ -111,6 +110,9 @@ namespace metron {
                 }
                 return document.documentElement.innerHTML.replace(/\{\{m:root=\"(.*)\"\}\}/g, "").replace(/\{\{m:master=\"(.*)\"\}\}/g, "");
             }
+        }
+        export function register(n: string, func: Function): void {
+            metron.globals[n] = func;
         }
     }
 }
