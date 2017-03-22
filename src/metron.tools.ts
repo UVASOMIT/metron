@@ -2,10 +2,13 @@
 /// <reference path="metron.ts" />
 
 namespace metron {
+    export interface Async {
+        then(callback: Function): void;
+    }
     export namespace tools {
         export enum OptionTypes {
-             QUERYSTRING = 1
-            ,KEYVALUE = 2
+            QUERYSTRING = 1
+            , KEYVALUE = 2
         }
         export function reduceObject<T>(key: string, obj: T[]): Array<any> {
             let resp = [];
@@ -20,13 +23,13 @@ namespace metron {
         }
         export function normalizeModelItems(obj: any, model: string, first: boolean = false): Array<any> {
             var result = obj;
-            if(!first) {
-                if(obj[model] != null) {
+            if (!first) {
+                if (obj[model] != null) {
                     result = obj[model];
                 }
             }
             else {
-                if(obj[model] != null) {
+                if (obj[model] != null) {
                     result = obj[model][0];
                 }
             }
@@ -43,7 +46,7 @@ namespace metron {
         export function formatOptions(attr: string, opt: OptionTypes = OptionTypes.KEYVALUE): any {
             var pairDivider;
             var optDivider;
-            switch(opt) {
+            switch (opt) {
                 case OptionTypes.QUERYSTRING:
                     pairDivider = "&";
                     optDivider = "=";
@@ -92,25 +95,25 @@ namespace metron {
             return url;
         }
         export function normalizeURL(url: string): string {
-            if(url.endsWith("/")) {
+            if (url.endsWith("/")) {
                 return url.substr(0, (url.length - 2));
             }
             return url;
         }
         export function loadJSON(url: string, callback: Function): void {
-            if(!url.contains("://")) {
+            if (!url.contains("://")) {
                 url = `${window.location.protocol}//${normalizeURL(window.location.host)}/${url}`;
             }
-            metron.web.load(`${url}`, {}, null, "JSON", function(data: JSON) {
-                if(callback != null) {
+            metron.web.load(`${url}`, {}, null, "JSON", function (data: JSON) {
+                if (callback != null) {
                     callback(data);
                 }
             });
         }
         export function getMatching(text: string, regex: RegExp) {
             let match = regex.exec(text);
-            if(match[1] !== undefined) {
-                if(match[1].contains("\"")) { //Edge isn't handling regex matches correctly
+            if (match[1] !== undefined) {
+                if (match[1].contains("\"")) { //Edge isn't handling regex matches correctly
                     return match[1].split("\"")[0];
                 }
                 return match[1];

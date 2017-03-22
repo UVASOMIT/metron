@@ -17,6 +17,7 @@
   ],
   "dependencies": {
     "milligram": "^1.1.0",
-    "awesomplete": "^1.1.1"
+    "awesomplete": "^1.1.1",
+    "rsvp.js": "rsvp#^3.5.0"
   }
 }

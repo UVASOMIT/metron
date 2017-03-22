@@ -1,3 +1,4 @@
+/// <reference path="../node_modules/@types/rsvp/index.d.ts" />
 /// <reference path="metron.extenders.ts" />
 /// <reference path="metron.ts" />
 /// <reference path="metron.base.ts" />
@@ -22,7 +23,7 @@ namespace metron {
     }
     export class list<T> extends base {
         private _elem: Element;
-        private _filters: any = { };
+        private _filters: any = {};
         private _items: Array<T>;
         private _rowTemplate: string;
         private _form: metron.form<any>;
@@ -39,7 +40,7 @@ namespace metron {
                 self._form = asscForm;
             }
             var qs: string = <string><any>metron.web.querystring();
-            if(qs != "") {
+            if (qs != "") {
                 self._filters = metron.tools.formatOptions(qs.substr(1), metron.tools.OptionTypes.QUERYSTRING);
             }
         }
@@ -101,28 +102,24 @@ namespace metron {
         }
         private loadFilters(f: metron.form<T>, filters: NodeListOf<Element>): void {
             var self = this;
-            let len = filters.length;
-            let alen = 0;
+            var promises: Array<any> = [];
             filters.each(function (indx: number, el: Element) {
                 if (el.attribute("data-m-binding") != null) {
                     let binding: string = el.attribute("data-m-binding");
                     let key: string = el.attribute("name");
                     let nText: string = el.attribute("data-m-text");
-                    metron.web.get(`${metron.fw.getAPIURL(binding)}`, {}, null, "json", function (data: Array<T>) {
-                        data.each(function (i: number, item: any) {
-                            el.append(`<option value="${item[key]}">${item[nText]}</option>`);
-                            if (f.elem.selectOne(`#${self.model}_${key}`) != null) {
-                                (<HTMLElement>f.elem.selectOne(`#${self.model}_${key}`)).append(`<option value="${item[key]}">${item[nText]}</option>`);
-                            }
+                    let ajx = new RSVP.Promise(function (resolve, reject) {
+                        metron.web.get(`${metron.fw.getAPIURL(binding)}`, {}, null, "json", function (data: Array<T>) {
+                            data.each(function (i: number, item: any) {
+                                el.append(`<option value="${item[key]}">${item[nText]}</option>`);
+                                if (f.elem.selectOne(`#${self.model}_${key}`) != null) {
+                                    (<HTMLElement>f.elem.selectOne(`#${self.model}_${key}`)).append(`<option value="${item[key]}">${item[nText]}</option>`);
+                                }
+                            });
+                            resolve(data);
                         });
-                    }, null, function() {
-                        alen++;
-                        if(len == alen) {
-                            if ((<any>self).loadFilters_m_inject != null) {
-                                (<any>self).loadFilters_m_inject();
-                            }
-                        }
                     });
+                    promises.push(ajx);
                     el.addEvent("change", function (e) {
                         let fil = self._filters;
                         fil[key] = ((<HTMLElement>this).val() == '') ? null : <any>(<HTMLElement>this).val();
@@ -145,6 +142,14 @@ namespace metron {
                     });
                 }
             });
+            RSVP.all(promises).then(function () {
+                if ((<any>self).loadFilters_m_inject != null) {
+                    (<any>self).loadFilters_m_inject();
+                }
+            }).catch(function (reason) {
+                console.log("Error: Promise execution failed!");
+            });
+            
         }
         private applyViewEvents(): void {
             var self = this;
