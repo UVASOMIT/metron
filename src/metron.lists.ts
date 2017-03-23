@@ -199,7 +199,7 @@ namespace metron {
             var self = this;
             self.clearTable(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='list']`);
             self.populateTable(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='list']`);
-            self.createPaging(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='paging']`, self.callListing, (self._items.length > 0) ? self._items[0]["TotalCount"] : 0);
+            self.createPaging(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='paging']`, (self._items.length > 0) ? self._items[0]["TotalCount"] : 0);
             self.applyViewEvents();
             if ((<any>self).populateListing_m_inject != null) {
                 (<any>self).populateListing_m_inject();
@@ -257,33 +257,33 @@ namespace metron {
         public getRows(selector: string): number {
             return document.selectAll(`${selector} [data-m-type='table-body'] [data-m-type='row']`).length;
         }
-        public setupPagingEvents(selector: string, callback: Function, filters?: any): void {
+        public setupPagingEvents(selector: string, filters?: any): void {
             var self = this;
             document.selectOne(`${selector} > li > a[title='Previous']`).removeEvent("click").addEvent("click", function (e) {
                 e.preventDefault();
-                self.pageListing(self.getPreviousPage(), callback, filters);
-            });
+                self.pageListing(self.getPreviousPage(), filters);
+            }, true);
             document.selectOne(`${selector} > li > a[title='Next']`).removeEvent("click").addEvent("click", function (e) {
                 e.preventDefault();
-                self.pageListing(self.getNextPage(), callback, filters);
-            });
+                self.pageListing(self.getNextPage(), filters);
+            }, true);
             document.selectOne(`${selector} > li > a[title='First']`).removeEvent("click").addEvent("click", function (e) {
                 e.preventDefault();
-                self.pageListing(1, callback, filters);
-            });
+                self.pageListing(1, filters);
+            }, true);
             document.selectOne(`${selector} > li > a[title='Last']`).removeEvent("click").addEvent("click", function (e) {
                 e.preventDefault();
-                self.pageListing(self.totalPageSize, callback, filters);
-            });
+                self.pageListing(self.totalPageSize, filters);
+            }, true);
         }
-        public createPaging(selector: string, callback: Function, totalCount, filters?: any): void {
+        public createPaging(selector: string, totalCount, filters?: any): void {
             var self = this;
             if (self.currentPageIndex != null && self.pageSize != null) {
                 self.totalPageSize = self.calculateTotalPageSize(totalCount);
                 var startPage: number = ((parseInt(this.currentPageIndex.toString(), 10) - 5) < 1) ? 1 : (parseInt(this.currentPageIndex.toString(), 10) - 5);
                 var endPage: number = ((parseInt(this.currentPageIndex.toString(), 10) + 5) > this.totalPageSize) ? this.totalPageSize : (parseInt(this.currentPageIndex.toString(), 10) + 5);
 
-                self.setupPagingEvents(selector, callback, filters);
+                self.setupPagingEvents(selector, filters);
 
                 document.selectAll(`${selector} > li`).each(function (idx: number, elem: Element) {
                     if (elem.first("a").attribute("title") != "Previous" && elem.first("a").attribute("title") != "Next" && elem.first("a").attribute("title") != "First" && elem.first("a").attribute("title") != "Last") {
@@ -296,15 +296,15 @@ namespace metron {
                     }
                     let li: Element = document.create("<li />");
                     let idx = i;
-                    let link: Element = document.create(`<a>${idx}</a>`).attribute("href", "#").attribute("title", <string><any>idx).addEvent("click", function (e) {
+                    let link: Element = document.create(`<a class="button button-outline">${idx}</a>`).attribute("href", "#").attribute("title", <string><any>idx).addEvent("click", function (e) {
                         e.preventDefault();
-                        self.pageListing(<number><any>this.attribute("title"), callback, filters);
+                        self.pageListing(<number><any>this.attribute("title"), filters);
                     });
-                    li.append(link.asString());
+                    li.appendChild(link);
                     document.selectOne(`${selector}`).insertBefore(li, document.selectOne(`${selector} > li > a[title='Next']`).parent());
                 }
                 if (self.totalPageSize > 0) {
-                    document.selectOne(`${selector} > li > a[title='${self.currentPageIndex}']`).parent().addClass("active");
+                    document.selectOne(`${selector} > li > a[title='${self.currentPageIndex}']`).removeClass("button-outline").addClass("button-clear");
                 }
                 if (document.selectAll(`${selector} > li`).length <= 5) {
                     document.selectOne(`${selector}`).hide();
@@ -330,9 +330,9 @@ namespace metron {
         private calculateTotalPageSize(totalCount: number): number {
             return Math.ceil(totalCount / this.pageSize);
         }
-        private pageListing(idx: number, callback: Function, filters?: any) {
+        private pageListing(idx: number, filters?: any) {
             this.currentPageIndex = idx;
-            callback(this, filters);
+            this.callListing();
         }
         private getPreviousPage(): number {
             return (this.currentPageIndex === 0) ? this.currentPageIndex : (parseInt(<any>this.currentPageIndex, 10) - 1);
