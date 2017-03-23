@@ -6,7 +6,7 @@
   "description": "",
   "main": "index.html",
   "license": "MIT",
-  "homepage": "http://metron.october.codes",
+  "homepage": "https://github.com/szul/metron.v2",
   "private": true,
   "ignore": [
     "**/.*",
