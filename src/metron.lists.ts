@@ -33,6 +33,7 @@ namespace metron {
         public totalPageSize: number = 0;
         public sortOrder: string = "DateCreated";
         public sortDirection: string = "DESC";
+        public fetchURL: string;
         constructor(public model: string, public listType: string = "list", public asscForm?: form<T>) {
             super();
             var self = this;
@@ -224,7 +225,8 @@ namespace metron {
         public callListing(): void {
             var self = this;
             var parameters: any = Object.extend({ PageIndex: self.currentPageIndex, PageSize: self.pageSize, _SortOrder: self.sortOrder, _SortDirection: self.sortDirection }, self._filters);
-            metron.web.get(`${metron.fw.getAPIURL(self.model)}${metron.web.querystringify(parameters)}`, {}, null, "json", function (data: Array<T>) {
+            var url = (self.fetchURL != null) ? self.fetchURL : self.model;
+            metron.web.get(`${metron.fw.getAPIURL(url)}${metron.web.querystringify(parameters)}`, {}, null, "json", function (data: Array<T>) {
                 self._items = data;
                 self.populateListing();
                 if ((<any>self).callListing_m_inject != null) {

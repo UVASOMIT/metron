@@ -11,26 +11,31 @@ namespace metron {
                         result = result.replace(new RegExp(replacement, "g"), (<string><any>item[k] != null && <string><any>item[k] != "null") ? <string><any>item[k] : "");
                     }
                 }
-                var doc = document.createElement((isTable ? "tr" : "div"));
+                var doc = document.createElement((isTable ? "tbody" : "div"));
                 doc.innerHTML = result;
                 doc.selectAll("[data-m-format]").each((idx: number, elem: HTMLElement) => {
                     let options = (elem.attribute("data-m-options") != null) ? metron.tools.formatOptions(elem.attribute("data-m-options")) : null;
-                    elem.innerText = format(elem.attribute("data-m-format"), elem.innerText, options);
+                    if (elem.firstElementChild == null) {
+                        elem.innerText = format(elem.attribute("data-m-format"), elem.innerText, options);
+                    }
+                    else {
+                        format(elem.attribute("data-m-format"), elem, options);
+                    }
                 });
                 return doc.innerHTML;
             }
-            export function format(type: string, val: string, options?: any): string {
+            export function format(type: string, val: string | Element, options?: any): string {
                 switch (type.lower()) {
                     case "yesno":
-                        return metron.tools.formatBoolean(val);
+                        return metron.tools.formatBoolean(<string><any>val);
                     case "datetime":
-                        return metron.tools.formatDateTime(val);
+                        return metron.tools.formatDateTime(<string><any>val);
                     case "time":
                         return metron.tools.formatTime(<Date><any>val);
                     case "formatMessage":
-                        return metron.tools.formatMessage(val, options["length"]);
+                        return metron.tools.formatMessage(<string><any>val, options["length"]);
                     default:
-                        return metron.globals[type](val, options);
+                        return metron.globals[type](<Element>val, options);
                 }
             }
         }
