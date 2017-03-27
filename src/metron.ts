@@ -223,7 +223,7 @@ namespace metron {
                         }
                         if (request.status === 404 || request.status === 500) {
                             if (failure !== undefined) {
-                                failure(request);
+                                failure(request.responseText, request.responseJSON(), request.responseXML);
                             }
                         }
                         if (always !== undefined) {

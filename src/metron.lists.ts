@@ -113,7 +113,7 @@ namespace metron {
                         metron.web.get(`${metron.fw.getAPIURL(binding)}`, {}, null, "json", function (data: Array<T>) {
                             data.each(function (i: number, item: any) {
                                 el.append(`<option value="${item[key]}">${item[nText]}</option>`);
-                                if (f.elem.selectOne(`#${self.model}_${key}`) != null) {
+                                if (f.elem != null && f.elem.selectOne(`#${self.model}_${key}`) != null) {
                                     (<HTMLElement>f.elem.selectOne(`#${self.model}_${key}`)).append(`<option value="${item[key]}">${item[nText]}</option>`);
                                 }
                             });
@@ -192,6 +192,18 @@ namespace metron {
                     self.callListing();
                 }, true);
             });
+            document.selectAll(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action]`).each(function (idx: number, elem: Element) {
+                if (elem.attribute("data-m-action") != "edit" && elem.attribute("data-m-action") != "delete" && elem.attribute("data-m-action") != "sort" && elem.attribute("data-m-action") != "filter") { //Use an in/keys here
+                    if (metron.globals.actions != null && metron.globals.actions[elem.attribute("data-m-action").lower()] != null) {
+                        elem.removeEvent("click").addEvent("click", function (e) {
+                            e.preventDefault();
+                            if (metron.globals.actions[elem.attribute("data-m-action").lower()] != null) {
+                                metron.globals.actions[elem.attribute("data-m-action").lower()](self, elem);
+                            }
+                        });
+                    }
+                }
+            });
             if ((<any>self).applyViewEvents_m_inject != null) {
                 (<any>self).applyViewEvents_m_inject();
             }
@@ -224,6 +236,7 @@ namespace metron {
         }
         public callListing(): void {
             var self = this;
+            self.clearErrors();
             var parameters: any = Object.extend({ PageIndex: self.currentPageIndex, PageSize: self.pageSize, _SortOrder: self.sortOrder, _SortDirection: self.sortDirection }, self._filters);
             var url = (self.fetchURL != null) ? self.fetchURL : self.model;
             metron.web.get(`${metron.fw.getAPIURL(url)}${metron.web.querystringify(parameters)}`, {}, null, "json", function (data: Array<T>) {
@@ -232,6 +245,8 @@ namespace metron {
                 if ((<any>self).callListing_m_inject != null) {
                     (<any>self).callListing_m_inject();
                 }
+            }, (txt: string, jsn: any, xml: XMLDocument) => {
+                self.showErrors(txt, jsn, xml);
             });
         }
         public populateTable(selector: string): void {
@@ -249,12 +264,26 @@ namespace metron {
                 tbody.show();
             }
         }
+        public clearErrors(): void {
+            var self = this;
+            var elem = <HTMLElement>document.selectOne(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='alert']`);
+            elem.innerHTML = "";
+            elem.attribute("data-m-state", "hide");
+            elem.hide();
+        }
         public clearTable(selector: string): void {
             var self = this;
             if (String.isNullOrEmpty(self._rowTemplate)) {
                 self._rowTemplate = (<HTMLElement>document.selectOne(`${selector} [data-m-type='table-body'] [data-m-action='repeat']`)).outerHTML;
             }
             document.selectOne(`${selector} [data-m-type='table-body']`).empty();
+        }
+        public showErrors(txt: string, jsn: any, xml: XMLDocument): void {
+            var self = this;
+            var elem = <HTMLElement>document.selectOne(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='alert']`);
+            elem.innerHTML = txt;
+            elem.attribute("data-m-state", "show");
+            elem.show();
         }
         public getRows(selector: string): number {
             return document.selectAll(`${selector} [data-m-type='table-body'] [data-m-type='row']`).length;
