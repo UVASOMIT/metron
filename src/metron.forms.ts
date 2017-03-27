@@ -25,17 +25,20 @@ namespace metron {
             if (asscListing != null) {
                 self._list = asscListing;
             }
-            var qs: string = <string><any>metron.web.querystring();
-            if(qs != "") {
-                let parameters = metron.tools.formatOptions(qs.substr(1), metron.OptionTypes.QUERYSTRING);
-                self.loadForm(parameters);
-            }
         }
         public init(): form<T> {
             var self = this;
             self._elem = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
             if (self._elem != null) {
-                var controlBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='controls']");
+                let selects = self._elem.selectAll("select");
+                self.loadSelects(selects, () => {
+                    var qs: string = <string><any>metron.web.querystring();
+                    if (qs != "") {
+                        let parameters = metron.tools.formatOptions(qs, metron.OptionTypes.QUERYSTRING);
+                        self.loadForm(parameters);
+                    }
+                });
+                let controlBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='controls']");
                 controlBlocks.each((idx: number, elem: Element) => {
                     let actions = elem.selectAll("[data-m-action]");
                     actions.each((indx: number, el: Element) => {
@@ -122,6 +125,36 @@ namespace metron {
                     self._list.elem.attribute("data-m-state", "hide");
                     self._list.elem.hide();
                 }
+            });
+        }
+        public loadSelects(selects: NodeListOf<Element>, callback?: Function): void {
+            var self = this;
+            var promises: Array<any> = [];
+            selects.each(function (indx: number, el: Element) {
+                if (el.attribute("data-m-binding") != null && el.selectAll("option").length <= 1) {
+                    let binding: string = el.attribute("data-m-binding");
+                    let key: string = el.attribute("name");
+                    let nText: string = el.attribute("data-m-text");
+                    let ajx = new RSVP.Promise(function (resolve, reject) {
+                        metron.web.get(`${metron.fw.getAPIURL(binding)}`, {}, null, "json", function (data: Array<T>) {
+                            data.each(function (i: number, item: any) {
+                                (<HTMLElement>self._elem.selectOne(`#${self.model}_${key}`)).append(`<option value="${item[key]}">${item[nText]}</option>`);
+                            });
+                            resolve(data);
+                        });
+                    });
+                    promises.push(ajx);
+                }
+            });
+            RSVP.all(promises).then(function () {
+                if (callback != null) {
+                    callback();
+                }
+                if ((<any>self).loadSelects_m_inject != null) {
+                    (<any>self).loadSelects_m_inject();
+                }
+            }).catch(function (reason) {
+                console.log("Error: Promise execution failed!");
             });
         }
         public clearForm(selector?: string, callback?: Function): void {

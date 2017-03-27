@@ -151,7 +151,6 @@ namespace metron {
             }).catch(function (reason) {
                 console.log("Error: Promise execution failed!");
             });
-            
         }
         private applyViewEvents(): void {
             var self = this;
