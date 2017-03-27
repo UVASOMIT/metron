@@ -1,5 +1,6 @@
 /// <reference path="../node_modules/@types/rsvp/index.d.ts" />
 /// <reference path="metron.extenders.ts" />
+/// <reference path="metron.tools.ts" />
 /// <reference path="metron.ts" />
 /// <reference path="metron.base.ts" />
 /// <reference path="metron.framework.ts" />
@@ -42,7 +43,7 @@ namespace metron {
             }
             var qs: string = <string><any>metron.web.querystring();
             if (qs != "") {
-                self._filters = metron.tools.formatOptions(qs.substr(1), metron.tools.OptionTypes.QUERYSTRING);
+                self._filters = metron.tools.formatOptions(qs.substr(1), metron.OptionTypes.QUERYSTRING);
             }
         }
         public init(): list<T> {
@@ -236,7 +237,7 @@ namespace metron {
         }
         public callListing(): void {
             var self = this;
-            self.clearErrors();
+            self.clearAlerts();
             var parameters: any = Object.extend({ PageIndex: self.currentPageIndex, PageSize: self.pageSize, _SortOrder: self.sortOrder, _SortDirection: self.sortDirection }, self._filters);
             var url = (self.fetchURL != null) ? self.fetchURL : self.model;
             metron.web.get(`${metron.fw.getAPIURL(url)}${metron.web.querystringify(parameters)}`, {}, null, "json", function (data: Array<T>) {
@@ -246,7 +247,7 @@ namespace metron {
                     (<any>self).callListing_m_inject();
                 }
             }, (txt: string, jsn: any, xml: XMLDocument) => {
-                self.showErrors(txt, jsn, xml);
+                self.showAlerts(DANGER, txt, jsn, xml);
             });
         }
         public populateTable(selector: string): void {
@@ -264,10 +265,11 @@ namespace metron {
                 tbody.show();
             }
         }
-        public clearErrors(): void {
+        public clearAlerts(): void {
             var self = this;
             var elem = <HTMLElement>document.selectOne(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='alert']`);
             elem.innerHTML = "";
+            elem.removeClass("info").removeClass("warning").removeClass("danger").removeClass("success"); //Create a removeClasses() method
             elem.attribute("data-m-state", "hide");
             elem.hide();
         }
@@ -278,10 +280,11 @@ namespace metron {
             }
             document.selectOne(`${selector} [data-m-type='table-body']`).empty();
         }
-        public showErrors(txt: string, jsn: any, xml: XMLDocument): void {
+        public showAlerts(className: string, txt: string, jsn?: any, xml?: XMLDocument): void {
             var self = this;
             var elem = <HTMLElement>document.selectOne(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='alert']`);
             elem.innerHTML = txt;
+            elem.addClass(className);
             elem.attribute("data-m-state", "show");
             elem.show();
         }

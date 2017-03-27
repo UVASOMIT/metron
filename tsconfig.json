@@ -10,6 +10,7 @@
             },
     "files": [
         "src/metron.extenders.ts",
+        "src/metron.types.ts",
         "src/metron.ts",
         "src/metron.optional.ts",
         "src/metron.tools.ts",

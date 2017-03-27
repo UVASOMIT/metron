@@ -1,12 +1,9 @@
 /// <reference path="metron.extenders.ts" />
+/// <reference path="metron.types.ts" />
 /// <reference path="metron.ts" />
 
 namespace metron {
     export namespace tools {
-        export enum OptionTypes {
-            QUERYSTRING = 1
-            , KEYVALUE = 2
-        }
         export function reduceObject<T>(key: string, obj: T[]): Array<any> {
             let resp = [];
             obj.forEach(function (val, idx) {

@@ -27,7 +27,7 @@ namespace metron {
             }
             var qs: string = <string><any>metron.web.querystring();
             if(qs != "") {
-                let parameters = metron.tools.formatOptions(qs.substr(1), metron.tools.OptionTypes.QUERYSTRING);
+                let parameters = metron.tools.formatOptions(qs.substr(1), metron.OptionTypes.QUERYSTRING);
                 self.loadForm(parameters);
             }
         }
