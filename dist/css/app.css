@@ -8,6 +8,9 @@
 .button.button-clear, button.button-clear, input[type='button'].button-clear, input[type='reset'].button-clear, input[type='submit'].button-clear {
     color: #ff942b;
 }
+a {
+  color: #ff942b;
+}
 input[type='datetime-local'] {
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -57,9 +60,6 @@ div[data-m-segment='controls'] {
     padding: 1.2rem 1.5rem;
 }
 [data-m-segment='alert'] {
-    color: #a94442;
-    background-color: #f2dede;
-    border-color: #ebccd1;
     padding: 0.75rem 0rem 0.75rem 0rem;
     margin-bottom: 2rem;
     border-radius: 0.5rem;
@@ -97,8 +97,25 @@ form[data-m-segment='controls'] > fieldset > select {
     float: left;
     width: 10rem;
 }
-.pointer {
-    cursor: pointer;
+.info {
+    color: #31708f;
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+}
+.warning {
+    color: #8a6d3b;
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+}
+.danger {
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+}
+.success {
+    color: #3c763d;
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
 }
 .error {
     border-color: #a94442 !important;
@@ -109,6 +126,43 @@ form[data-m-segment='controls'] > fieldset > select {
 .label-error {
     color: #a94442;
 }
+.pointer {
+    cursor: pointer;
+}
+.callout {
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid #eee;
+    border-left-width: 5px;
+    border-radius: 3px;
+    border-left-color: #ff942b;
+}
+.callout h1
+,.callout h2
+,.callout h3
+,.callout h4
+,.callout h5
+,.callout h6
+ {
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+
+.callout p:last-child {
+    margin-bottom: 0;
+}
+
+.callout code {
+    border-radius: 3px;
+}
+
+.callout + .callout {
+    margin-top: -5px;
+}
+div.awesomplete {
+    display: block !important;
+}
+
 /* Larger than mobile screen */
 @media (min-width: 1.0rem) {
     .xs-hide {
