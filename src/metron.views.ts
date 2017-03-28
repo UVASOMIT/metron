@@ -10,7 +10,7 @@ namespace metron {
         private _elem: Element;
         private _form: metron.form<any>;
         constructor(public model: string, public asscForm?: form<T>) {
-            super();
+            super(model, VIEW);
             var self = this;
             if(asscForm != null) {
                 self._form = asscForm;

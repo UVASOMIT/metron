@@ -2,7 +2,7 @@
 
 namespace metron {
     export abstract class base {
-        constructor() {
+        constructor(public model: string, private baseType: string) {
         }
         public inject(type: string, method: string, func: Function): base {
             var self = this;
@@ -24,10 +24,26 @@ namespace metron {
             }
             return self;
         }
-        public action(action: string, func: Function): base {
+        public action(action: string, model: string, func: Function): base {
             var self = this;
-            metron.globals.actions[action] = func;
+            metron.globals.actions[`${model}_${action}`] = func;
             return self;
+        }
+        public clearAlerts(): void {
+            var self = this;
+            var elem = <HTMLElement>document.selectOne(`[data-m-type='${self.baseType}'][data-m-model='${self.model}'] [data-m-segment='alert']`);
+            elem.innerHTML = "";
+            elem.removeClass("info").removeClass("warning").removeClass("danger").removeClass("success"); //Create a removeClasses() method
+            elem.attribute("data-m-state", "hide");
+            elem.hide();
+        }
+        public showAlerts(className: string, txt: string, jsn?: any, xml?: XMLDocument): void {
+            var self = this;
+            var elem = <HTMLElement>document.selectOne(`[data-m-type='${self.baseType}'][data-m-model='${self.model}'] [data-m-segment='alert']`);
+            elem.innerHTML = txt;
+            elem.addClass(className);
+            elem.attribute("data-m-state", "show");
+            elem.show();
         }
     }
 }

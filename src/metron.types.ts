@@ -28,6 +28,10 @@ namespace metron {
             QUERYSTRING = 1
             , KEYVALUE = 2
     }
+    export const LIST = "list";
+    export const LOOKUP = "lookup";
+    export const FORM = "form";
+    export const VIEW = "view";
     export const INFO = "info";
     export const WARNING = "warning";
     export const DANGER = "danger";

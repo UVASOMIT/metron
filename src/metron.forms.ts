@@ -1,3 +1,4 @@
+/// <reference path="metron.types.ts" />
 /// <reference path="metron.base.ts" />
 
 namespace metron {
@@ -20,7 +21,7 @@ namespace metron {
         private _list: metron.list<any>;
         private _fields: Array<string> = [];
         constructor(public model: string, public asscListing?: list<T>) {
-            super();
+            super(model, FORM);
             var self = this;
             if (asscListing != null) {
                 self._list = asscListing;
@@ -46,44 +47,55 @@ namespace metron {
                             case "save":
                                 el.addEvent("click", function (e) {
                                     e.preventDefault();
-                                    if (self.isValid()) {
-                                        let parameters: any = { };
-                                        let hasPrimary: boolean = false;
-                                        self.elem.selectAll("input, select, textarea").each(function (idx: number, elem: Element) {
-                                            parameters[<string>elem.attribute("name")] = (<HTMLElement>elem).val();
-                                            if (elem.attribute("data-m-primary") != null && elem.attribute("data-m-primary").toBool() && (<HTMLElement>elem).val() != "") {
-                                                hasPrimary = true;
+                                    if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`] != null) { //Refactor getting the action overrides
+                                        metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`](self);
+                                    }
+                                    else {
+                                        if (self.isValid()) {
+                                            let parameters: any = {};
+                                            let hasPrimary: boolean = false;
+                                            self.elem.selectAll("input, select, textarea").each(function (idx: number, elem: Element) {
+                                                parameters[<string>elem.attribute("name")] = (<HTMLElement>elem).val();
+                                                if (elem.attribute("data-m-primary") != null && elem.attribute("data-m-primary").toBool() && (<HTMLElement>elem).val() != "") {
+                                                    hasPrimary = true;
+                                                }
+                                            });
+                                            if (!hasPrimary) {
+                                                metron.web.post(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
+                                                    self.save(self, data)
+                                                });
                                             }
-                                        });
-                                        if (!hasPrimary) {
-                                            metron.web.post(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
-                                                self.save(self, data)
-                                            });
-                                        }
-                                        else {
-                                            metron.web.put(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
-                                                self.save(self, data);
-                                            });
+                                            else {
+                                                metron.web.put(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
+                                                    self.save(self, data);
+                                                });
+                                            }
                                         }
                                     }
                                 });
                                 break;
                             case "cancel":
                                 el.addEvent("click", function (e) {
-                                    self.clearForm();
-                                    self._elem.attribute("data-m-state", "hide");
-                                    self._elem.hide();
-                                    if (self._list != null) {
-                                        self._list.elem.attribute("data-m-state", "show");
-                                        self._list.elem.show();
+                                    e.preventDefault();
+                                    if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`] != null) {
+                                        metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`](self);
+                                    }
+                                    else {
+                                        self.clearForm();
+                                        self._elem.attribute("data-m-state", "hide");
+                                        self._elem.hide();
+                                        if (self._list != null) {
+                                            self._list.elem.attribute("data-m-state", "show");
+                                            self._list.elem.show();
+                                        }
                                     }
                                 });
                                 break;
                             default:
-                                if (metron.globals.actions != null && metron.globals.actions[el.attribute("data-m-action").lower()] != null) {
+                                if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`] != null) {
                                     el.addEvent("click", function (e) {
                                         e.preventDefault();
-                                        metron.globals.actions[el.attribute("data-m-action").lower()](self);
+                                        metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`](self);
                                     });
                                 }
                                 break;
@@ -106,6 +118,9 @@ namespace metron {
                 context._list.elem.attribute("data-m-state", "show");
                 context._list.elem.show();
                 context._list.callListing();
+            }
+            if ((<any>context).save_m_inject != null) {
+                (<any>context).save_m_inject();
             }
         }
         public loadForm(parameters: any): void {
@@ -178,24 +193,27 @@ namespace metron {
         }
         public isValid(selector?: string): boolean {
             var self = this;
+            self.clearAlerts();
+            var result = "";
             var f = (self._elem != null) ? self._elem : document.selectOne(selector);
-            var alert: Element = f.selectOne("[data-m-segment='alert']");
-            alert.hide();
-            alert.empty();
-            document.selectAll(".error").each(function (idx, elem) {
+            f.selectAll(".error").each(function (idx, elem) {
                 elem.removeClass("error");
+            });
+            f.selectAll(".label-error").each(function (idx, elem) {
+                elem.removeClass("label-error");
             });
             var isValid: boolean = true;
             var required: NodeListOf<Element> = f.selectAll("[required='required']");
             required.each(function (idx: number, elem: Element) {
                 if ((<HTMLElement>elem).val() == null || (<HTMLElement>elem).val().trim() === "") {
                     isValid = false;
-                    alert.append(`<p>[${elem.attribute("name")}] is a required field.</p>`);
-                    elem.up("div").addClass("has-error");
+                    result += `<p>[${elem.attribute("name")}] is a required field.</p>`;
+                    elem.addClass("error");
+                    f.selectOne(`label[for='${elem.attribute("id")}']`).addClass("label-error");
                 }
             });
             if (!isValid) {
-                alert.show();
+                self.showAlerts(DANGER, result);
                 window.scrollTo(0, 0);
             }
             return isValid;

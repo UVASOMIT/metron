@@ -35,8 +35,8 @@ namespace metron {
         public sortOrder: string = "DateCreated";
         public sortDirection: string = "DESC";
         public fetchURL: string;
-        constructor(public model: string, public listType: string = "list", public asscForm?: form<T>) {
-            super();
+        constructor(public model: string, public listType: string = LIST, public asscForm?: form<T>) {
+            super(model, listType);
             var self = this;
             if (asscForm != null) {
                 self._form = asscForm;
@@ -64,24 +64,39 @@ namespace metron {
                             case "new":
                                 el.addEvent("click", function (e) {
                                     e.preventDefault();
-                                    f.clearForm();
-                                    f.elem.attribute("data-m-state", "show");
-                                    f.elem.show();
-                                    self._elem.attribute("data-m-state", "hide");
-                                    self._elem.hide();
+                                    if (metron.globals.actions != null && metron.globals.actions[el.attribute("data-m-action").lower()] != null) { //Refactor getting the action overrides
+                                        metron.globals.actions[el.attribute("data-m-action").lower()](self);
+                                    }
+                                    else {
+                                        f.clearForm();
+                                        f.elem.attribute("data-m-state", "show");
+                                        f.elem.show();
+                                        self._elem.attribute("data-m-state", "hide");
+                                        self._elem.hide();
+                                    }
                                 });
                                 break;
                             case "undo":
                                 el.addEvent("click", function (e) {
                                     e.preventDefault();
-                                    self.undoLast();
+                                    if (metron.globals.actions != null && metron.globals.actions[el.attribute("data-m-action").lower()] != null) {
+                                        metron.globals.actions[el.attribute("data-m-action").lower()](self);
+                                    }
+                                    else {
+                                        self.undoLast();
+                                    }
                                 });
                                 el.hide();
                                 break;
                             case "download":
                                 el.addEvent("click", function (e) {
                                     e.preventDefault();
-                                    document.location.href = `${metron.fw.getBaseUrl()}/${self.model}/download`;
+                                    if (metron.globals.actions != null && metron.globals.actions[el.attribute("data-m-action").lower()] != null) {
+                                        metron.globals.actions[el.attribute("data-m-action").lower()](self);
+                                    }
+                                    else {
+                                        document.location.href = `${metron.fw.getBaseUrl()}/${self.model}/download`;
+                                    }
                                 });
                                 break;
                             default:
@@ -157,25 +172,35 @@ namespace metron {
             document.selectAll(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='edit']`).each(function (idx: number, elem: Element) {
                 elem.removeEvent("click").addEvent("click", function (e) {
                     e.preventDefault();
-                    self._form.clearForm();
-                    let parameters = metron.tools.formatOptions(elem.attribute("data-m-primary"));
-                    self._form.loadForm(parameters);
+                    if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${elem.attribute("data-m-action").lower()}`] != null) { //Refactor getting the action overrides
+                        metron.globals.actions[`${self.model}_${elem.attribute("data-m-action").lower()}`](self, elem);
+                    }
+                    else {
+                        self._form.clearForm();
+                        let parameters = metron.tools.formatOptions(elem.attribute("data-m-primary"));
+                        self._form.loadForm(parameters);
+                    }
                 });
             });
             document.selectAll(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='delete']`).each(function (idx: number, elem: Element) {
                 elem.removeEvent("click").addEvent("click", function (e) {
                     e.preventDefault();
-                    if (confirm('Are you sure you want to delete this record?')) {
-                        let current = this;
-                        let parameters = metron.tools.formatOptions(elem.attribute("data-m-primary"));
-                        metron.web.remove(`${metron.fw.getAPIURL(self.model)}${metron.web.querystringify(parameters)}`, parameters, null, "json", function (data: T) {
-                            if (data instanceof Array) {
-                                data = data[0];
-                            }
-                            self.recycleBin.push(data);
-                            current.up("tr").drop();
-                            document.selectOne(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='undo']`).show();
-                        });
+                    if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${elem.attribute("data-m-action").lower()}`] != null) { //Refactor getting the action overrides
+                        metron.globals.actions[`${self.model}_${elem.attribute("data-m-action").lower()}`](self, elem);
+                    }
+                    else {
+                        if (confirm('Are you sure you want to delete this record?')) {
+                            let current = this;
+                            let parameters = metron.tools.formatOptions(elem.attribute("data-m-primary"));
+                            metron.web.remove(`${metron.fw.getAPIURL(self.model)}${metron.web.querystringify(parameters)}`, parameters, null, "json", function (data: T) {
+                                if (data instanceof Array) {
+                                    data = data[0];
+                                }
+                                self.recycleBin.push(data);
+                                current.up("tr").drop();
+                                document.selectOne(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='undo']`).show();
+                            });
+                        }
                     }
                 });
             });
@@ -194,12 +219,10 @@ namespace metron {
             });
             document.selectAll(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action]`).each(function (idx: number, elem: Element) {
                 if (elem.attribute("data-m-action") != "edit" && elem.attribute("data-m-action") != "delete" && elem.attribute("data-m-action") != "sort" && elem.attribute("data-m-action") != "filter") { //Use an in/keys here
-                    if (metron.globals.actions != null && metron.globals.actions[elem.attribute("data-m-action").lower()] != null) {
+                    if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${elem.attribute("data-m-action").lower()}`] != null) {
                         elem.removeEvent("click").addEvent("click", function (e) {
                             e.preventDefault();
-                            if (metron.globals.actions[elem.attribute("data-m-action").lower()] != null) {
-                                metron.globals.actions[elem.attribute("data-m-action").lower()](self, elem);
-                            }
+                            metron.globals.actions[`${self.model}_${elem.attribute("data-m-action").lower()}`](self, elem);
                         });
                     }
                 }
@@ -264,28 +287,12 @@ namespace metron {
                 tbody.show();
             }
         }
-        public clearAlerts(): void {
-            var self = this;
-            var elem = <HTMLElement>document.selectOne(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='alert']`);
-            elem.innerHTML = "";
-            elem.removeClass("info").removeClass("warning").removeClass("danger").removeClass("success"); //Create a removeClasses() method
-            elem.attribute("data-m-state", "hide");
-            elem.hide();
-        }
         public clearTable(selector: string): void {
             var self = this;
             if (String.isNullOrEmpty(self._rowTemplate)) {
                 self._rowTemplate = (<HTMLElement>document.selectOne(`${selector} [data-m-type='table-body'] [data-m-action='repeat']`)).outerHTML;
             }
             document.selectOne(`${selector} [data-m-type='table-body']`).empty();
-        }
-        public showAlerts(className: string, txt: string, jsn?: any, xml?: XMLDocument): void {
-            var self = this;
-            var elem = <HTMLElement>document.selectOne(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='alert']`);
-            elem.innerHTML = txt;
-            elem.addClass(className);
-            elem.attribute("data-m-state", "show");
-            elem.show();
         }
         public getRows(selector: string): number {
             return document.selectAll(`${selector} [data-m-type='table-body'] [data-m-type='row']`).length;
