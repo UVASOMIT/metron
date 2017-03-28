@@ -43,7 +43,7 @@ namespace metron {
             }
             var qs: string = <string><any>metron.web.querystring();
             if (qs != "") {
-                self._filters = metron.tools.formatOptions(qs.substr(1), metron.OptionTypes.QUERYSTRING);
+                self._filters = metron.tools.formatOptions(qs, metron.OptionTypes.QUERYSTRING);
             }
         }
         public init(): list<T> {
