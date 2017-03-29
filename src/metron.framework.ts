@@ -28,6 +28,11 @@ namespace metron {
             });
         });
     }
+    export function load(segment: string, model: string, func: Function) {
+        if (document.selectOne(`[data-m-type="${segment}"][data-m-model="${model}"]`) != null) {
+            func();
+        }
+    }
     export namespace fw {
         export function getApplicationRoot(page: string): string {
             let root: string = (document.selectOne("body[data-m-root]") != null) ? `${document.selectOne("body[data-m-root]").attribute("data-m-root")}` : null;

@@ -30,6 +30,12 @@ input[type='email']:focus, input[type='number']:focus, input[type='password']:fo
 select:focus {
     background-image: none;
 }
+hr {
+    padding-top: 3rem;
+    border: 0;
+    border-bottom: 0.1rem solid #d1d1d1;
+    clear: both;
+}
 [data-m-type] {
     clear: both;
     /*margin: auto 5rem auto 5rem;*/

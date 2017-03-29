@@ -50,7 +50,7 @@ namespace metron {
             var self = this;
             self._elem = document.selectOne(`[data-m-type='list'][data-m-model='${self.model}']`);
             if (self._elem != null) {
-                let f: metron.form<any> = (self.asscForm != null) ? self.asscForm : self.attachForm(new metron.form(self.model, self).init());
+                let f: metron.form<any> = (self.asscForm != null) ? self.asscForm : self.attachForm(self.model);
                 let filterBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='filters']");
                 filterBlocks.each(function (idx: number, elem: Element) {
                     let filters = elem.selectAll("[data-m-action='filter']");
@@ -380,8 +380,13 @@ namespace metron {
         private getNextPage(): number {
             return (this.currentPageIndex === this.totalPageSize) ? this.currentPageIndex : (parseInt(<any>this.currentPageIndex, 10) + 1);
         }
-        private attachForm(f: metron.form<any>): metron.form<any> {
+        private attachForm(m: string): metron.form<any> {
             var self = this;
+            var f = new metron.form(m, self);
+            var elem = document.selectOne(`[data-m-type='form'][data-m-model='${m}']`);
+            if (elem != null && (elem.attribute("data-m-autoload") == null || elem.attribute("data-m-autoload") == "true")) {
+                f.init();
+            }
             self._form = f;
             return self._form;
         }
