@@ -27,16 +27,18 @@ namespace metron {
                 self._list = asscListing;
             }
         }
-        public init(): form<T> {
+        public init(preload: boolean = true): form<T> {
             var self = this;
             self._elem = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
             if (self._elem != null) {
                 let selects = self._elem.selectAll("select");
                 self.loadSelects(selects, () => {
-                    var qs: string = <string><any>metron.web.querystring();
-                    if (qs != "") {
-                        let parameters = metron.tools.formatOptions(qs, metron.OptionTypes.QUERYSTRING);
-                        self.loadForm(parameters);
+                    if (preload) {
+                        var qs: string = <string><any>metron.web.querystring();
+                        if (qs != "") {
+                            let parameters = metron.tools.formatOptions(qs, metron.OptionTypes.QUERYSTRING);
+                            self.loadForm(parameters);
+                        }
                     }
                 });
                 let controlBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='controls']");
@@ -136,7 +138,7 @@ namespace metron {
                 }
                 self._elem.attribute("data-m-state", "show");
                 self._elem.show();
-                if (self._list != null && (self._elem.attribute("data-m-autoload") == null || self._elem.attribute("data-m-autoload") == "true")) {
+                if (self._list != null) {
                     self._list.elem.attribute("data-m-state", "hide");
                     self._list.elem.hide();
                 }
