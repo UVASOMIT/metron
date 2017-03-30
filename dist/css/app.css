@@ -1,12 +1,49 @@
-.button, button, input[type='button'], input[type='reset'], input[type='submit'] {
+.button
+,button
+,input[type='button']
+,input[type='reset']
+,input[type='submit'] {
     background-color: #ff942b;
     border-color: #ff942b;
 }
-.button.button-outline, button.button-outline, input[type='button'].button-outline, input[type='reset'].button-outline, input[type='submit'].button-outline {
+.button.button-outline
+,button.button-outline
+,input[type='button'].button-outline
+,input[type='reset'].button-outline
+,input[type='submit'].button-outline {
     color: #ff942b;
 }
-.button.button-clear, button.button-clear, input[type='button'].button-clear, input[type='reset'].button-clear, input[type='submit'].button-clear {
+.button.button-clear
+,button.button-clear
+,input[type='button'].button-clear
+,input[type='reset'].button-clear
+,input[type='submit'].button-clear {
     color: #ff942b;
+}
+.button.button-outline[disabled]:focus
+,.button.button-outline[disabled]:hover
+,button.button-outline[disabled]:focus
+,button.button-outline[disabled]:hover
+,input[type='button'].button-outline[disabled]:focus
+,input[type='button'].button-outline[disabled]:hover
+,input[type='reset'].button-outline[disabled]:focus
+,input[type='reset'].button-outline[disabled]:hover
+,input[type='submit'].button-outline[disabled]:focus
+,input[type='submit'].button-outline[disabled]:hover {
+  border-color: inherit;
+  color: #606c76;
+}
+.button.button-clear[disabled]:focus
+,.button.button-clear[disabled]:hover
+,button.button-clear[disabled]:focus
+,button.button-clear[disabled]:hover
+,input[type='button'].button-clear[disabled]:focus
+,input[type='button'].button-clear[disabled]:hover
+,input[type='reset'].button-clear[disabled]:focus
+,input[type='reset'].button-clear[disabled]:hover
+,input[type='submit'].button-clear[disabled]:focus
+,input[type='submit'].button-clear[disabled]:hover {
+  color: #606c76;
 }
 a {
   color: #ff942b;
@@ -24,7 +61,15 @@ input[type='datetime-local'] {
     padding: .6rem 1.0rem;
     width: 100%;
 }
-input[type='email']:focus, input[type='number']:focus, input[type='password']:focus, input[type='search']:focus, input[type='tel']:focus, input[type='text']:focus, input[type='url']:focus, textarea:focus, select:focus {
+input[type='email']:focus
+,input[type='number']:focus
+,input[type='password']:focus
+,input[type='search']:focus
+,input[type='tel']:focus
+,input[type='text']:focus
+,input[type='url']:focus
+,textarea:focus
+,select:focus {
     border-color: #ff942b;
 }
 select:focus {

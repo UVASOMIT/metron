@@ -136,7 +136,7 @@ namespace metron {
                 }
                 self._elem.attribute("data-m-state", "show");
                 self._elem.show();
-                if(self._list != null) {
+                if (self._list != null && (self._elem.attribute("data-m-autoload") == null || self._elem.attribute("data-m-autoload") == "true")) {
                     self._list.elem.attribute("data-m-state", "hide");
                     self._list.elem.hide();
                 }
@@ -148,12 +148,13 @@ namespace metron {
             selects.each(function (indx: number, el: Element) {
                 if (el.attribute("data-m-binding") != null && el.selectAll("option").length <= 1) {
                     let binding: string = el.attribute("data-m-binding");
-                    let key: string = el.attribute("name");
+                    let key: string = (el.attribute("data-m-key")) != null ? el.attribute("data-m-key") : el.attribute("name");
+                    let nm: string = el.attribute("name");
                     let nText: string = el.attribute("data-m-text");
                     let ajx = new RSVP.Promise(function (resolve, reject) {
                         metron.web.get(`${metron.fw.getAPIURL(binding)}`, {}, null, "json", function (data: Array<T>) {
                             data.each(function (i: number, item: any) {
-                                (<HTMLElement>self._elem.selectOne(`#${self.model}_${key}`)).append(`<option value="${item[key]}">${item[nText]}</option>`);
+                                (<HTMLElement>self._elem.selectOne(`#${self.model}_${nm}`)).append(`<option value="${item[key]}">${item[nText]}</option>`);
                             });
                             resolve(data);
                         });

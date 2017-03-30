@@ -123,14 +123,15 @@ namespace metron {
             filters.each(function (indx: number, el: Element) {
                 if (el.attribute("data-m-binding") != null) {
                     let binding: string = el.attribute("data-m-binding");
-                    let key: string = el.attribute("name");
+                    let key: string = (el.attribute("data-m-key")) != null ? el.attribute("data-m-key") : el.attribute("name");
+                    let nm: string = el.attribute("name");
                     let nText: string = el.attribute("data-m-text");
                     let ajx = new RSVP.Promise(function (resolve, reject) {
                         metron.web.get(`${metron.fw.getAPIURL(binding)}`, {}, null, "json", function (data: Array<T>) {
                             data.each(function (i: number, item: any) {
                                 el.append(`<option value="${item[key]}">${item[nText]}</option>`);
                                 if (f.elem != null && f.elem.selectOne(`#${self.model}_${key}`) != null) {
-                                    (<HTMLElement>f.elem.selectOne(`#${self.model}_${key}`)).append(`<option value="${item[key]}">${item[nText]}</option>`);
+                                    (<HTMLElement>f.elem.selectOne(`#${self.model}_${nm}`)).append(`<option value="${item[key]}">${item[nText]}</option>`);
                                 }
                             });
                             resolve(data);
