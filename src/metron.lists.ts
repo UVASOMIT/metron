@@ -65,7 +65,7 @@ namespace metron {
                                 el.addEvent("click", function (e) {
                                     e.preventDefault();
                                     if (metron.globals.actions != null && metron.globals.actions[el.attribute("data-m-action").lower()] != null) { //Refactor getting the action overrides
-                                        metron.globals.actions[el.attribute("data-m-action").lower()](self);
+                                        metron.globals.actions[el.attribute("data-m-action").lower()]();
                                     }
                                     else {
                                         f.clearForm();
@@ -80,7 +80,7 @@ namespace metron {
                                 el.addEvent("click", function (e) {
                                     e.preventDefault();
                                     if (metron.globals.actions != null && metron.globals.actions[el.attribute("data-m-action").lower()] != null) {
-                                        metron.globals.actions[el.attribute("data-m-action").lower()](self);
+                                        metron.globals.actions[el.attribute("data-m-action").lower()]();
                                     }
                                     else {
                                         self.undoLast();
@@ -92,7 +92,7 @@ namespace metron {
                                 el.addEvent("click", function (e) {
                                     e.preventDefault();
                                     if (metron.globals.actions != null && metron.globals.actions[el.attribute("data-m-action").lower()] != null) {
-                                        metron.globals.actions[el.attribute("data-m-action").lower()](self);
+                                        metron.globals.actions[el.attribute("data-m-action").lower()]();
                                     }
                                     else {
                                         document.location.href = `${metron.fw.getBaseUrl()}/${self.model}/download`;
@@ -103,7 +103,7 @@ namespace metron {
                                 if (metron.globals.actions != null && metron.globals.actions[el.attribute("data-m-action").lower()] != null) {
                                     el.addEvent("click", function (e) {
                                         e.preventDefault();
-                                        metron.globals.actions[el.attribute("data-m-action").lower()](self);
+                                        metron.globals.actions[el.attribute("data-m-action").lower()]();
                                     });
                                 }
                                 break;
@@ -174,7 +174,7 @@ namespace metron {
                 elem.removeEvent("click").addEvent("click", function (e) {
                     e.preventDefault();
                     if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${elem.attribute("data-m-action").lower()}`] != null) { //Refactor getting the action overrides
-                        metron.globals.actions[`${self.model}_${elem.attribute("data-m-action").lower()}`](self, elem);
+                        metron.globals.actions[`${self.model}_${elem.attribute("data-m-action").lower()}`](elem);
                     }
                     else {
                         self._form.clearForm();
@@ -187,7 +187,7 @@ namespace metron {
                 elem.removeEvent("click").addEvent("click", function (e) {
                     e.preventDefault();
                     if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${elem.attribute("data-m-action").lower()}`] != null) { //Refactor getting the action overrides
-                        metron.globals.actions[`${self.model}_${elem.attribute("data-m-action").lower()}`](self, elem);
+                        metron.globals.actions[`${self.model}_${elem.attribute("data-m-action").lower()}`](elem);
                     }
                     else {
                         if (confirm('Are you sure you want to delete this record?')) {
@@ -223,7 +223,7 @@ namespace metron {
                     if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${elem.attribute("data-m-action").lower()}`] != null) {
                         elem.removeEvent("click").addEvent("click", function (e) {
                             e.preventDefault();
-                            metron.globals.actions[`${self.model}_${elem.attribute("data-m-action").lower()}`](self, elem);
+                            metron.globals.actions[`${self.model}_${elem.attribute("data-m-action").lower()}`](elem);
                         });
                     }
                 }

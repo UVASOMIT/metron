@@ -98,7 +98,7 @@ namespace metron {
             if (!url.contains("://")) {
                 url = `${window.location.protocol}//${normalizeURL(window.location.host)}/${url}`;
             }
-            metron.web.load(`${url}`, {}, null, "JSON", function (data: JSON) {
+            metron.web.get(`${url}`, {}, null, "JSON", function (data: JSON) {
                 if (callback != null) {
                     callback(data);
                 }

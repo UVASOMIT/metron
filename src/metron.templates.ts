@@ -1,3 +1,4 @@
+/// <reference path="../node_modules/@types/rsvp/index.d.ts" />
 /// <reference path="metron.extenders.ts" />
 
 namespace metron {
@@ -80,14 +81,22 @@ namespace metron {
                 return false;
             }
             export function loadMaster(page: string): void {
-                let root: string = metron.tools.getMatching(page, /\{\{m:root=\"(.*)\"\}\}/g);
-                let fileName: string = metron.tools.getMatching(page, /\{\{m:master=\"(.*)\"\}\}/g);
-                metron.web.load(`${root}/${fileName}`, {}, "text/html", "text", (resp: string) => {
-                    metron.templates.master.merge(resp);
-                },
-                    (err) => {
+                var root: string = metron.tools.getMatching(page, /\{\{m:root=\"(.*)\"\}\}/g);
+                var fileName: string = metron.tools.getMatching(page, /\{\{m:master=\"(.*)\"\}\}/g);
+                var ajx = new RSVP.Promise(function (resolve, reject) {
+                    metron.web.get(`${root}/${fileName}`, {}, "text/html", "text", (resp: string) => {
+                        metron.templates.master.merge(resp);
+                        resolve(resp);
+                    }, (err) => {
                         document.documentElement.append(`<h1>Error: Failed to load [${root}/${fileName}].</h1><p>${err}</p>`);
+                        reject(err);
                     });
+                });
+                RSVP.all([ajx]).then(function () {
+                    console.log("Info: Loaded master template through Promise.");
+                }).catch(function (reason) {
+                    console.log("Error: Promise execution failed!");
+                });
             }
             export function merge(template: string): void {
                 function _copyAttributes(src: Node, elemName: string) {

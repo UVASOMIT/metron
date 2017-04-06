@@ -1,3 +1,4 @@
+/// <reference path="../node_modules/@types/rsvp/index.d.ts" />
 /// <reference path="metron.extenders.ts" />
 /// <reference path="metron.optional.ts" />
 /// <reference path="metron.ts" />
@@ -18,13 +19,20 @@ namespace metron {
             });
             metron.fw.loadOptionalFunctionality();
             let root: string = metron.fw.getApplicationRoot(document.documentElement.outerHTML);
-            metron.tools.loadJSON(`${root}/metron.json`, (configData: JSON) => {
-                for (let obj in configData) {
-                    globals[obj] = configData[obj];
-                }
+            let ajx = new RSVP.Promise(function (resolve, reject) {
+                metron.tools.loadJSON(`${root}/metron.json`, (configData: JSON) => {
+                    for (let obj in configData) {
+                        globals[obj] = configData[obj];
+                    }
+                    resolve(configData);
+                });
+            });
+            RSVP.all([ajx]).then(function () {
                 if (callback != null) {
                     callback(e);
                 }
+            }).catch(function (reason) {
+                console.log("Error: Promise execution failed!");
             });
         });
     }

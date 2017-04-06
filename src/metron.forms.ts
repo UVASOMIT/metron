@@ -50,7 +50,7 @@ namespace metron {
                                 el.addEvent("click", function (e) {
                                     e.preventDefault();
                                     if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`] != null) { //Refactor getting the action overrides
-                                        metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`](self);
+                                        metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`]();
                                     }
                                     else {
                                         if (self.isValid()) {
@@ -64,12 +64,12 @@ namespace metron {
                                             });
                                             if (!hasPrimary) {
                                                 metron.web.post(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
-                                                    self.save(self, data)
+                                                    self.save(data)
                                                 });
                                             }
                                             else {
                                                 metron.web.put(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
-                                                    self.save(self, data);
+                                                    self.save(data);
                                                 });
                                             }
                                         }
@@ -80,7 +80,7 @@ namespace metron {
                                 el.addEvent("click", function (e) {
                                     e.preventDefault();
                                     if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`] != null) {
-                                        metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`](self);
+                                        metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`]();
                                     }
                                     else {
                                         self.clearForm();
@@ -97,7 +97,7 @@ namespace metron {
                                 if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`] != null) {
                                     el.addEvent("click", function (e) {
                                         e.preventDefault();
-                                        metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`](self);
+                                        metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`]();
                                     });
                                 }
                                 break;
@@ -110,19 +110,20 @@ namespace metron {
             }
             return self;
         }
-        public save(context: form<T>, data: T): void {
-            context.elem.selectAll("[data-m-primary]").each((idx: number, elem: Element) => {
+        public save(data: T): void {
+            var self = this;
+            self.elem.selectAll("[data-m-primary]").each((idx: number, elem: Element) => {
                 (<HTMLElement>elem).val(<string><any>data[<string><any>elem.attribute("name")]);
             });
-            context.elem.attribute("data-m-state", "hide");
-            context.elem.hide();
-            if (context._list != null) {
-                context._list.elem.attribute("data-m-state", "show");
-                context._list.elem.show();
-                context._list.callListing();
+            self.elem.attribute("data-m-state", "hide");
+            self.elem.hide();
+            if (self._list != null) {
+                self._list.elem.attribute("data-m-state", "show");
+                self._list.elem.show();
+                self._list.callListing();
             }
-            if ((<any>context).save_m_inject != null) {
-                (<any>context).save_m_inject();
+            if ((<any>self).save_m_inject != null) {
+                (<any>self).save_m_inject();
             }
         }
         public loadForm(parameters: any): void {
