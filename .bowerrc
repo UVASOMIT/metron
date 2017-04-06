@@ -1,5 +1,5 @@
 {
     "scripts": {
-        "postinstall": "grunt default"
+        "postinstall": "npm install && grunt default"
     }
 }
