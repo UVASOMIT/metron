@@ -47,6 +47,7 @@ namespace metron {
             if (root == null) {
                 root = metron.tools.getMatching(page, /\{\{m:root=\"(.*)\"\}\}/g);
             }
+            metron.globals["config.root"] = root;
             return root;
         }
         export function getBaseUrl(): string {
@@ -57,7 +58,8 @@ namespace metron {
         }
         export function getBaseAPI(): string {
             if (metron.globals["config.api.dir"] != null) {
-                return ((<string>metron.globals["config.api.dir"]).endsWith("/")) ? (<string>metron.globals["config.api.dir"]).substr(0, (<string>metron.globals["config.api.dir"]).length - 2) : `${metron.globals["config.api.dir"]}`;
+                let url = ((<string>metron.globals["config.api.dir"]).endsWith("/")) ? (<string>metron.globals["config.api.dir"]).substr(0, (<string>metron.globals["config.api.dir"]).length - 2) : `${metron.globals["config.api.dir"]}`;
+                return (metron.globals["config.root"] != null && metron.globals["config.root"] != "") ? `${metron.globals["config.root"]}/url` : url;
             }
             return "";
         }
