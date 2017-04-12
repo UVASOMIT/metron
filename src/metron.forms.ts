@@ -5,13 +5,14 @@ namespace metron {
     export class forms {
         public static bindAll(): void {
             let sections: NodeListOf<Element> = document.selectAll("[data-m-type='form']");
-            metron.globals["forms"] = [];
             for (let i = 0; i < sections.length; i++) {
                 let section: Element = <Element>sections[i];
                 if (section.attribute("data-m-autoload") == null || section.attribute("data-m-autoload") == "true") {
                     let model: string = section.attribute("data-m-model");
-                    let f: form<any> = new form(model).init();
-                    metron.globals["forms"].push(f);
+                    if (metron.globals["forms"][model] == null) {
+                        let f: form<any> = new form(model).init();
+                        metron.globals["forms"][model] = f;
+                    }
                 }
             }
         }

@@ -11,13 +11,14 @@ namespace metron {
     export class lists {
         public static bindAll(): void {
             let sections: NodeListOf<Element> = document.selectAll("[data-m-type='list']");
-            metron.globals["lists"] = [];
             for (let i = 0; i < sections.length; i++) {
                 let section: Element = <Element>sections[i];
                 if (section.attribute("data-m-autoload") == null || section.attribute("data-m-autoload") == "true") {
                     let model: string = section.attribute("data-m-model");
-                    let l: list<any> = new list(model).init();
-                    metron.globals["lists"].push(l);
+                    if (metron.globals["lists"][model] == null) {
+                        let l: list<any> = new list(model).init();
+                        metron.globals["lists"][model] = l;
+                    }
                 }
             }
         }
@@ -383,7 +384,8 @@ namespace metron {
         }
         private attachForm(m: string): metron.form<any> {
             var self = this;
-            var f = new metron.form(m, self);
+            var f = (metron.globals["forms"][self.model] != null) ? metron.globals["forms"][self.model] : new metron.form(m, self);
+            metron.globals["forms"][self.model] = f;
             var elem = document.selectOne(`[data-m-type='form'][data-m-model='${m}']`);
             if (elem != null && (elem.attribute("data-m-autoload") == null || elem.attribute("data-m-autoload") == "true")) {
                 f.init();
