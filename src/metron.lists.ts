@@ -9,7 +9,7 @@
 
 namespace metron {
     export class lists {
-        public static bindAll(): void {
+        public static bindAll(callback: Function): void {
             let sections: NodeListOf<Element> = document.selectAll("[data-m-type='list']");
             for (let i = 0; i < sections.length; i++) {
                 let section: Element = <Element>sections[i];
@@ -20,6 +20,9 @@ namespace metron {
                         metron.globals["lists"][model] = l;
                     }
                 }
+            }
+            if(callback != null) {
+                callback();
             }
         }
     }
@@ -384,10 +387,13 @@ namespace metron {
         }
         private attachForm(m: string): metron.form<any> {
             var self = this;
-            var f = (metron.globals["forms"][self.model] != null) ? metron.globals["forms"][self.model] : new metron.form(m, self);
+            var f: metron.form<T> = (metron.globals["forms"][self.model] != null) ? metron.globals["forms"][self.model] : new metron.form(m, self);
+            if(f.list == null) {
+                f.list = self;
+            }
             metron.globals["forms"][self.model] = f;
             var elem = document.selectOne(`[data-m-type='form'][data-m-model='${m}']`);
-            if (elem != null && (elem.attribute("data-m-autoload") == null || elem.attribute("data-m-autoload") == "true")) {
+            if (!f.hasLoaded && elem != null && (elem.attribute("data-m-autoload") == null || elem.attribute("data-m-autoload") == "true")) {
                 f.init();
             }
             self._form = f;

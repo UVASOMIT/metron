@@ -21,6 +21,7 @@ namespace metron {
         private _elem: Element;
         private _list: metron.list<any>;
         private _fields: Array<string> = [];
+        public hasLoaded: boolean = false;
         constructor(public model: string, public asscListing?: list<T>) {
             super(model, FORM);
             var self = this;
@@ -30,6 +31,7 @@ namespace metron {
         }
         public init(): form<T> {
             var self = this;
+            self.hasLoaded = true;
             self._elem = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
             if (self._elem != null) {
                 let selects = self._elem.selectAll("select");

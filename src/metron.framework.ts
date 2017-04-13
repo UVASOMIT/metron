@@ -105,8 +105,9 @@ namespace metron {
             elem.hide();
         });
         if (wantsAutoload) {
-            metron.lists.bindAll();
-            metron.forms.bindAll();
+            metron.lists.bindAll(() => {
+                metron.forms.bindAll();
+            });
         }
     });
 }
