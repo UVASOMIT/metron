@@ -286,7 +286,7 @@ namespace metron {
             });
             tbody.attribute("data-m-state", "show");
             if (isTable) {
-                tbody.show("inline-grid");
+                tbody.show("table-row-group");
             }
             else {
                 tbody.show();
