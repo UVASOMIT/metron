@@ -28,18 +28,16 @@ namespace metron {
                 self._list = asscListing;
             }
         }
-        public init(preload: boolean = true): form<T> {
+        public init(): form<T> {
             var self = this;
             self._elem = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
             if (self._elem != null) {
                 let selects = self._elem.selectAll("select");
                 self.loadSelects(selects, () => {
-                    if (preload) {
-                        var qs: string = <string><any>metron.web.querystring();
-                        if (qs != "") {
-                            let parameters = metron.tools.formatOptions(qs, metron.OptionTypes.QUERYSTRING);
-                            self.loadForm(parameters);
-                        }
+                    var qs: string = <string><any>metron.web.querystring();
+                    if (qs != "") {
+                        let parameters = metron.tools.formatOptions(qs, metron.OptionTypes.QUERYSTRING);
+                        self.loadForm(parameters, false);
                     }
                 });
                 let controlBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='controls']");
@@ -127,7 +125,7 @@ namespace metron {
                 (<any>self).save_m_inject();
             }
         }
-        public loadForm(parameters: any): void {
+        public loadForm(parameters: any, toggle: boolean = true): void {
             var self = this;
             metron.web.get(`${metron.fw.getAPIURL(self.model)}${metron.web.querystringify(parameters)}`, parameters, null, "json", function (data: T) {
                 if (data instanceof Array) {
@@ -138,11 +136,13 @@ namespace metron {
                         (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(<any>data[prop]);
                     }
                 }
-                self._elem.attribute("data-m-state", "show");
-                self._elem.show();
-                if (self._list != null) {
-                    self._list.elem.attribute("data-m-state", "hide");
-                    self._list.elem.hide();
+                if(toggle) {
+                    self._elem.attribute("data-m-state", "show");
+                    self._elem.show();
+                    if (self._list != null) {
+                        self._list.elem.attribute("data-m-state", "hide");
+                        self._list.elem.hide();
+                    }
                 }
             });
         }
