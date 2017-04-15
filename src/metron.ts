@@ -1,32 +1,7 @@
 /// <reference path="metron.extenders.ts" />
-
-type AjaxRequest = string | JSON | XMLDocument;
+/// <reference path="metron.types.ts" />
 
 namespace metron {
-    export interface Dictionary {
-        setItem: (key: string, value: any) => void;
-        getItem: (key: string) => any;
-        hasItem: (key: string) => boolean;
-        removeItem: (key: string) => any;
-        keys: () => Array<string>;
-        values: () => Array<any>;
-        each: (callback: Function) => void;
-        clear: () => void;
-    }
-    export interface Ajax {
-        url: string;
-        method: string;
-        contentType: string;
-        dataType: string;
-        data: any;
-        async: boolean;
-        request: XMLHttpRequest;
-        success?: (callback: Function) => XMLHttpRequest;
-        error?: (callback: Function) => XMLHttpRequest;
-        always?: (callback: Function) => XMLHttpRequest;
-        send?: () => void;
-    }
-
     export namespace dictionary {
         (function () {
             function dictionary(obj: any): any {
@@ -114,7 +89,7 @@ namespace metron {
             }
             return url + '?' + paramPairs.join('&');
         }
-        export function querystring(obj: any): Array<string> {
+        export function querystring(obj?: any): Array<string> | string {
             if (typeof (document) !== 'undefined') {
                 if (typeof (obj) === 'string' && arguments.length === 1) {
                     let result: Array<any> = [];
@@ -128,8 +103,11 @@ namespace metron {
                 else if (typeof (obj) === 'string' && arguments.length > 1) {
                     return [parseUrl(obj, arguments[1])];
                 }
-                else {
+                else if (obj != null) {
                     return [parseUrl(document.location.href, obj)];
+                }
+                else {
+                    return document.location.search.substring(1);
                 }
             }
             else {
@@ -178,7 +156,7 @@ namespace metron {
             }
         }
         export namespace headers {
-            export function get (name: string) {
+            export function get(name: string) {
                 if (typeof (document) !== 'undefined') {
                     let request: XMLHttpRequest = new XMLHttpRequest();
                     request.open("HEAD", document.location.href, false);
@@ -197,7 +175,7 @@ namespace metron {
         }
         export function ajax(url: string, data: any = {}, method: string = "POST", async: boolean = true, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType: string = "text", success?: Function, failure?: Function, always?: Function): Ajax {
             function _parseResult(request: XMLHttpRequest): AjaxRequest {
-                switch(dataType.lower()) {
+                switch (dataType.lower()) {
                     case "text":
                         return request.responseText;
                     case "json":
@@ -209,75 +187,74 @@ namespace metron {
                 }
             }
             function _send(request: XMLHttpRequest, data: any): void {
+                var ajx = this;
                 request.open(method, url, async, data);
-                request.onreadystatechange = function() {
-                    if(request.readyState === 4) {
-                        if(request.status === 200) {
-                            if(success !== undefined) {
+                request.onreadystatechange = function () {
+                    if (request.readyState === 4) {
+                        if (request.status === 200) {
+                            if (success !== undefined) {
                                 success(_parseResult(request));
                             }
                         }
-                        if(request.status === 404 || request.status === 500) {
-                            if(failure !== undefined) {
-                                failure(request);
+                        if (request.status === 404 || request.status === 500) {
+                            if (failure !== undefined) {
+                                failure(request.responseText, request.responseJSON(), request.responseXML);
                             }
                         }
-                        if(always !== undefined) {
+                        if (always !== undefined) {
                             always(request);
                         }
                     }
                 };
                 request.setRequestHeader("Content-Type", contentType);
-                if(url.contains("localhost")) {
+                if (url.contains("localhost")) {
                     request.setRequestHeader("Cache-Control", "max-age=0");
                 }
                 request.send(data);
             }
             let request: XMLHttpRequest = new XMLHttpRequest();
             let requestData = metron.web.querystringify(data);
-            if(requestData.startsWith("?")) {
+            if (requestData.startsWith("?")) {
                 requestData = requestData.substr(1);
             }
-            if(requestData.endsWith("?")) {
+            if (requestData.endsWith("?")) {
                 requestData = requestData.substr(0, requestData.length - 2);
             }
-            if(success != null || failure != null || always != null) {
-                _send(request, requestData);
-            }
-            return {
-                url: url,
-                method: method,
-                contentType: contentType,
-                dataType: dataType,
-                data: requestData,
-                async: async,
-                request: request,
-                send: function(): void {
-                    _send(this.request, requestData);
+            var self = {
+                url: url
+                , method: method
+                , contentType: contentType
+                , dataType: dataType
+                , data: requestData
+                , async: async
+                , request: request
+                , send: function (): void {
+                    _send(request, requestData);
                 }
             };
+            if (success != null || failure != null || always != null) {
+                self.send();
+            }
+            return self;
         }
         export function get(url: string, params: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
-            return ajax(url, params, "GET", true ,(contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, success, failure, always);
-        }
-        export function load(url: string, params: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
-            return ajax(url, params, "GET", false ,(contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, success, failure, always);
+            return ajax(url, params, "GET", true, (contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, success, failure, always);
         }
         export function post(url: string, params: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
-            return ajax(url, params, "POST", true ,(contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, success, failure, always);
+            return ajax(url, params, "POST", true, (contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, success, failure, always);
         }
         export function postAll(url: string, params: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
-            return ajax(url, JSON.stringify({ params }), "POST", true ,(contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, success, failure, always);
+            return ajax(url, JSON.stringify({ params }), "POST", true, (contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, success, failure, always);
         }
         export function put(url: string, params: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
-            return ajax(url, params, "PUT", true ,(contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, success, failure, always);
+            return ajax(url, params, "PUT", true, (contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, success, failure, always);
         }
         export function putAll(url: string, params: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
-            return ajax(url, JSON.stringify({ params }), "PUT", true ,(contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, success, failure, always);
+            return ajax(url, JSON.stringify({ params }), "PUT", true, (contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, success, failure, always);
         }
         export function remove(url: string, params: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
-            return ajax(url, params, "DELETE", true, (contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, function(data) {
-                if(data != null && data instanceof Array && data.length > 0) {
+            return ajax(url, params, "DELETE", true, (contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, function (data) {
+                if (data != null && data instanceof Array && data.length > 0) {
                     success(data[0])
                 }
                 else {

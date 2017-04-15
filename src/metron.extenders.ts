@@ -19,7 +19,6 @@ interface String {
     toPhoneNumber: () => string;
     getValueByKey: (key: string) => string;
     setValueByKey: (key: string, replacement: string) => string;
-    //isNullOrEmpty: (val: any) => boolean;
 }
 
 interface StringConstructor {
@@ -65,8 +64,8 @@ interface Element {
     empty: () => Element;
     drop: () => Element;
     removeEvent: (event: string) => Element;
-    addEvent: (event: string, callback: Function) => Element;
-    show: () => Element;
+    addEvent: (event: string, callback: Function, overwrite?: boolean) => Element;
+    show: (t?: string) => Element;
     hide: () => Element;
     addClass: (className: string) => Element;
     removeClass: (className: string) => Element;
@@ -94,11 +93,9 @@ String.prototype.upper = function (): string {
     return this.toUpperCase();
 };
 
-/*
 String.prototype.trim = function (): string {
     return this.replace(/^\s+|\s+$/g, "");
 };
-*/
 
 String.prototype.ltrim = function (): string {
     return this.replace(/^\s+/, "");
@@ -117,7 +114,7 @@ String.prototype.startsWith = function (part: string): boolean {
 };
 
 String.prototype.endsWith = function (part: string): boolean {
-    return this.slice(-part.length) == part;
+    return this.slice(part.length) == part;
 };
 
 String.prototype.capFirst = function (): string {
@@ -373,7 +370,9 @@ Object.prototype.getName = function (): string {
 
 (<any>Object).extend = function(dest: any, src: any) {
     for (let prop in src) {
-        dest[prop] = src[prop];
+        if(src.hasOwnProperty(prop)) {
+            dest[prop] = src[prop];
+        }
     }
     return dest;
 };
@@ -478,24 +477,37 @@ Element.prototype.drop = function(): Element {
     return self;
 };
 
-Element.prototype.removeEvent = function(event: string): Element {
-    if(this[`on${event}`] != null) {
-        this[`on${event}`] = null;
+Element.prototype.removeEvent = function (event: string): Element {
+    let evt = this[`on${event}`] || this[`${event}`];
+    try {
+        this.removeEventListener(event, evt);
+    }
+    catch (e) { }
+    try {
+        this.detachEvent(`on${event}`, evt);
+    }
+    catch (e) { }
+    this[`on${event}`] = null;
+    this[`${event}`] = null;
+    return this;
+};
+
+Element.prototype.addEvent = function (event: string, callback: Function, overwrite: boolean = false): Element {
+    if (overwrite) {
+        this[`on${event}`] = callback;
+    }
+    else {
+        this.addEventListener(event, callback);
     }
     return this;
 };
 
-Element.prototype.addEvent = function(event: string, callback:Function): Element {
-    this.addEventListener(event, callback);
-    return this;
-};
-
-Element.prototype.show = function(): Element {
+Element.prototype.show = function(t: string = "block"): Element {
     let styles = this.attribute("style");
     if(styles != null && styles != "") {
-        return this.attribute("style", styles.setValueByKey("display", "block"));
+        return this.attribute("style", styles.setValueByKey("display", t));
     }
-    return this.attribute("style", `display:block`);
+    return this.attribute("style", `display:${t}`);
 };
 
 Element.prototype.hide = function(): Element {
@@ -508,6 +520,7 @@ Element.prototype.hide = function(): Element {
 
 Element.prototype.addClass = function(className: string) : Element {
     this.className += ` ${className}`;
+    this.className = this.className.trim();
     return this;
 };
 
@@ -532,12 +545,6 @@ HTMLElement.prototype.val = function(val?: string): string {
         }
         else if(this.nodeName.lower() == "input") {
             switch(this.attribute("type").lower()) {
-                case "hidden":
-                    this.value = val;
-                    break;
-                case "text":
-                    this.value = val;
-                    break;
                 case "checkbox":
                     if (<boolean><any>val) {
                         this.checked = true;
@@ -556,7 +563,8 @@ HTMLElement.prototype.val = function(val?: string): string {
                     });
                     break;
                 default:
-                    throw new Error("Error: No [type] attribute on element.");
+                    this.value = val;
+                    break;
             }
         }
         else if(this.nodeName.lower() == "select") {
@@ -574,17 +582,13 @@ HTMLElement.prototype.val = function(val?: string): string {
         }
         else if(this.nodeName.lower() == "input") {
             switch(this.attribute("type").lower()) {
-                case "hidden":
-                    return this.value
-                case "text":
-                    return this.value;
                 case "checkbox":
                     return this.checked;
                 case "radio":
                     let name: string = this.attribute("name");
                     return (<HTMLInputElement>document.selectOne(`input[type='radio'][name='${name}']:checked`)).value;
                 default:
-                    throw new Error("Error: No [type] attribute on element.");
+                    return this.value;
             }
         }
         else if(this.nodeName.lower() == "select") {

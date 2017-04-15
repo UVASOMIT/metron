@@ -47,3 +47,4 @@ demo/static/bower_components/
 .vscode/
 dist/gen/
 test/bower_components/
+bower_components/

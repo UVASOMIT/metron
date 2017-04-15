@@ -6,7 +6,7 @@
   "description": "",
   "main": "index.html",
   "license": "MIT",
-  "homepage": "http://metron.october.codes",
+  "homepage": "https://github.com/szul/metron.v2",
   "private": true,
   "ignore": [
     "**/.*",
@@ -16,6 +16,8 @@
     "tests"
   ],
   "dependencies": {
-    "milligram": "^1.1.0"
+    "milligram": "^1.1.0",
+    "awesomplete": "^1.1.1",
+    "rsvp.js": "rsvp#^3.5.0"
   }
 }
