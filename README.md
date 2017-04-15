@@ -5,4 +5,4 @@ Helper functions can be found in the metron.extenders.ts file. The full library 
 
 This repo contains the development branch.
 
-Full documentation is being written, and will be available on the [wiki](https://github.com/szul/metron.v2/wiki).
+Full documentation is being written, and will be available on the [wiki](https://github.com/metronical/metron.v2/wiki).
