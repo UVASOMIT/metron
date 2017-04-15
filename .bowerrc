@@ -1,6 +1,5 @@
 {
-    "cwd": "./",
     "scripts": {
-        "postinstall": "node postprocess.js"
+        "postinstall": "node ./bower_components/metron.v2/postprocess.js"
     }
 }
