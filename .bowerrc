@@ -1,4 +1,5 @@
 {
+    "cwd": "./",
     "scripts": {
         "postinstall": "node postprocess.js"
     }
