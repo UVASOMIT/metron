@@ -1,5 +1,0 @@
-{
-    "scripts": {
-        "postinstall": "node ./bower_components/metron.v2/postprocess.js"
-    }
-}
