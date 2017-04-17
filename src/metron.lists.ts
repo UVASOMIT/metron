@@ -36,6 +36,7 @@ namespace metron {
         public currentPageIndex: number = 1;
         public pageSize: number = 10;
         public totalPageSize: number = 0;
+        public totalCount: number = 0;
         public sortOrder: string = "DateCreated";
         public sortDirection: string = "DESC";
         public fetchURL: string;
@@ -240,7 +241,8 @@ namespace metron {
             var self = this;
             self.clearTable(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='list']`);
             self.populateTable(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='list']`);
-            self.createPaging(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='paging']`, (self._items.length > 0) ? self._items[0]["TotalCount"] : 0);
+            self.totalCount = (self._items.length > 0) ? self._items[0]["TotalCount"] : 0;
+            self.createPaging(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='paging']`, self.totalCount);
             self.applyViewEvents();
             if ((<any>self).populateListing_m_inject != null) {
                 (<any>self).populateListing_m_inject();
