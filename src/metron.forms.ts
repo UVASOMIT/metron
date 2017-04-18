@@ -29,7 +29,7 @@ namespace metron {
                 self._list = asscListing;
             }
         }
-        public init(): form<T> {
+        public init(toggle: boolean = false): form<T> {
             var self = this;
             self.hasLoaded = true;
             self._elem = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
@@ -39,7 +39,7 @@ namespace metron {
                     var qs: string = <string><any>metron.web.querystring();
                     if (qs != "") {
                         let parameters = metron.tools.formatOptions(qs, metron.OptionTypes.QUERYSTRING);
-                        self.loadForm(parameters, false);
+                        self.loadForm(parameters, toggle);
                     }
                 });
                 let controlBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='controls']");
@@ -129,24 +129,24 @@ namespace metron {
         }
         public loadForm(parameters: any, toggle: boolean = true): void {
             var self = this;
-            metron.web.get(`${metron.fw.getAPIURL(self.model)}${metron.web.querystringify(parameters)}`, parameters, null, "json", function (data: T) {
-                if (data instanceof Array) {
-                    data = data[0];
-                }
-                for (let prop in data) {
-                    if (data.hasOwnProperty(prop) && data[prop] != null && document.selectOne(`#${self.model}_${prop}`) != null) {
-                        (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(<any>data[prop]);
+            if (toggle) {
+                metron.web.get(`${metron.fw.getAPIURL(self.model)}${metron.web.querystringify(parameters)}`, parameters, null, "json", function (data: T) {
+                    if (data instanceof Array) {
+                        data = data[0];
                     }
-                }
-                if(toggle) {
+                    for (let prop in data) {
+                        if (data.hasOwnProperty(prop) && data[prop] != null && document.selectOne(`#${self.model}_${prop}`) != null) {
+                            (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(<any>data[prop]);
+                        }
+                    }
                     self._elem.attribute("data-m-state", "show");
                     self._elem.show();
                     if (self._list != null) {
                         self._list.elem.attribute("data-m-state", "hide");
                         self._list.elem.hide();
                     }
-                }
-            });
+                });
+            }
         }
         public loadSelects(selects: NodeListOf<Element>, callback?: Function): void {
             var self = this;
