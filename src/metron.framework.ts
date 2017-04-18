@@ -26,7 +26,9 @@ namespace metron {
             let ajx = new RSVP.Promise(function (resolve, reject) {
                 metron.tools.loadJSON(`${root}/metron.json`, (configData: JSON) => {
                     for (let obj in configData) {
-                        globals[obj] = configData[obj];
+                        if (globals[obj] == null) {
+                            globals[obj] = configData[obj];
+                        }
                     }
                     resolve(configData);
                 });
