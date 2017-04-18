@@ -542,6 +542,14 @@ HTMLElement.prototype.val = function(val?: string): string {
     if(val != null) {
         if(this.nodeName.lower() == "textarea") {
             this.innerHTML = val;
+            try {
+                this.innerText = val;
+            }
+            catch (e) { }
+            try {
+                this.value = val;
+            }
+            catch (e) { }
         }
         else if(this.nodeName.lower() == "input") {
             switch(this.attribute("type").lower()) {
@@ -577,8 +585,19 @@ HTMLElement.prototype.val = function(val?: string): string {
         }
     }
     else {
-        if(this.nodeName.lower() == "textarea") {
-            return this.innerHTML;
+        if (this.nodeName.lower() == "textarea") {
+            if (this.innerText != null && (<string>this.innerText).trim() != "") {
+                return this.innerText;
+            }
+            else if (this.innerHTML != null && (<string>this.innerHTML).trim() != "") {
+                return this.innerHTML;
+            }
+            else {
+                try {
+                    return this.value;
+                }
+                catch (e) { }
+            }
         }
         else if(this.nodeName.lower() == "input") {
             switch(this.attribute("type").lower()) {
