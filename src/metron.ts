@@ -200,6 +200,10 @@ namespace metron {
                             if (failure !== undefined) {
                                 failure(request.responseText, request.responseJSON(), request.responseXML);
                             }
+                            else {
+                                (<HTMLElement>document.selectOne("[data-m-segment='alert']").addClass("danger")).innerHTML = `<p>${(request.responseText != null && request.responseText != "") ? request.responseText : "Error: A problem has occurred while attempting to complete the last operation!"}</p>`;
+                                document.selectOne("[data-m-segment='alert']").show();
+                            }
                         }
                         if (always !== undefined) {
                             always(request);
