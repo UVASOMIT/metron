@@ -341,7 +341,7 @@ Array.prototype.indexOfPartial = function (partial: string): number {
  * return data in inconsistent ways. For example, an array of strings might be returned
  * instead of an array of objects containing strings, etc. because the underlying data at the time
  * only cotains the string value, but when other data is present (in the database, etc.),
- * it will return the object array. Certain convience methods are necessary to force proper formatting.
+ * it will return the object array. Certain convenience methods are necessary to force proper formatting.
  */
 
 Array.prototype.toObjectArray = function (objName: string): Array<any> {
