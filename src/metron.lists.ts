@@ -156,7 +156,7 @@ namespace metron {
                         e.preventDefault();
                         let itm: Element = this;
                         let fil = self._filters;
-                        let terms: Array<string> = this.attribute("data-m-search").split(",");
+                        let terms: Array<string> = this.attribute("data-m-search").split(";");
                         terms.each(function (i: number, term: string) {
                             let parent: Element = itm.parent();
                             fil[term.trim()] = ((<HTMLElement>parent.selectOne(`#${itm.attribute("data-m-search-for")}`)).val() == '') ? null : <any>(<HTMLElement>parent.selectOne(`#${itm.attribute("data-m-search-for")}`)).val();
@@ -270,7 +270,7 @@ namespace metron {
             self.clearAlerts();
             var parameters: any = Object.extend({ PageIndex: self.currentPageIndex, PageSize: self.pageSize, _SortOrder: self.sortOrder, _SortDirection: self.sortDirection }, self._filters);
             var url = (self.fetchURL != null) ? self.fetchURL : self.model;
-            metron.web.get(`${metron.fw.getAPIURL(url)}${metron.web.querystringify(parameters)}`, {}, null, "json", function (data: Array<T>) {
+            metron.web.get(`${metron.fw.getAPIURL(url)}${metron.web.querystringify(metron.tools.normalizeModelData(parameters))}`, {}, null, "json", function (data: Array<T>) {
                 self._items = data;
                 self.populateListing();
                 if ((<any>self).callListing_m_inject != null) {
