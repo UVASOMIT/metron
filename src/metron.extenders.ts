@@ -557,6 +557,9 @@ HTMLElement.prototype.val = function(val?: string): string {
                     if (<boolean><any>val) {
                         this.checked = true;
                     }
+                    else {
+                        this.checked = false;
+                    }
                     break;
                 case "radio":
                     let name: string = this.attribute("name");

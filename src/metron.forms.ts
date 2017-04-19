@@ -184,7 +184,10 @@ namespace metron {
             var self = this;
             var f = (self._elem != null) ? self._elem : document.selectOne(selector);
             document.selectAll(".error").each(function (idx, elem) {
-                document.selectOne(elem).removeClass("error");
+                (<HTMLElement>elem).removeClass("error");
+            });
+            document.selectAll(".label-error").each(function (idx, elem) {
+                (<HTMLElement>elem).removeClass("label-error");
             });
             f.selectAll("input, select").each(function (idx: number, elem: Element) {
                 (<HTMLElement>elem).val("");
@@ -195,6 +198,7 @@ namespace metron {
             f.selectAll("input[type='checkbox']").each(function (idx: number, elem: Element) {
                 (<HTMLElement>elem).val("");
             });
+            self.clearAlerts();
             if (callback != null) {
                 callback();
             }
