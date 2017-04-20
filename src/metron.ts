@@ -196,7 +196,7 @@ namespace metron {
                                 success(_parseResult(request));
                             }
                         }
-                        if (request.status === 404 || request.status === 500) {
+                        if (request.status === 404 || request.status === 405 || request.status === 500) {
                             if (failure !== undefined) {
                                 failure(request.responseText, request.responseJSON(), request.responseXML);
                             }

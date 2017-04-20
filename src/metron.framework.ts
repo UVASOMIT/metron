@@ -47,6 +47,15 @@ namespace metron {
             func();
         }
     }
+    export function ifQuerystring(callback: Function): void {
+        let qs: string = <string><any>metron.web.querystring();
+        if (qs != "") {
+            let parameters = metron.tools.formatOptions(qs, metron.OptionTypes.QUERYSTRING);
+            if (callback != null) {
+                callback(parameters);
+            }
+        }
+    }
     export namespace fw {
         export function getApplicationRoot(page: string): string {
             let root: string = (document.selectOne("body[data-m-root]") != null) ? `${document.selectOne("body[data-m-root]").attribute("data-m-root")}` : null;
