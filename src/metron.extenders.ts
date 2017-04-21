@@ -589,18 +589,17 @@ HTMLElement.prototype.val = function(val?: string): string {
     }
     else {
         if (this.nodeName.lower() == "textarea") {
+            try {
+                return this.value;
+            }
+            catch (e) { }
             if (this.innerText != null && (<string>this.innerText).trim() != "") {
                 return this.innerText;
             }
             else if (this.innerHTML != null && (<string>this.innerHTML).trim() != "") {
                 return this.innerHTML;
             }
-            else {
-                try {
-                    return this.value;
-                }
-                catch (e) { }
-            }
+            return null;
         }
         else if(this.nodeName.lower() == "input") {
             switch(this.attribute("type").lower()) {
