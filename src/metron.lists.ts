@@ -21,7 +21,7 @@ namespace metron {
                     }
                 }
             }
-            if(callback != null) {
+            if (callback != null) {
                 callback();
             }
         }
@@ -43,6 +43,9 @@ namespace metron {
         constructor(public model: string, public listType: string = LIST, public asscForm?: form<T>) {
             super(model, listType);
             var self = this;
+            if (!String.isNullOrEmpty(metron.globals["config.options.pageSize"]) && !isNaN(<number><any>metron.globals["config.options.pageSize"])) {
+                self.pageSize = <number><any>metron.globals["config.options.pageSize"];
+            }
             if (asscForm != null) {
                 self._form = asscForm;
             }
@@ -391,7 +394,7 @@ namespace metron {
         private attachForm(m: string): metron.form<any> {
             var self = this;
             var f: metron.form<T> = (metron.globals["forms"][self.model] != null) ? metron.globals["forms"][self.model] : new metron.form(m, self);
-            if(f.list == null) {
+            if (f.list == null) {
                 f.list = self;
             }
             metron.globals["forms"][self.model] = f;
