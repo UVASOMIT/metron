@@ -43,8 +43,5 @@ Temporary Items
 .apdisk
 
 node_modules/
-demo/static/bower_components/
-.vscode/
-dist/gen/
-test/bower_components/
+gen/
 bower_components/

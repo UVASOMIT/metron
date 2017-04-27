@@ -1,0 +1,26 @@
+{
+    "version": "2.0.0",
+    "configurations": [
+        {
+            "name": "Launch index.html",
+            "type": "chrome",
+            "request": "launch",
+            "file": "${workspaceRoot}/demo/index.html"
+        },
+        {
+            "name": "Launch localhost with sourcemaps",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost/demo/index.html",
+            "sourceMaps": true,
+            "webRoot": "${workspaceRoot}/demo"
+        },
+        {
+            "name": "Attach",
+            "type": "chrome",
+            "request": "attach",
+            "sourceMaps": true,
+            "port": 9222 
+        }
+    ]
+}
