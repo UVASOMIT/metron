@@ -138,7 +138,7 @@ namespace metron {
             return "";
         }
         export function formatDateTime(datetime: string): string {
-            if (datetime != null) {
+            if (!String.isNullOrEmpty(datetime)) {
                 let d = new Date(datetime);
                 let m = d.getMonth() + 1;
                 let mm = m < 10 ? "0" + m : m;
