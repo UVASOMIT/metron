@@ -21,7 +21,7 @@ namespace metron {
                     }
                 }
             }
-            if(callback != null) {
+            if (callback != null) {
                 callback();
             }
         }
@@ -43,6 +43,9 @@ namespace metron {
         constructor(public model: string, public listType: string = LIST, public asscForm?: form<T>) {
             super(model, listType);
             var self = this;
+            if (!String.isNullOrEmpty(metron.globals["config.options.pageSize"]) && !isNaN(<number><any>metron.globals["config.options.pageSize"])) {
+                self.pageSize = <number><any>metron.globals["config.options.pageSize"];
+            }
             if (asscForm != null) {
                 self._form = asscForm;
             }
@@ -131,11 +134,12 @@ namespace metron {
                     let key: string = (el.attribute("data-m-key")) != null ? el.attribute("data-m-key") : el.attribute("name");
                     let nm: string = el.attribute("name");
                     let nText: string = el.attribute("data-m-text");
+                    let options: any = (el.attribute("data-m-options") != null) ? metron.tools.formatOptions(el.attribute("data-m-options")) : {};
                     let ajx = new RSVP.Promise(function (resolve, reject) {
-                        metron.web.get(`${metron.fw.getAPIURL(binding)}`, {}, null, "json", function (data: Array<T>) {
+                        metron.web.get(`${metron.fw.getAPIURL(binding)}${metron.web.querystringify(options)}`, {}, null, "json", function (data: Array<T>) {
                             data.each(function (i: number, item: any) {
                                 el.append(`<option value="${item[key]}">${item[nText]}</option>`);
-                                if (f.elem != null && f.elem.selectOne(`#${self.model}_${key}`) != null) {
+                                if (f.elem != null && f.elem.selectOne(`#${self.model}_${key}`) != null && String.isNullOrEmpty(f.elem.selectOne(`#${self.model}_${key}`).attribute("data-m-binding"))) {
                                     (<HTMLElement>f.elem.selectOne(`#${self.model}_${nm}`)).append(`<option value="${item[key]}">${item[nText]}</option>`);
                                 }
                             });
@@ -155,7 +159,7 @@ namespace metron {
                         e.preventDefault();
                         let itm: Element = this;
                         let fil = self._filters;
-                        let terms: Array<string> = this.attribute("data-m-search").split(",");
+                        let terms: Array<string> = this.attribute("data-m-search").split(";");
                         terms.each(function (i: number, term: string) {
                             let parent: Element = itm.parent();
                             fil[term.trim()] = ((<HTMLElement>parent.selectOne(`#${itm.attribute("data-m-search-for")}`)).val() == '') ? null : <any>(<HTMLElement>parent.selectOne(`#${itm.attribute("data-m-search-for")}`)).val();
@@ -269,7 +273,7 @@ namespace metron {
             self.clearAlerts();
             var parameters: any = Object.extend({ PageIndex: self.currentPageIndex, PageSize: self.pageSize, _SortOrder: self.sortOrder, _SortDirection: self.sortDirection }, self._filters);
             var url = (self.fetchURL != null) ? self.fetchURL : self.model;
-            metron.web.get(`${metron.fw.getAPIURL(url)}${metron.web.querystringify(parameters)}`, {}, null, "json", function (data: Array<T>) {
+            metron.web.get(`${metron.fw.getAPIURL(url)}${metron.web.querystringify(metron.tools.normalizeModelData(parameters))}`, {}, null, "json", function (data: Array<T>) {
                 self._items = data;
                 self.populateListing();
                 if ((<any>self).callListing_m_inject != null) {
@@ -390,7 +394,7 @@ namespace metron {
         private attachForm(m: string): metron.form<any> {
             var self = this;
             var f: metron.form<T> = (metron.globals["forms"][self.model] != null) ? metron.globals["forms"][self.model] : new metron.form(m, self);
-            if(f.list == null) {
+            if (f.list == null) {
                 f.list = self;
             }
             metron.globals["forms"][self.model] = f;

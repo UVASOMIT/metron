@@ -1,9 +1,9 @@
 {
-  "name": "metron.v2",
-  "version": "2.0.0",
+  "name": "metronical.metron",
+  "version": "1.0.0",
   "description": "A lightweight library and front-end framework utilizing data attributes",
   "main": "dist/gen/metron.js",
-  "homepage": "https://github.com/szul/metron.v2",
+  "homepage": "https://github.com/metronical/metron",
   "devDependencies": {
     "@types/awesomplete": "^1.1.4",
     "@types/rsvp": "^3.3.0",
@@ -21,10 +21,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/szul/metron.v2.git"
+    "url": "https://github.com/metronical/metron.git"
   },
   "bugs": {
-    "url": "https://github.com/szul/metron.v2/issues"
+    "url": "https://github.com/metronical/metron/issues"
   },
   "keywords": [
     "typescript",

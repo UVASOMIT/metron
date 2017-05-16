@@ -26,7 +26,9 @@ namespace metron {
             let ajx = new RSVP.Promise(function (resolve, reject) {
                 metron.tools.loadJSON(`${root}/metron.json`, (configData: JSON) => {
                     for (let obj in configData) {
-                        globals[obj] = configData[obj];
+                        if (globals[obj] == null) {
+                            globals[obj] = configData[obj];
+                        }
                     }
                     resolve(configData);
                 });
@@ -43,6 +45,15 @@ namespace metron {
     export function load(segment: string, model: string, func: Function) {
         if (document.selectOne(`[data-m-type="${segment}"][data-m-model="${model}"]`) != null) {
             func();
+        }
+    }
+    export function ifQuerystring(callback: Function): void {
+        let qs: string = <string><any>metron.web.querystring();
+        if (qs != "") {
+            let parameters = metron.tools.formatOptions(qs, metron.OptionTypes.QUERYSTRING);
+            if (callback != null) {
+                callback(parameters);
+            }
         }
     }
     export namespace fw {

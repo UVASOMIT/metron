@@ -341,7 +341,7 @@ Array.prototype.indexOfPartial = function (partial: string): number {
  * return data in inconsistent ways. For example, an array of strings might be returned
  * instead of an array of objects containing strings, etc. because the underlying data at the time
  * only cotains the string value, but when other data is present (in the database, etc.),
- * it will return the object array. Certain convience methods are necessary to force proper formatting.
+ * it will return the object array. Certain convenience methods are necessary to force proper formatting.
  */
 
 Array.prototype.toObjectArray = function (objName: string): Array<any> {
@@ -542,12 +542,23 @@ HTMLElement.prototype.val = function(val?: string): string {
     if(val != null) {
         if(this.nodeName.lower() == "textarea") {
             this.innerHTML = val;
+            try {
+                this.innerText = val;
+            }
+            catch (e) { }
+            try {
+                this.value = val;
+            }
+            catch (e) { }
         }
         else if(this.nodeName.lower() == "input") {
             switch(this.attribute("type").lower()) {
                 case "checkbox":
                     if (<boolean><any>val) {
                         this.checked = true;
+                    }
+                    else {
+                        this.checked = false;
                     }
                     break;
                 case "radio":
@@ -577,8 +588,18 @@ HTMLElement.prototype.val = function(val?: string): string {
         }
     }
     else {
-        if(this.nodeName.lower() == "textarea") {
-            return this.innerHTML;
+        if (this.nodeName.lower() == "textarea") {
+            try {
+                return this.value;
+            }
+            catch (e) { }
+            if (this.innerText != null && (<string>this.innerText).trim() != "") {
+                return this.innerText;
+            }
+            else if (this.innerHTML != null && (<string>this.innerHTML).trim() != "") {
+                return this.innerHTML;
+            }
+            return null;
         }
         else if(this.nodeName.lower() == "input") {
             switch(this.attribute("type").lower()) {

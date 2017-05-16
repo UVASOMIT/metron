@@ -142,7 +142,7 @@ namespace metron {
                 let d = new Date(datetime);
                 let m = d.getMonth() + 1;
                 let mm = m < 10 ? "0" + m : m;
-                let dd = d.getDay();
+                let dd = d.getDate();
                 let ddd = dd < 10 ? "0" + dd : dd;
                 let y = d.getFullYear();
                 let time = formatTime(d);

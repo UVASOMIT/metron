@@ -196,9 +196,13 @@ namespace metron {
                                 success(_parseResult(request));
                             }
                         }
-                        if (request.status === 404 || request.status === 500) {
+                        if (request.status === 404 || request.status === 405 || request.status === 500) {
                             if (failure !== undefined) {
                                 failure(request.responseText, request.responseJSON(), request.responseXML);
+                            }
+                            else {
+                                (<HTMLElement>document.selectOne("[data-m-segment='alert']").addClass("danger")).innerHTML = `<p>${(request.responseText != null && request.responseText != "") ? request.responseText : "Error: A problem has occurred while attempting to complete the last operation!"}</p>`;
+                                document.selectOne("[data-m-segment='alert']").show();
                             }
                         }
                         if (always !== undefined) {
