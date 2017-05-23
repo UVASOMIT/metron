@@ -145,6 +145,9 @@ namespace metron {
                         self._list.elem.attribute("data-m-state", "hide");
                         self._list.elem.hide();
                     }
+                    if ((<any>self).loadForm_m_inject != null) {
+                        (<any>self).loadForm_m_inject();
+                    }
                 });
             }
         }
