@@ -1,6 +1,6 @@
 {
   "name": "metron",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "A lightweight library and front-end framework utilizing data attributes",
   "main": "dist/gen/metron.js",
   "authors": [
@@ -21,11 +21,9 @@
     "tests"
   ],
   "dependencies": {
+    "grunt-contrib-uglify": "^2.2.0",
+    "grunt": "^1.0.1",
     "rsvp.js": "rsvp#^3.5.0",
     "awesomplete": "^1.1.1"
-  },
-  "devDependencies": {
-    "grunt-contrib-uglify": "^2.2.0",
-    "grunt": "^1.0.1"
   }
 }
