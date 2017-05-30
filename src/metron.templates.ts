@@ -1,6 +1,3 @@
-/// <reference path="../node_modules/@types/rsvp/index.d.ts" />
-/// <reference path="metron.extenders.ts" />
-
 namespace metron {
     export namespace templates {
         export namespace list {
