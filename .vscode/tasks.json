@@ -5,7 +5,7 @@
     "tasks": [
         {
             "taskName": "default",
-            "args": ["default"],
+            "args": ["default", "--force"],
             "isBuildCommand": true,
             "problemMatcher": [
                 "$lessCompile",

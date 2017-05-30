@@ -1,5 +1,3 @@
-/// <reference path="metron.base.ts" />
-
 namespace metron {
     export class views {
         public static bindAll(): void {

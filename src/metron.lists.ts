@@ -1,11 +1,4 @@
-/// <reference path="../node_modules/@types/rsvp/index.d.ts" />
-/// <reference path="metron.extenders.ts" />
-/// <reference path="metron.tools.ts" />
-/// <reference path="metron.ts" />
-/// <reference path="metron.base.ts" />
-/// <reference path="metron.framework.ts" />
-/// <reference path="metron.forms.ts" />
-/// <reference path="metron.templates.ts" />
+/// <reference path="metron.types.ts" />
 
 namespace metron {
     export class lists {

@@ -1,7 +1,3 @@
-/// <reference path="metron.extenders.ts" />
-/// <reference path="metron.types.ts" />
-/// <reference path="metron.ts" />
-
 namespace metron {
     export namespace tools {
         export function reduceObject<T>(key: string, obj: T[]): Array<any> {
