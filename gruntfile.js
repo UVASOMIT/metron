@@ -1,4 +1,18 @@
+var path = require("path");
+var parentFolder = path.basename(path.resolve(".."));
+
+var getLoaderPackageName = function() {
+    if (parentFolder === "node_modules") {
+        return "load-grunt-parent-tasks";
+    } else {
+        return "load-grunt-tasks";
+    }
+};
+
 module.exports = function (grunt) {
+    
+    require(getLoaderPackageName())(grunt);
+
     grunt.initConfig({
         pkg: grunt.file.readJSON("package.json"),
         typescript: {
@@ -8,7 +22,8 @@ module.exports = function (grunt) {
                 rootDir: 'src',
                 sourceMap: true,
                 declaration: true,
-                removeComments: true
+                removeComments: true,
+                noEmitOnError: false
             },
             base: {
                 src: ['src/**/*.ts', "!**/*.d.ts"],
@@ -33,9 +48,6 @@ module.exports = function (grunt) {
             }
         }
     });
-
-    grunt.loadNpmTasks("grunt-typescript");
-    grunt.loadNpmTasks("grunt-contrib-uglify");
 
     grunt.registerTask("default", ["typescript", "uglify"]);
 };
