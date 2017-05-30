@@ -23,8 +23,7 @@ module.exports = function (grunt) {
                 sourceMap: true,
                 declaration: true,
                 removeComments: true,
-                noEmitOnError: false,
-                noResolve: true
+                noEmitOnError: false
             },
             base: {
                 src: ['src/**/*.ts', "!**/*.d.ts"],
