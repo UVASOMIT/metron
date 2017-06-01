@@ -36,7 +36,7 @@ namespace metron {
         constructor(public model: string, public listType: string = LIST, public asscForm?: form<T>) {
             super(model, listType);
             var self = this;
-            if (!String.isNullOrEmpty(metron.globals["config.options.pageSize"]) && !isNaN(<number><any>metron.globals["config.options.pageSize"])) {
+            if (!isNaN(<number><any>metron.globals["config.options.pageSize"])) {
                 self.pageSize = <number><any>metron.globals["config.options.pageSize"];
             }
             if (asscForm != null) {

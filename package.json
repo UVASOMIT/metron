@@ -17,7 +17,7 @@
     "rsvp": "^3.5.0"
   },
   "scripts": {
-    "postinstall": "grunt default --force"
+    "postinstall": "grunt default"
   },
   "repository": {
     "type": "git",
