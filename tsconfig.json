@@ -1,7 +1,7 @@
 {
     "compileOnSave": true,
     "compilerOptions": {
-                "module": "system", 
+                "module": "amd", 
                 "target": "es5",
                 "outFile": "dist/gen/metron.js",
                 "sourceMap": true,
