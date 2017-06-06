@@ -1,4 +1,4 @@
-/// <reference path="../node_modules/@types/rsvp/index.d.ts" />
+/// <reference types="rsvp" />
 
 namespace metron {
     export namespace dictionary {
