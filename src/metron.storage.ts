@@ -37,9 +37,28 @@ namespace metron {
             }
             return self;
         }
-        public getItem(s: string): any {
+        private getObjectStore(): any {
+            var self = this;
             try {
-                if(localStorage != null) {
+                let transaction = self._db.transaction([metron.globals["config.storage.localDBName"]], "readwrite");
+                return transaction.objectStore("metron.store");
+            }
+            catch(e) {
+                console.log("Error: Failed to get object store.");
+                return null;
+            }
+        }
+        public getItem(s: string): any {
+            var self = this;
+            try {
+                if(window.indexedDB != null) {
+                    let objectStore = self.getObjectStore();
+                    var request = objectStore.get(s);
+                    request.onsuccess = function(evt) {
+                        alert("Name for SSN 444-44-4444 is " + evt.target.result.value);
+                    };
+                }
+                else if(localStorage != null) {
                     return localStorage.getItem(s);
                 }
             }
@@ -49,8 +68,18 @@ namespace metron {
             return null;
         }
         public setItem(s: string, a: any): boolean {
+            var self = this;
             try {
-                if(localStorage != null) {
+                if(window.indexedDB != null) {
+                    let objectStore = self.getObjectStore();
+                    let item = { "name": s, "value": JSON.stringify(a) };
+                    var request = objectStore.put(item);
+                        request.onsuccess = function(evt) {
+                            console.log("Info: Item added to the object store.");
+                            return true;
+                    };
+                }
+                else if(localStorage != null) {
                     localStorage.setItem(s, a);
                     return true;
                 }
@@ -61,8 +90,16 @@ namespace metron {
             return false;
         }
         public removeItem(s: string): boolean {
+            var self = this;
             try {
-                if(localStorage != null) {
+                let objectStore = self.getObjectStore();
+                if(window.indexedDB != null) {
+                    var request = self._db.transaction([metron.globals["config.storage.localDBName"]], "readwrite").objectStore("metron.store").delete(s);
+                    request.onsuccess = function(evt) {
+                        console.log("Info: Object deleted.");
+                    };
+                }
+                else if(localStorage != null) {
                     localStorage.removeItem(s);
                     return true;
                 }
@@ -73,7 +110,11 @@ namespace metron {
             return false;
         }
         public clearItems(): boolean {
+            var self = this;
             try {
+                if(window.indexedDB != null) {
+                    let objectStore = self.getObjectStore().clear();
+                }
                 if(localStorage != null) {
                     localStorage.clear();
                     return true;
