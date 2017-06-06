@@ -49,5 +49,5 @@ module.exports = function (grunt) {
         }
     });
 
-    grunt.registerTask("default", ["typescript", "uglify"]);
+    grunt.registerTask("default", ["uglify"]);
 };
