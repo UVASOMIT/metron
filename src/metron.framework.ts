@@ -1,12 +1,3 @@
-/// <reference path="../node_modules/@types/rsvp/index.d.ts" />
-/// <reference path="metron.extenders.ts" />
-/// <reference path="metron.optional.ts" />
-/// <reference path="metron.ts" />
-/// <reference path="metron.lists.ts" />
-/// <reference path="metron.forms.ts" />
-/// <reference path="metron.tools.ts" />
-/// <reference path="metron.templates.ts" />
-
 namespace metron {
     export var globals: any = {
           actions: { }

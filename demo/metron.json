@@ -1,6 +1,0 @@
-{
-    "config.baseURL": "http://localhost:20108",
-    "config.api.dir": "demo/api",
-    "config.api.extension": ".json",
-    "config.options.pageSize": 10
-}

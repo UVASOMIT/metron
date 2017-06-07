@@ -1,5 +1,4 @@
-/// <reference path="metron.extenders.ts" />
-/// <reference path="metron.types.ts" />
+/// <reference types="rsvp" />
 
 namespace metron {
     export namespace dictionary {

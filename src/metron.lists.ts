@@ -1,11 +1,4 @@
-/// <reference path="../node_modules/@types/rsvp/index.d.ts" />
-/// <reference path="metron.extenders.ts" />
-/// <reference path="metron.tools.ts" />
-/// <reference path="metron.ts" />
-/// <reference path="metron.base.ts" />
-/// <reference path="metron.framework.ts" />
-/// <reference path="metron.forms.ts" />
-/// <reference path="metron.templates.ts" />
+/// <reference path="metron.types.ts" />
 
 namespace metron {
     export class lists {
@@ -43,7 +36,7 @@ namespace metron {
         constructor(public model: string, public listType: string = LIST, public asscForm?: form<T>) {
             super(model, listType);
             var self = this;
-            if (!String.isNullOrEmpty(metron.globals["config.options.pageSize"]) && !isNaN(<number><any>metron.globals["config.options.pageSize"])) {
+            if (!isNaN(<number><any>metron.globals["config.options.pageSize"])) {
                 self.pageSize = <number><any>metron.globals["config.options.pageSize"];
             }
             if (asscForm != null) {

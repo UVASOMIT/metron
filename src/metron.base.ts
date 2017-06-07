@@ -1,5 +1,3 @@
-/// <reference path="metron.extenders.ts" />
-
 namespace metron {
     export abstract class base {
         constructor(public model: string, private baseType: string) {
