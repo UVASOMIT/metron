@@ -87,6 +87,9 @@ namespace metron {
         }
         export function loadOptionalFunctionality(): void {
             if (typeof Awesomplete !== undefined) {
+                if (metron.globals.autolists == null) {
+                    metron.globals.autolists = { };
+                }
                 document.selectAll("[data-m-autocomplete]").each((idx: number, elem: Element) => {
                     let endpoint = elem.attribute("data-m-autocomplete");
                     let label: string = elem.attribute("data-m-label");
@@ -98,12 +101,20 @@ namespace metron {
                         if (elemVal != "" && elemVal.trim().length > 1) {
                             metron.web.get(`${metron.fw.getAPIURL(endpoint)}?${target}=${elemVal}`, {}, null, "json", (result) => {
                                 auto.list = result;
+                                metron.globals.autolists[(<HTMLInputElement>elem).attribute("id")] = result;
                                 auto.data = function (item, input) {
                                     return { value: item[val], label: `(${item[val]}) ${item[label]}` };
                                 };
                             });
                         }
                     });
+                    window.addEventListener("awesomplete-selectcomplete", (e) => {
+                        let elem = document.selectOne(`#${e.srcElement.id}`);
+                        let action = elem.attribute("data-m-format");
+                        if (action != null) {
+                            metron.globals[action](e.srcElement.id, e);
+                        }
+                    }, false);
                 });
             }
         }
