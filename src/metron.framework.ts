@@ -112,7 +112,7 @@ namespace metron {
                         let elem = document.selectOne(`#${e.srcElement.id}`);
                         let action = elem.attribute("data-m-format");
                         if (action != null) {
-                            metron.globals[action](e.srcElement.id, e);
+                            metron.globals[action]((<HTMLElement>elem).val(), e);
                         }
                     }, false);
                 });
