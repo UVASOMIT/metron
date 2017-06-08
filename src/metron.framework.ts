@@ -14,22 +14,43 @@ namespace metron {
             });
             metron.fw.loadOptionalFunctionality();
             let root: string = metron.fw.getApplicationRoot(document.documentElement.outerHTML);
-            let ajx = new RSVP.Promise(function (resolve, reject) {
-                metron.tools.loadJSON(`${root}/metron.json`, (configData: JSON) => {
-                    for (let obj in configData) {
-                        if (globals[obj] == null) {
-                            globals[obj] = configData[obj];
-                        }
+            
+            let store = new metron.store(metron.DB, metron.DBVERSION, metron.STORE);
+            store.init().then((result) => {
+                return store.getItem("metron.globals");
+            }).then((result) => {
+                if(result != null && result["value"] != null) {
+                    metron.globals = result["value"];
+                    if (callback != null) {
+                            callback(e);
                     }
-                    resolve(configData);
-                });
-            });
-            RSVP.all([ajx]).then(function () {
-                if (callback != null) {
-                    callback(e);
                 }
-            }).catch(function (reason) {
-                console.log("Error: Promise execution failed!");
+                else {
+                    new RSVP.Promise(function (resolve, reject) {
+                        metron.tools.loadJSON(`${root}/metron.json`, (configData: JSON) => {
+                            for (let obj in configData) {
+                                if (globals[obj] == null) {
+                                    globals[obj] = configData[obj];
+                                }
+                            }
+                            store.init().then((result) => {
+                                return store.setItem("metron.globals", metron.globals);
+                            }).then((result) => {
+                                resolve(configData);
+                            }).catch((rs) => {
+                                console.log(`Error: Failed to access storage. ${rs}`);
+                            });
+                        });
+                    }).then(() => {
+                        if (callback != null) {
+                            callback(e);
+                        }
+                    }).catch((rsn) => {
+                        console.log(`Error: Promise execution failed! ${rsn}`);
+                    });
+                }
+            }).catch((reason) => {
+                console.log(`Error: Failed to access storage. ${reason}`);
             });
         });
     }
