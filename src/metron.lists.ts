@@ -167,7 +167,7 @@ namespace metron {
                     (<any>self).loadFilters_m_inject();
                 }
             }).catch(function (reason) {
-                console.log("Error: Promise execution failed!");
+                console.log(`Error: Promise execution failed! ${reason}`);
             });
         }
         private applyViewEvents(): void {
@@ -368,8 +368,17 @@ namespace metron {
             var control = parent.selectOne("[data-m-segment='controls'] [data-m-segment='paging']");
             control.addEvent("change", function (e) {
                 self.pageSize = <number><any>(<HTMLElement>control).val();
-                self.callListing();
-            });
+                metron.globals["config.options.pageSize"] = self.pageSize;
+                let store = new metron.store(metron.DB, metron.DBVERSION, metron.STORE);
+                store.init().then((result) => {
+                    return store.setItem("metron.globals", metron.globals);
+                }).then((result) => {
+                    self.callListing();
+                }).catch((reason) => {
+                    console.log(`Error: Failed to access storage. ${reason}`);
+                    self.callListing();
+                });
+            }, true);
         }
         private calculateTotalPageSize(totalCount: number): number {
             return Math.ceil(totalCount / this.pageSize);

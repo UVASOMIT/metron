@@ -2,7 +2,17 @@ namespace metron {
     export class store {
         private _db;
         private _hasIndexedDB: boolean = false;
-        constructor() {
+        constructor(public localDBName?: string, public localDBVersion?: number, public localDBStore?: string) {
+            var self = this;
+            if(localDBName == null) {
+                self.localDBName = metron.globals["config.storage.localDBName"];
+            }
+            if(localDBVersion == null) {
+                self.localDBVersion = metron.globals["config.storage.localDBVersion"];
+            }
+            if(localDBStore == null) {
+                self.localDBStore = metron.globals["config.storage.localDBStore"];
+            }
         }
         public init(): RSVP.Promise<metron.store> {
             var self = this;
@@ -16,13 +26,13 @@ namespace metron {
                     }
                     else {
                         self._hasIndexedDB = true;
-                        let request = window.indexedDB.open(metron.globals["config.storage.localDBName"], <number><any>metron.globals["config.storage.localDBVersion"]);
+                        let request = window.indexedDB.open(self.localDBName, self.localDBVersion);
                         request.onerror = function(evt) {
                             self._hasIndexedDB = false;
                             console.log("Warning: Access to IndexedDB for application has been rejected.");
                         };
                         request.onupgradeneeded = function (evt) {
-                            let objectStore = (<any>evt.currentTarget).result.createObjectStore("metron.store", { keyPath: "name" });
+                            let objectStore = (<any>evt.currentTarget).result.createObjectStore(self.localDBStore, { keyPath: "name" });
                             objectStore.createIndex("name", "name", { unique: true });
                             objectStore.transaction.oncomplete = function(oevt) {
                                 console.log(`Info: Object store has been successfully created. ${objectStore}`);
@@ -45,8 +55,8 @@ namespace metron {
         private getObjectStore(): any {
             var self = this;
             try {
-                let transaction = self._db.transaction("metron.store", "readwrite");
-                return transaction.objectStore("metron.store");
+                let transaction = self._db.transaction(self.localDBStore, "readwrite");
+                return transaction.objectStore(self.localDBStore);
             }
             catch(e) {
                 console.log(`Error: Failed to get object store. ${e}`);
@@ -109,9 +119,8 @@ namespace metron {
             var self = this;
             var p = new RSVP.Promise(function(resolve, reject) {
                 try {
-                    let objectStore = self.getObjectStore();
                     if(window.indexedDB != null) {
-                        var request = self._db.transaction([metron.globals["config.storage.localDBName"]], "readwrite").objectStore("metron.store").delete(s);
+                        var request = self.getObjectStore().delete(s);
                         request.onsuccess = function(evt) {
                             console.log("Info: Object deleted.");
                             resolve(true);
@@ -133,7 +142,7 @@ namespace metron {
             var self = this;
             try {
                 if(window.indexedDB != null) {
-                    let objectStore = self.getObjectStore().clear();
+                    self.getObjectStore().clear();
                 }
                 if(sessionStorage != null) {
                     sessionStorage.clear();
