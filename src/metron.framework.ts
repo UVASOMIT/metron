@@ -17,10 +17,19 @@ namespace metron {
             
             let store = new metron.store(metron.DB, metron.DBVERSION, metron.STORE);
             store.init().then((result) => {
-                return store.getItem("metron.globals");
+                return store.getItem("metron.globals", "value");
             }).then((result) => {
-                if(result != null && result["value"] != null) {
-                    metron.globals = result["value"];
+                if(result != null) {
+                    metron.globals = JSON.parse(<string><any>result);
+                    if(metron.globals.actions == null) {
+                        metron.globals.actions = { };
+                    }
+                    if(metron.globals.forms == null) {
+                        metron.globals.forms = { };
+                    }
+                    if(metron.globals.lists == null) {
+                        metron.globals.lists = { };
+                    }
                     if (callback != null) {
                             callback(e);
                     }
@@ -29,12 +38,12 @@ namespace metron {
                     new RSVP.Promise(function (resolve, reject) {
                         metron.tools.loadJSON(`${root}/metron.json`, (configData: JSON) => {
                             for (let obj in configData) {
-                                if (globals[obj] == null) {
-                                    globals[obj] = configData[obj];
+                                if (metron.globals[obj] == null) {
+                                    metron.globals[obj] = configData[obj];
                                 }
                             }
                             store.init().then((result) => {
-                                return store.setItem("metron.globals", metron.globals);
+                                return store.setItem("metron.globals", JSON.stringify(metron.globals));
                             }).then((result) => {
                                 resolve(configData);
                             }).catch((rs) => {

@@ -366,6 +366,7 @@ namespace metron {
             var self = this;
             var parent = document.selectOne(`${selector}`).parent();
             var control = parent.selectOne("[data-m-segment='controls'] [data-m-segment='paging']");
+            (<HTMLElement>control).val(<string><any>self.pageSize);
             control.addEvent("change", function (e) {
                 self.pageSize = <number><any>(<HTMLElement>control).val();
                 metron.globals["config.options.pageSize"] = self.pageSize;

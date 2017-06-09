@@ -71,7 +71,7 @@ namespace metron {
                         let objectStore = self.getObjectStore();
                         var request = objectStore.get(s);
                         request.onsuccess = function(evt) {
-                            if(val != null) {
+                            if(val != null && evt.target.result != null) {
                                 resolve(evt.target.result[val]);
                             }
                             else {
@@ -90,12 +90,28 @@ namespace metron {
             });
             return p;
         }
-        public setItem(s: string, a: string): RSVP.Promise<metron.store> {
+        public setItem(s: string, a: any): RSVP.Promise<metron.store> {
             var self = this;
             var p = new RSVP.Promise(function(resolve, reject) {
                 try {
                     if(window.indexedDB != null) {
                         let objectStore = self.getObjectStore();
+                        if(!(typeof a === "string")) {
+                            let b = { };
+                            for(let prop in a) {
+                                if(a.hasOwnProperty(prop) && (!(a[prop] instanceof Function))) {
+                                    b[prop] = a[prop];
+                                }
+                            }
+                            delete b["__proto__"];
+                            if(s.lower() === "metron.globals") {
+                                delete b["actions"];
+                                delete b["lists"];
+                                delete b["forms"];
+                                delete b["views"];
+                            }
+                            a = JSON.stringify(b);
+                        }
                         let item = { "name": s, "value": a };
                         var request = objectStore.put(item);
                             request.onsuccess = function(evt) {
