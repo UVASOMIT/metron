@@ -36,8 +36,8 @@ namespace metron {
         constructor(public model: string, public listType: string = LIST, public asscForm?: form<T>) {
             super(model, listType);
             var self = this;
-            if (!isNaN(<number><any>metron.globals["config.options.pageSize"])) {
-                self.pageSize = <number><any>metron.globals["config.options.pageSize"];
+            if (!isNaN(<number><any>metron.config["config.options.pageSize"])) {
+                self.pageSize = <number><any>metron.config["config.options.pageSize"];
             }
             if (asscForm != null) {
                 self._form = asscForm;
@@ -369,10 +369,10 @@ namespace metron {
             (<HTMLElement>control).val(<string><any>self.pageSize);
             control.addEvent("change", function (e) {
                 self.pageSize = <number><any>(<HTMLElement>control).val();
-                metron.globals["config.options.pageSize"] = self.pageSize;
+                metron.config["config.options.pageSize"] = self.pageSize;
                 let store = new metron.store(metron.DB, metron.DBVERSION, metron.STORE);
                 store.init().then((result) => {
-                    return store.setItem("metron.globals", metron.globals);
+                    return store.setItem("metron.config", metron.config);
                 }).then((result) => {
                     self.callListing();
                 }).catch((reason) => {
