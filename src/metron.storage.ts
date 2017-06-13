@@ -5,13 +5,13 @@ namespace metron {
         constructor(public localDBName?: string, public localDBVersion?: number, public localDBStore?: string) {
             var self = this;
             if(localDBName == null) {
-                self.localDBName = metron.globals["config.storage.localDBName"];
+                self.localDBName = metron.config["config.storage.localDBName"];
             }
             if(localDBVersion == null) {
-                self.localDBVersion = metron.globals["config.storage.localDBVersion"];
+                self.localDBVersion = metron.config["config.storage.localDBVersion"];
             }
             if(localDBStore == null) {
-                self.localDBStore = metron.globals["config.storage.localDBStore"];
+                self.localDBStore = metron.config["config.storage.localDBStore"];
             }
         }
         public init(): RSVP.Promise<metron.store> {
@@ -104,12 +104,6 @@ namespace metron {
                                 }
                             }
                             delete b["__proto__"];
-                            if(s.lower() === "metron.globals") {
-                                delete b["actions"];
-                                delete b["lists"];
-                                delete b["forms"];
-                                delete b["views"];
-                            }
                             a = JSON.stringify(b);
                         }
                         let item = { "name": s, "value": a };
