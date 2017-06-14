@@ -30,14 +30,14 @@ namespace metron {
                     self.pivotPreviousButton = (previousButton != null) ? document.selectOne(`#${previousButton}`): Pivot.selectOne("[data-m-segment='controls'] [data-m-action='previous']");
                     if (displayIndex != null){
                         let i = 0;
-                        let itemList = self.pivotItemContainer.selectAll("[data-m-segment='pivot-item']");
+                        let itemList = self.pivotItemContainer.selectAll("[data-m-segment='pivot-items'] [data-m-segment='pivot-item']");
                         itemList.each(function (idx: number, elm: Element){
                             if (idx == displayIndex){
                                 self.initPivotControls(elm);
-                                elm.attribute("style", "display: block;");
+                                elm.show();
                             }
                             else {
-                                elm.attribute("style", "display: none");
+                                elm.hide();
                             }
                         });
                     }
