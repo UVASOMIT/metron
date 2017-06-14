@@ -37,7 +37,7 @@ namespace metron {
                                 elm.attribute("style", "display: block;");
                             }
                             else {
-                                elm.attribute("style", "dispaly: none");
+                                elm.attribute("style", "display: none");
                             }
                         });
                     }
