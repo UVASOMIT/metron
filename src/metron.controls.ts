@@ -18,7 +18,7 @@ namespace metron {
                 }
             }
             export class pivot{
-                private pivotItemContainer: any;
+                private pivotItemContainer: Element;
                 private pivotItem: any;
                 private pivotPreviousButton: any;
                 private pivotNextButton: any;
@@ -26,8 +26,8 @@ namespace metron {
                 constructor(private Pivot: Element, private displayIndex: number = 0, private nextButton?: any, private previousButton?: any, private eventFunction?: Function, private preEventFunction?: Function){
                     var self = this;
                     self.pivotItemContainer = Pivot;
-                    self.pivotNextButton = document.selectOne(`#${nextButton}`);
-                    self.pivotPreviousButton = document.selectOne(`#${previousButton}`);
+                    self.pivotNextButton = (nextButton != null) ? document.selectOne(`#${nextButton}`): Pivot.selectOne("[data-m-segment='controls'] [data-m-action='next']");
+                    self.pivotPreviousButton = (previousButton != null) ? document.selectOne(`#${previousButton}`): Pivot.selectOne("[data-m-segment='controls'] [data-m-action='previous']");
                     if (displayIndex != null){
                         let i = 0;
                         let itemList = self.pivotItemContainer.selectAll("[data-m-segment='pivot-item']");
@@ -43,11 +43,8 @@ namespace metron {
                     }
                 }
 
-                private init():void{
-                    
-                }
-
                 private initPivotControls(ItemContainer: Element){
+                    var self = this;
                     this.pivotItemContainer = ItemContainer;
                     this.pivotItem = new Object({
                         //parent : document.selectOne(`[data-m-type='pivot'] < [data-m-segment='pivot-item']`),
@@ -62,14 +59,44 @@ namespace metron {
                         }
                         else {
                             this.pivotNextButton.attribute("disabled", null);
+                            this.pivotNextButton.removeEvent("click").addEvent("click", function (e) {
+                                e.preventDefault();
+                                self.next();
+                            });
                         }
                         if (this.pivotItem["previous"] == undefined){
                             this.pivotPreviousButton.attribute("disabled", "disabled");
                         }
                         else{
                             this.pivotPreviousButton.attribute("disabled", null);
+                            this.pivotPreviousButton.removeEvent("click").addEvent("click", function (e) {
+                                e.preventDefault();
+                                self.previous();
+                            });
                         }
                     }
+                }
+
+                private initControlsAction(el: Element){
+                        
+                }
+
+                private next(): void {
+                    if (!this.pivotItem['next']){
+                        console.log("Couldn't find next pivot");
+                        return;
+                    }
+                    this.pivotItemContainer.toggle;
+                    this.initPivotControls(this.pivotItem["next"]);
+                }
+
+                private previous(): void {
+                    if (!this.pivotItem['previous']){
+                        console.log("Couldn't find previous pivot");
+                        return;
+                    }
+                    this.pivotItemContainer.toggle;
+                    this.initPivotControls(this.pivotItem["previous"]);
                 }
             }
         }
