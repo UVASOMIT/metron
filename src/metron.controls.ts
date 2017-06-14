@@ -23,7 +23,7 @@ namespace metron {
                 private pivotPreviousButton: any;
                 private pivotNextButton: any;
 
-                constructor(private Pivot: Element, private displayIndex?: number, private nextButton?: any, private previousButton?: any, private eventFunction?: Function, private preEventFunction?: Function){
+                constructor(private Pivot: Element, private displayIndex: number = 0, private nextButton?: any, private previousButton?: any, private eventFunction?: Function, private preEventFunction?: Function){
                     var self = this;
                     self.pivotItemContainer = Pivot;
                     self.pivotNextButton = document.selectOne(`#${nextButton}`);
@@ -41,9 +41,10 @@ namespace metron {
                             }
                         });
                     }
-                    else {
-                        self.initPivotControls(self.pivotItemContainer.selectAll("[data-m-segment='pivot-item']")[0]);
-                    }
+                }
+
+                private init():void{
+                    
                 }
 
                 private initPivotControls(ItemContainer: Element){
