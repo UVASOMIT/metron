@@ -520,10 +520,10 @@ Element.prototype.hide = function(): Element {
 };
 Element.prototype.toggle = function(): Element {
     if (!(this.offsetWidth || this.offsetHeight || this.getClientRects().length)){
-        return this.show;
+        return this.show();
     }
     else {
-        return this.hide;
+        return this.hide();
     }
 };
 

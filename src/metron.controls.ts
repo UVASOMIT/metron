@@ -86,7 +86,7 @@ namespace metron {
                         console.log("Couldn't find next pivot");
                         return;
                     }
-                    this.pivotItemContainer.toggle;
+                    this.pivotItemContainer.toggle();
                     this.initPivotControls(this.pivotItem["next"]);
                 }
 
@@ -95,7 +95,7 @@ namespace metron {
                         console.log("Couldn't find previous pivot");
                         return;
                     }
-                    this.pivotItemContainer.toggle;
+                    this.pivotItemContainer.toggle();
                     this.initPivotControls(this.pivotItem["previous"]);
                 }
             }
