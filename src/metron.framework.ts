@@ -117,6 +117,7 @@ namespace metron {
             metron.lists.bindAll(() => {
                 metron.forms.bindAll();
             });
+            metron.controls.pivot.pivots.bindAll();
         }
     });
 }

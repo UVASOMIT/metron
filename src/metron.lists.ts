@@ -8,11 +8,14 @@ namespace metron {
                 let section: Element = <Element>sections[i];
                 if (section.attribute("data-m-autoload") == null || section.attribute("data-m-autoload") == "true") {
                     let model: string = section.attribute("data-m-model");
+                    
                     if (metron.globals["lists"][model] == null) {
                         let l: list<any> = new list(model).init();
                         metron.globals["lists"][model] = l;
                     }
                 }
+            
+
             }
             if (callback != null) {
                 callback();
