@@ -59,20 +59,20 @@ namespace metron {
                         }
                         else {
                             this.pivotNextButton.removeAttribute("disabled");
-                            this.pivotNextButton.removeEvent("click").addEvent("click", function (e) {
+                            this.pivotNextButton.addEvent("click", function (e) {
                                 e.preventDefault();
                                 self.next();
-                            });
+                            }, true);
                         }
                         if (this.pivotItem["previous"] == undefined){
                             this.pivotPreviousButton.attribute("disabled", "disabled");
                         }
                         else{
                             this.pivotPreviousButton.removeAttribute("disabled");
-                            this.pivotPreviousButton.removeEvent("click").addEvent("click", function (e) {
+                            this.pivotPreviousButton.addEvent("click", function (e) {
                                 e.preventDefault();
                                 self.previous();
-                            });
+                            }, true);
                         }
                     }
                 }
