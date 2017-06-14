@@ -58,7 +58,7 @@ namespace metron {
                             this.pivotNextButton.attribute("disabled", "disabled");
                         }
                         else {
-                            this.pivotNextButton.attribute("disabled", null);
+                            this.pivotNextButton.removeAttribute("disabled");
                             this.pivotNextButton.removeEvent("click").addEvent("click", function (e) {
                                 e.preventDefault();
                                 self.next();
@@ -68,7 +68,7 @@ namespace metron {
                             this.pivotPreviousButton.attribute("disabled", "disabled");
                         }
                         else{
-                            this.pivotPreviousButton.attribute("disabled", null);
+                            this.pivotPreviousButton.removeAttribute("disabled");
                             this.pivotPreviousButton.removeEvent("click").addEvent("click", function (e) {
                                 e.preventDefault();
                                 self.previous();
