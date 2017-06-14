@@ -87,6 +87,7 @@ namespace metron {
                         return;
                     }
                     this.pivotItemContainer.toggle();
+                    this.pivotItem["next"].show();
                     this.initPivotControls(this.pivotItem["next"]);
                 }
 
@@ -96,6 +97,7 @@ namespace metron {
                         return;
                     }
                     this.pivotItemContainer.toggle();
+                    this.pivotItem["previous"].show();
                     this.initPivotControls(this.pivotItem["previous"]);
                 }
             }
