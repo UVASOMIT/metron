@@ -25,8 +25,8 @@ namespace metron {
         send?: () => void;
     }
     export enum OptionTypes {
-            QUERYSTRING = 1
-            , KEYVALUE = 2
+          QUERYSTRING = 1
+        , KEYVALUE = 2
     }
     export const LIST = "list";
     export const LOOKUP = "lookup";
@@ -36,4 +36,7 @@ namespace metron {
     export const WARNING = "warning";
     export const DANGER = "danger";
     export const SUCCESS = "success";
+    export const DB = "metron.db";
+    export const DBVERSION = 1;
+    export const STORE = "metron.store";
 }

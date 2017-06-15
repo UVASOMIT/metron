@@ -1,4 +1,5 @@
 namespace metron {
+    export var config: any = { };
     export var globals: any = {
           actions: { }
         , forms: { }
@@ -14,22 +15,43 @@ namespace metron {
             });
             metron.fw.loadOptionalFunctionality();
             let root: string = metron.fw.getApplicationRoot(document.documentElement.outerHTML);
-            let ajx = new RSVP.Promise(function (resolve, reject) {
-                metron.tools.loadJSON(`${root}/metron.json`, (configData: JSON) => {
-                    for (let obj in configData) {
-                        if (globals[obj] == null) {
-                            globals[obj] = configData[obj];
-                        }
+            
+            let store = new metron.store(metron.DB, metron.DBVERSION, metron.STORE);
+            store.init().then((result) => {
+                return store.getItem("metron.config", "value");
+            }).then((result) => {
+                if(result != null) {
+                    metron.config = JSON.parse(<string><any>result);
+                    if (callback != null) {
+                            callback(e);
                     }
-                    resolve(configData);
-                });
-            });
-            RSVP.all([ajx]).then(function () {
-                if (callback != null) {
-                    callback(e);
                 }
-            }).catch(function (reason) {
-                console.log("Error: Promise execution failed!");
+                else {
+                    new RSVP.Promise(function (resolve, reject) {
+                        metron.tools.loadJSON(`${root}/metron.json`, (configData: JSON) => {
+                            for (let obj in configData) {
+                                if (metron.config[obj] == null) {
+                                    metron.config[obj] = configData[obj];
+                                }
+                            }
+                            store.init().then((result) => {
+                                return store.setItem("metron.config", JSON.stringify(metron.config));
+                            }).then((result) => {
+                                resolve(configData);
+                            }).catch((rs) => {
+                                console.log(`Error: Failed to access storage. ${rs}`);
+                            });
+                        });
+                    }).then(() => {
+                        if (callback != null) {
+                            callback(e);
+                        }
+                    }).catch((rsn) => {
+                        console.log(`Error: Promise execution failed! ${rsn}`);
+                    });
+                }
+            }).catch((reason) => {
+                console.log(`Error: Failed to access storage. ${reason}`);
             });
         });
     }
@@ -53,32 +75,32 @@ namespace metron {
             if (root == null) {
                 root = metron.tools.getMatching(page, /\{\{m:root=\"(.*)\"\}\}/g);
             }
-            metron.globals["config.root"] = root;
+            metron.config["config.root"] = root;
             return root;
         }
         export function getBaseUrl(): string {
-            if (metron.globals["config.baseURL"] != null) {
-                return ((<string>metron.globals["config.baseURL"]).endsWith("/")) ? (<string>metron.globals["config.baseURL"]).substr(0, (<string>metron.globals["config.baseURL"]).length - 2) : `${metron.globals["config.baseURL"]}`;
+            if (metron.config["config.baseURL"] != null) {
+                return ((<string>metron.config["config.baseURL"]).endsWith("/")) ? (<string>metron.config["config.baseURL"]).substr(0, (<string>metron.config["config.baseURL"]).length - 2) : `${metron.config["config.baseURL"]}`;
             }
             return "";
         }
         export function getAppUrl(): string {
-            if (metron.globals["config.baseURL"] != null) {
-                let url = ((<string>metron.globals["config.baseURL"]).endsWith("/")) ? (<string>metron.globals["config.baseURL"]).substr(0, (<string>metron.globals["config.baseURL"]).length - 2) : `${metron.globals["config.baseURL"]}`;
-                return (metron.globals["config.root"] != null && metron.globals["config.root"] != "") ? `${url}/${metron.globals["config.root"]}` : url;
+            if (metron.config["config.baseURL"] != null) {
+                let url = ((<string>metron.config["config.baseURL"]).endsWith("/")) ? (<string>metron.config["config.baseURL"]).substr(0, (<string>metron.config["config.baseURL"]).length - 2) : `${metron.config["config.baseURL"]}`;
+                return (metron.config["config.root"] != null && metron.config["config.root"] != "") ? `${url}/${metron.config["config.root"]}` : url;
             }
             return "";
         }
         export function getBaseAPI(): string {
-            if (metron.globals["config.api.dir"] != null) {
-                let url = ((<string>metron.globals["config.api.dir"]).endsWith("/")) ? (<string>metron.globals["config.api.dir"]).substr(0, (<string>metron.globals["config.api.dir"]).length - 2) : `${metron.globals["config.api.dir"]}`;
-                return (metron.globals["config.root"] != null && metron.globals["config.root"] != "") ? `${metron.globals["config.root"]}/${url}` : url;
+            if (metron.config["config.api.dir"] != null) {
+                let url = ((<string>metron.config["config.api.dir"]).endsWith("/")) ? (<string>metron.config["config.api.dir"]).substr(0, (<string>metron.config["config.api.dir"]).length - 2) : `${metron.config["config.api.dir"]}`;
+                return (metron.config["config.root"] != null && metron.config["config.root"] != "") ? `${metron.config["config.root"]}/${url}` : url;
             }
             return "";
         }
         export function getAPIExtension(): string {
-            if (metron.globals["config.api.extension"] != null) {
-                return metron.globals["config.api.extension"];
+            if (metron.config["config.api.extension"] != null) {
+                return metron.config["config.api.extension"];
             }
             return "";
         }
@@ -87,6 +109,9 @@ namespace metron {
         }
         export function loadOptionalFunctionality(): void {
             if (typeof Awesomplete !== undefined) {
+                if (metron.globals.autolists == null) {
+                    metron.globals.autolists = { };
+                }
                 document.selectAll("[data-m-autocomplete]").each((idx: number, elem: Element) => {
                     let endpoint = elem.attribute("data-m-autocomplete");
                     let label: string = elem.attribute("data-m-label");
@@ -98,12 +123,20 @@ namespace metron {
                         if (elemVal != "" && elemVal.trim().length > 1) {
                             metron.web.get(`${metron.fw.getAPIURL(endpoint)}?${target}=${elemVal}`, {}, null, "json", (result) => {
                                 auto.list = result;
+                                metron.globals.autolists[(<HTMLInputElement>elem).attribute("id")] = result;
                                 auto.data = function (item, input) {
                                     return { value: item[val], label: `(${item[val]}) ${item[label]}` };
                                 };
                             });
                         }
                     });
+                    window.addEventListener("awesomplete-selectcomplete", (e) => {
+                        let elem = document.selectOne(`#${e.srcElement.id}`);
+                        let action = elem.attribute("data-m-format");
+                        if (action != null) {
+                            metron.globals[action]((<HTMLElement>elem).val(), e);
+                        }
+                    }, false);
                 });
             }
         }
