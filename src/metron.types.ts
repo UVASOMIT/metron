@@ -24,6 +24,12 @@ namespace metron {
         always?: (callback: Function) => XMLHttpRequest;
         send?: () => void;
     }
+    export interface Pivot {
+          parent: HTMLElement
+        , current: Element
+        , next: Element
+        , previous: Element
+    }
     export enum OptionTypes {
           QUERYSTRING = 1
         , KEYVALUE = 2
