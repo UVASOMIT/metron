@@ -67,6 +67,7 @@ interface Element {
     addEvent: (event: string, callback: Function, overwrite?: boolean) => Element;
     show: (t?: string) => Element;
     hide: () => Element;
+    toggle:()=> Element;
     addClass: (className: string) => Element;
     removeClass: (className: string) => Element;
     asString: () => string;
@@ -516,6 +517,14 @@ Element.prototype.hide = function(): Element {
         return this.attribute("style", styles.setValueByKey("display", "none"));
     }
     return this.attribute("style", `display:none;`);
+};
+Element.prototype.toggle = function(): Element {
+    if (!(this.offsetWidth || this.offsetHeight || this.getClientRects().length)){
+        return this.show();
+    }
+    else {
+        return this.hide();
+    }
 };
 
 Element.prototype.addClass = function(className: string) : Element {
