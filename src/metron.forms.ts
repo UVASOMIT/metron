@@ -33,6 +33,7 @@ namespace metron {
             self.hasLoaded = true;
             self._elem = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
             if (self._elem != null) {
+                self._pivot = self.attachPivot(self._elem);
                 let selects = self._elem.selectAll("select");
                 self.loadSelects(selects, () => {
                     var qs: string = <string><any>metron.web.querystring();
