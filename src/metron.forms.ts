@@ -65,12 +65,12 @@ namespace metron {
                                             });
                                             if (!hasPrimary) {
                                                 metron.web.post(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
-                                                    self.save(data)
+                                                    self.save(data, <number><any>el.attribute("data-m-pivot"))
                                                 });
                                             }
                                             else {
                                                 metron.web.put(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
-                                                    self.save(data);
+                                                    self.save(data, <number><any>el.attribute("data-m-pivot"));
                                                 });
                                             }
                                         }
@@ -85,11 +85,16 @@ namespace metron {
                                     }
                                     else {
                                         self.clearForm();
-                                        self._elem.attribute("data-m-state", "hide");
-                                        self._elem.hide();
-                                        if (self._list != null) {
-                                            self._list.elem.attribute("data-m-state", "show");
-                                            self._list.elem.show();
+                                        if(self._pivot != null) {
+                                            (el.attribute("data-m-pivot") != null) ? self._pivot.exact(<number><any>el.attribute("data-m-pivot")) : self._pivot.previous();
+                                        }
+                                        else {
+                                            self._elem.attribute("data-m-state", "hide");
+                                            self._elem.hide();
+                                            if (self._list != null) {
+                                                self._list.elem.attribute("data-m-state", "show");
+                                                self._list.elem.show();
+                                            }
                                         }
                                     }
                                 });
@@ -111,17 +116,22 @@ namespace metron {
             }
             return self;
         }
-        public save(data: T): void {
+        public save(data: T, pivotPosition: number): void {
             var self = this;
             self.elem.selectAll("[data-m-primary]").each((idx: number, elem: Element) => {
                 (<HTMLElement>elem).val(<string><any>data[<string><any>elem.attribute("name")]);
             });
-            self.elem.attribute("data-m-state", "hide");
-            self.elem.hide();
-            if (self._list != null) {
-                self._list.elem.attribute("data-m-state", "show");
-                self._list.elem.show();
-                self._list.callListing();
+            if(self._pivot != null) {
+                (pivotPosition != null) ? self._pivot.exact(pivotPosition) : self._pivot.previous();
+            }
+            else {
+                self.elem.attribute("data-m-state", "hide");
+                self.elem.hide();
+                if (self._list != null) {
+                    self._list.elem.attribute("data-m-state", "show");
+                    self._list.elem.show();
+                    self._list.callListing();
+                }
             }
             if ((<any>self).save_m_inject != null) {
                 (<any>self).save_m_inject();
@@ -140,7 +150,7 @@ namespace metron {
                         }
                     }
                     if(self._pivot != null) {
-                        (pivotPosition != null) ? self._pivot.exact(pivotPosition) : self._pivot.previous();
+                        (pivotPosition != null) ? self._pivot.exact(pivotPosition) : self._pivot.next();
                     }
                     else {
                         self._elem.attribute("data-m-state", "show");
