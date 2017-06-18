@@ -8,7 +8,6 @@ namespace metron {
                 let section: Element = <Element>sections[i];
                 if (section.attribute("data-m-autoload") == null || section.attribute("data-m-autoload") == "true") {
                     let model: string = section.attribute("data-m-model");
-                    
                     if (metron.globals["lists"][model] == null) {
                         let l: list<any> = new list(model).init();
                         metron.globals["lists"][model] = l;
@@ -54,6 +53,7 @@ namespace metron {
             var self = this;
             self._elem = document.selectOne(`[data-m-type='list'][data-m-model='${self.model}']`);
             if (self._elem != null) {
+                self._pivot = self.attachPivot(self._elem);
                 let f: metron.form<any> = (self.asscForm != null) ? self.asscForm : self.attachForm(self.model);
                 let filterBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='filters']");
                 filterBlocks.each(function (idx: number, elem: Element) {
@@ -73,10 +73,15 @@ namespace metron {
                                     }
                                     else {
                                         f.clearForm();
-                                        f.elem.attribute("data-m-state", "show");
-                                        f.elem.show();
-                                        self._elem.attribute("data-m-state", "hide");
-                                        self._elem.hide();
+                                        if(self._pivot != null) {
+                                            (el.attribute("data-m-pivot") != null) ? self._pivot.exact(<number><any>el.attribute("data-m-pivot")) : self._pivot.next();
+                                        }
+                                        else {
+                                            f.elem.attribute("data-m-state", "show");
+                                            f.elem.show();
+                                            self._elem.attribute("data-m-state", "hide");
+                                            self._elem.hide();
+                                        }
                                     }
                                 });
                                 break;
@@ -184,7 +189,7 @@ namespace metron {
                     else {
                         self._form.clearForm();
                         let parameters = metron.tools.formatOptions(elem.attribute("data-m-primary"));
-                        self._form.loadForm(parameters);
+                        self._form.loadForm(parameters, true, <number><any>elem.attribute("data-m-pivot"));
                     }
                 });
             });
