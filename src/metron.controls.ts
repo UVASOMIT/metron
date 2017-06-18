@@ -77,7 +77,7 @@ namespace metron {
             }
             private applyActionEvents(el: Element) {
             }
-            private next(): boolean {
+            public next(): boolean {
                 var self = this;
                 if (!self._item.next) {
                     console.log("Couldn't find next pivot");
@@ -88,7 +88,7 @@ namespace metron {
                 self.init(self._item.next);
                 return true;
             }
-            private previous(): boolean {
+            public previous(): boolean {
                 var self = this;
                 if (!self._item.previous) {
                     console.log("Couldn't find previous pivot");
@@ -99,7 +99,7 @@ namespace metron {
                 self.init(self._item.previous);
                 return true;
             }
-            private exact(idx: number): boolean {
+            public exact(idx: number): boolean {
                 var self = this;
                 if(!self._items[idx]) {
                     console.log(`Error: No pivot at index ${idx}`);

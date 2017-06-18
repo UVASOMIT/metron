@@ -127,7 +127,7 @@ namespace metron {
                 (<any>self).save_m_inject();
             }
         }
-        public loadForm(parameters: any, toggle: boolean = true): void {
+        public loadForm(parameters: any, toggle: boolean = true, pivotPosition?: number): void {
             var self = this;
             if (toggle) {
                 metron.web.get(`${metron.fw.getAPIURL(self.model)}${metron.web.querystringify(parameters)}`, parameters, null, "json", function (data: T) {
@@ -139,11 +139,16 @@ namespace metron {
                             (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(<any>data[prop]);
                         }
                     }
-                    self._elem.attribute("data-m-state", "show");
-                    self._elem.show();
-                    if (self._list != null) {
-                        self._list.elem.attribute("data-m-state", "hide");
-                        self._list.elem.hide();
+                    if(self._pivot != null) {
+                        (pivotPosition != null) ? self._pivot.exact(pivotPosition) : self._pivot.previous();
+                    }
+                    else {
+                        self._elem.attribute("data-m-state", "show");
+                        self._elem.show();
+                        if (self._list != null) {
+                            self._list.elem.attribute("data-m-state", "hide");
+                            self._list.elem.hide();
+                        }
                     }
                     if ((<any>self).loadForm_m_inject != null) {
                         (<any>self).loadForm_m_inject();

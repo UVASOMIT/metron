@@ -73,10 +73,15 @@ namespace metron {
                                     }
                                     else {
                                         f.clearForm();
-                                        f.elem.attribute("data-m-state", "show");
-                                        f.elem.show();
-                                        self._elem.attribute("data-m-state", "hide");
-                                        self._elem.hide();
+                                        if(self._pivot != null) {
+                                            (el.attribute("data-m-pivot") != null) ? self._pivot.exact(<number><any>el.attribute("data-m-pivot")) : self._pivot.next();
+                                        }
+                                        else {
+                                            f.elem.attribute("data-m-state", "show");
+                                            f.elem.show();
+                                            self._elem.attribute("data-m-state", "hide");
+                                            self._elem.hide();
+                                        }
                                     }
                                 });
                                 break;
@@ -184,7 +189,7 @@ namespace metron {
                     else {
                         self._form.clearForm();
                         let parameters = metron.tools.formatOptions(elem.attribute("data-m-primary"));
-                        self._form.loadForm(parameters);
+                        self._form.loadForm(parameters, true, <number><any>elem.attribute("data-m-pivot"));
                     }
                 });
             });
