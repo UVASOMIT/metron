@@ -4,6 +4,7 @@ namespace metron {
           actions: { }
         , forms: { }
         , lists: { }
+        , pivots: { }
     };
     export function onready(callback: Function) {
         document.addEventListener("DOMContentLoaded", function (e) {
