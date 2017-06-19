@@ -1,5 +1,6 @@
 namespace metron {
     export abstract class base {
+        protected _name: string;
         protected _pivot: metron.controls.pivot;
         constructor(public model: string, private baseType: string) {
         }
@@ -52,6 +53,60 @@ namespace metron {
             elem.addClass(className);
             elem.attribute("data-m-state", "show");
             elem.show();
+        }
+        public setRouting(wsqs: string, page?: string): void {
+            var self = this;
+            var hash = (wsqs.length > 1) ? wsqs.substr(1) : "";
+            if(hash != "" && document.location.search != null) {
+                try {
+                    let hashItems = metron.tools.formatOptions(hash, metron.OptionTypes.QUERYSTRING);
+                    let qsItems = metron.tools.formatOptions((document.location.search.startsWith("?") ? document.location.search.substr(1) : document.location.search), metron.OptionTypes.QUERYSTRING);
+                    for(let h in hashItems) {
+                        if(hashItems.hasOwnProperty(h)) {
+                            if(qsItems[h] != null) {
+                                delete hashItems[h];
+                            }
+                        }
+                    }
+                    hash = metron.web.querystringify(hashItems).substr(1);
+                }
+                catch(e) {
+                    console.log(`Error: failed to parse query string and hash. ${e}`);
+                }
+            }
+            if(self._name != null) {
+                hash = `${self._name}/${hash}`;
+            }
+            history.replaceState({ }, "", `#${hash}`);
+        }
+        public getRouting(filters?: any): any {
+            var self = this;
+            var hash = document.location.hash;
+            if(hash.substr(0, 1) == "/") {
+                hash = hash.substr(1);
+            }
+            if(hash.length > 1) {
+                if(hash.indexOf("/") != -1) {
+                    try {
+                        hash = hash.split("/")[1];
+                    }
+                    catch(e) {
+                        console.log(`Error: Failed to get routing. ${e}`);
+                    }
+                }
+                let result = metron.tools.formatOptions(hash, metron.OptionTypes.QUERYSTRING);
+                if(filters != null) {
+                    for(let h in result) {
+                        if(result.hasOwnProperty(h)) {
+                            if(filters[h] != null) {
+                                delete result[h];
+                            }
+                        }
+                    }
+                }
+                return result;
+            }
+            return null;
         }
     }
 }

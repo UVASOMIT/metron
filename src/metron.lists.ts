@@ -44,16 +44,14 @@ namespace metron {
             if (asscForm != null) {
                 self._form = asscForm;
             }
-            var qs: string = <string><any>metron.web.querystring();
-            if (qs != "") {
-                self._filters = metron.tools.formatOptions(qs, metron.OptionTypes.QUERYSTRING);
-            }
+            self.setFilters();
         }
         public init(): list<T> {
             var self = this;
             self._elem = document.selectOne(`[data-m-type='list'][data-m-model='${self.model}']`);
             if (self._elem != null) {
                 self._pivot = self.attachPivot(self._elem);
+                self._name = self._elem.attribute("[data-m-page]");
                 let f: metron.form<any> = (self.asscForm != null) ? self.asscForm : self.attachForm(self.model);
                 let filterBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='filters']");
                 filterBlocks.each(function (idx: number, elem: Element) {
@@ -274,7 +272,9 @@ namespace metron {
             self.clearAlerts();
             var parameters: any = Object.extend({ PageIndex: self.currentPageIndex, PageSize: self.pageSize, _SortOrder: self.sortOrder, _SortDirection: self.sortDirection }, self._filters);
             var url = (self.fetchURL != null) ? self.fetchURL : self.model;
-            metron.web.get(`${metron.fw.getAPIURL(url)}${metron.web.querystringify(metron.tools.normalizeModelData(parameters))}`, {}, null, "json", function (data: Array<T>) {
+            var wsqs = metron.web.querystringify(metron.tools.normalizeModelData(parameters));
+            self.setRouting(wsqs);
+            metron.web.get(`${metron.fw.getAPIURL(url)}${wsqs}`, {}, null, "json", function (data: Array<T>) {
                 self._items = data;
                 self.populateListing();
                 if ((<any>self).callListing_m_inject != null) {
@@ -415,6 +415,31 @@ namespace metron {
             }
             self._form = f;
             return self._form;
+        }
+        private setFilters(): void {
+            var self = this;
+            var qs: string = <string><any>metron.web.querystring();
+            if (qs != "") {
+                self._filters = metron.tools.formatOptions(qs, metron.OptionTypes.QUERYSTRING);
+            }
+            var hash = self.getRouting(self._filters);
+            if(hash != null) {
+                self.pageSize = (hash.pageSize != null) ? hash.pageSize : self.pageSize;
+                self.currentPageIndex = (hash.currentPageIndex != null) ? hash.currentPageIndex : self.currentPageIndex;
+                self.sortOrder = (hash.sortOrder != null) ? hash.sortOrder : self.sortOrder;
+                self.sortDirection = (hash.sortDirection != null) ? hash.sortDirection : self.sortDirection;
+                delete hash["PageSize"];
+                delete hash["CurrentPageIndex"];
+                delete hash["_SortOrder"];
+                delete hash["_SortDirection"];
+                for(let h in hash) {
+                    if(hash.hasOwnProperty(h)) {
+                        if(self._filters[h] == null) {
+                            self._filters[h] = hash[h];
+                        }
+                    }
+                }
+            }
         }
         public get elem(): Element {
             return this._elem;
