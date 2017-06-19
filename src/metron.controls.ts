@@ -32,7 +32,7 @@ namespace metron {
                 self._previousButton = (previousButton != null) ? document.selectOne(`#${previousButton}`): self._pivotContainer.selectOne("[data-m-segment='controls'] [data-m-action='previous']");
                 if (displayIndex != null) {
                     let i = 0;
-                    let itemList = self._pivotContainer.selectAll("[data-m-segment='pivot-items'] [data-m-segment='pivot-item']");
+                    let itemList = self._pivotContainer.selectAll("[data-m-segment='pivot-item']");
                     itemList.each(function (idx: number, elem: Element) {
                         self._items.push(elem);
                         if (idx == displayIndex) {
@@ -50,10 +50,9 @@ namespace metron {
                 self._item = {
                     parent: item.parentElement,
                     current: item,
-                    next: item.nextElementSibling,
-                    previous: item.previousElementSibling
+                    next: (item.nextElementSibling != null && item.nextElementSibling.attribute("data-m-segment") != null && item.nextElementSibling.attribute("data-m-segment") == "pivot-item") ? item.nextElementSibling : null,
+                    previous: (item.previousElementSibling != null && item.previousElementSibling.attribute("data-m-segment") != null && item.previousElementSibling.attribute("data-m-segment") == "pivot-item") ? item.previousElementSibling : null,
                 };
-
                 if (self._nextButton != null || self._previousButton != null) {
                     if (self._item.next == null) {
                         self._nextButton.attribute("disabled", "disabled");
