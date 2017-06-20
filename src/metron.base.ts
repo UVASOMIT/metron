@@ -1,6 +1,16 @@
 namespace metron {
     export abstract class base {
+        protected _pivot: metron.controls.pivot;
         constructor(public model: string, private baseType: string) {
+        }
+        protected attachPivot(elem: Element): metron.controls.pivot {
+            if(elem.up("[data-m-type='pivot']")) {
+                let pivotName = elem.up("[data-m-type='pivot']").attribute("data-m-page");
+                if(metron.globals["pivots"][pivotName] != null) {
+                    return metron.globals["pivots"][pivotName];
+                }
+            }
+            return undefined;
         }
         public inject(type: string, method: string, func: Function): base {
             var self = this;
