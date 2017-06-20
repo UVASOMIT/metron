@@ -5,6 +5,13 @@ namespace metron {
         , forms: { }
         , lists: { }
         , pivots: { }
+        , previousPage: null
+        , currentPage: null
+        , previousModel: null
+        , currentModel: null
+        , previousBaseType: null
+        , currentBaseType: null
+        , hashLoadedFromApplication: false
     };
     export function onready(callback: Function) {
         document.addEventListener("DOMContentLoaded", function (e) {
@@ -141,6 +148,28 @@ namespace metron {
                 });
             }
         }
+    }
+    window.onhashchange = function() {
+        if(!metron.globals.hashLoadedFromApplication) {
+            window.location.reload(false); 
+            /*
+            let current = document.selectOne(`[data-m-page='${metron.globals.currentPage}']`);
+            let previous = document.selectOne(`[data-m-page='${metron.globals.previousPage}']`);
+            if(current == null) {
+                current = document.selectOne(`[data-m-type='${metron.globals.currentBaseType}'][data-m-model='${metron.globals.currentModel}']`);
+            }
+            if(previous == null) {
+                previous = document.selectOne(`[data-m-type='${metron.globals.previousBaseType}'][data-m-model='${metron.globals.previousModel}']`);
+            }
+            if(current != null && previous != null) {
+                current.hide();
+                current.attribute("data-m-state", "hide");
+                previous.show();
+                previous.attribute("data-m-state", "show");
+            }
+            */
+        }
+        metron.globals.hashLoadedFromApplication = false;
     }
     metron.onready(function (e: Event) {
         let wantsAutoload: boolean = ((document.selectOne("[data-m-autoload]") != null) && (document.selectOne("[data-m-autoload]").attribute("data-m-autoload") == "true"));

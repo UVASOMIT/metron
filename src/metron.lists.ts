@@ -51,7 +51,7 @@ namespace metron {
             self._elem = document.selectOne(`[data-m-type='list'][data-m-model='${self.model}']`);
             if (self._elem != null) {
                 self._pivot = self.attachPivot(self._elem);
-                self._name = self._elem.attribute("[data-m-page]");
+                self._name = self._elem.attribute("data-m-page");
                 let f: metron.form<any> = (self.asscForm != null) ? self.asscForm : self.attachForm(self.model);
                 let filterBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='filters']");
                 filterBlocks.each(function (idx: number, elem: Element) {
@@ -80,6 +80,8 @@ namespace metron {
                                             self._elem.attribute("data-m-state", "hide");
                                             self._elem.hide();
                                         }
+                                        let wsqs = metron.web.querystringify({ });
+                                        self.setRouting(wsqs, true);
                                     }
                                 });
                                 break;
@@ -137,9 +139,14 @@ namespace metron {
                     let ajx = new RSVP.Promise(function (resolve, reject) {
                         metron.web.get(`${metron.fw.getAPIURL(binding)}${metron.web.querystringify(options)}`, {}, null, "json", function (data: Array<T>) {
                             data.each(function (i: number, item: any) {
-                                el.append(`<option value="${item[key]}">${item[nText]}</option>`);
+                                if(self._filters[key] != null && self._filters[key] == item[key]) {
+                                    el.append(`<option value="${item[key]}" selected="selected">${item[nText]}</option>`);
+                                }
+                                else {
+                                    el.append(`<option value="${item[key]}">${item[nText]}</option>`);
+                                }
                                 if (f.elem != null && f.elem.selectOne(`#${self.model}_${key}`) != null && String.isNullOrEmpty(f.elem.selectOne(`#${self.model}_${key}`).attribute("data-m-binding"))) {
-                                    (<HTMLElement>f.elem.selectOne(`#${self.model}_${nm}`)).append(`<option value="${item[key]}">${item[nText]}</option>`);
+                                    let t = (<HTMLElement>f.elem.selectOne(`#${self.model}_${nm}`)).append(`<option value="${item[key]}">${item[nText]}</option>`);
                                 }
                             });
                             resolve(data);
@@ -424,12 +431,12 @@ namespace metron {
             }
             var hash = self.getRouting(self._filters);
             if(hash != null) {
-                self.pageSize = (hash.pageSize != null) ? hash.pageSize : self.pageSize;
-                self.currentPageIndex = (hash.currentPageIndex != null) ? hash.currentPageIndex : self.currentPageIndex;
-                self.sortOrder = (hash.sortOrder != null) ? hash.sortOrder : self.sortOrder;
-                self.sortDirection = (hash.sortDirection != null) ? hash.sortDirection : self.sortDirection;
+                self.pageSize = (hash["PageSize"] != null) ? hash["PageSize"] : self.pageSize;
+                self.currentPageIndex = (hash["PageIndex"] != null) ? hash["PageIndex"] : self.currentPageIndex;
+                self.sortOrder = (hash["_SortOrder"] != null) ? hash["_SortOrder"] : self.sortOrder;
+                self.sortDirection = (hash["_SortDirection"] != null) ? hash["_SortDirection"] : self.sortDirection;
                 delete hash["PageSize"];
-                delete hash["CurrentPageIndex"];
+                delete hash["PageIndex"];
                 delete hash["_SortOrder"];
                 delete hash["_SortDirection"];
                 for(let h in hash) {

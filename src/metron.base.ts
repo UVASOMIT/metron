@@ -54,7 +54,7 @@ namespace metron {
             elem.attribute("data-m-state", "show");
             elem.show();
         }
-        public setRouting(wsqs: string, page?: string): void {
+        public setRouting(wsqs: string, wantsReplaceHash: boolean = false): void {
             var self = this;
             var hash = (wsqs.length > 1) ? wsqs.substr(1) : "";
             if(hash != "" && document.location.search != null) {
@@ -75,13 +75,25 @@ namespace metron {
                 }
             }
             if(self._name != null) {
-                hash = `${self._name}/${hash}`;
+                metron.globals.previousPage = metron.globals.currentPage;
+                metron.globals.currentPage = self._name;
+                hash = `/${self._name}/${hash}`;
             }
-            history.replaceState({ }, "", `#${hash}`);
+            else {
+                metron.globals.previousModel = metron.globals.currentModel;
+                metron.globals.previousBaseType = metron.globals.currentBaseType;
+                metron.globals.currentModel = self.model;
+                metron.globals.currentBaseType = self.baseType;
+            }
+            metron.globals.hashLoadedFromApplication = true;
+            (wantsReplaceHash) ? document.location.hash = `#${hash}` : history.replaceState({ }, "", `#${hash}`);
         }
         public getRouting(filters?: any): any {
             var self = this;
             var hash = document.location.hash;
+            if(hash.substr(0, 1) == "#") {
+                hash = hash.substr(1);
+            }
             if(hash.substr(0, 1) == "/") {
                 hash = hash.substr(1);
             }

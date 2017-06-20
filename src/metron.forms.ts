@@ -34,7 +34,7 @@ namespace metron {
             self._elem = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
             if (self._elem != null) {
                 self._pivot = self.attachPivot(self._elem);
-                self._name = self._elem.attribute("[data-m-page]");
+                self._name = self._elem.attribute("data-m-page");
                 let selects = self._elem.selectAll("select");
                 self.loadSelects(selects, () => {
                     var qs: string = <string><any>metron.web.querystring();
@@ -97,6 +97,9 @@ namespace metron {
                                                 self._list.elem.show();
                                             }
                                         }
+                                        if(self._list != null) {
+                                            self._list.callListing();
+                                        }
                                     }
                                 });
                                 break;
@@ -141,6 +144,8 @@ namespace metron {
         public loadForm(parameters: any, toggle: boolean = true, pivotPosition?: number): void {
             var self = this;
             if (toggle) {
+                let wsqs = metron.web.querystringify(parameters);
+                self.setRouting(wsqs, true);
                 metron.web.get(`${metron.fw.getAPIURL(self.model)}${metron.web.querystringify(parameters)}`, parameters, null, "json", function (data: T) {
                     if (data instanceof Array) {
                         data = data[0];
