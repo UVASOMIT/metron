@@ -16,6 +16,7 @@
         "src/metron.storage.ts",
         "src/metron.tools.ts",
         "src/metron.base.ts",
+        "src/metron.routing.ts",
         "src/metron.framework.ts",
         "src/metron.lists.ts",
         "src/metron.forms.ts",

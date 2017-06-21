@@ -5,6 +5,7 @@ namespace metron {
         , forms: { }
         , lists: { }
         , pivots: { }
+        , hashLoadedFromApplication: false
     };
     export function onready(callback: Function) {
         document.addEventListener("DOMContentLoaded", function (e) {
@@ -141,6 +142,12 @@ namespace metron {
                 });
             }
         }
+    }
+    window.onhashchange = function() {
+        if(!metron.globals.hashLoadedFromApplication) {
+            window.location.reload(false); 
+        }
+        metron.globals.hashLoadedFromApplication = false;
     }
     metron.onready(function (e: Event) {
         let wantsAutoload: boolean = ((document.selectOne("[data-m-autoload]") != null) && (document.selectOne("[data-m-autoload]").attribute("data-m-autoload") == "true"));
