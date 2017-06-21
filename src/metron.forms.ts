@@ -144,8 +144,7 @@ namespace metron {
         public loadForm(parameters: any, toggle: boolean = true, pivotPosition?: number): void {
             var self = this;
             if (toggle) {
-                let wsqs = metron.web.querystringify(parameters);
-                self.setRouting(wsqs, true);
+                metron.routing.setRouteUrl(self, metron.web.querystringify(parameters), true);
                 metron.web.get(`${metron.fw.getAPIURL(self.model)}${metron.web.querystringify(parameters)}`, parameters, null, "json", function (data: T) {
                     if (data instanceof Array) {
                         data = data[0];

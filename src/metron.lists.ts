@@ -80,8 +80,7 @@ namespace metron {
                                             self._elem.attribute("data-m-state", "hide");
                                             self._elem.hide();
                                         }
-                                        let wsqs = metron.web.querystringify({ });
-                                        self.setRouting(wsqs, true);
+                                        metron.routing.setRouteUrl(self, metron.web.querystringify({ }), true);
                                     }
                                 });
                                 break;
@@ -280,7 +279,7 @@ namespace metron {
             var parameters: any = Object.extend({ PageIndex: self.currentPageIndex, PageSize: self.pageSize, _SortOrder: self.sortOrder, _SortDirection: self.sortDirection }, self._filters);
             var url = (self.fetchURL != null) ? self.fetchURL : self.model;
             var wsqs = metron.web.querystringify(metron.tools.normalizeModelData(parameters));
-            self.setRouting(wsqs);
+            metron.routing.setRouteUrl(self, wsqs);
             metron.web.get(`${metron.fw.getAPIURL(url)}${wsqs}`, {}, null, "json", function (data: Array<T>) {
                 self._items = data;
                 self.populateListing();
@@ -341,9 +340,7 @@ namespace metron {
                 self.totalPageSize = self.calculateTotalPageSize(totalCount);
                 var startPage: number = ((parseInt(this.currentPageIndex.toString(), 10) - 5) < 1) ? 1 : (parseInt(this.currentPageIndex.toString(), 10) - 5);
                 var endPage: number = ((parseInt(this.currentPageIndex.toString(), 10) + 5) > this.totalPageSize) ? this.totalPageSize : (parseInt(this.currentPageIndex.toString(), 10) + 5);
-
                 self.setupPagingEvents(selector, filters);
-
                 document.selectAll(`${selector} > li`).each(function (idx: number, elem: Element) {
                     if (elem.first("a").attribute("title") != "Previous" && elem.first("a").attribute("title") != "Next" && elem.first("a").attribute("title") != "First" && elem.first("a").attribute("title") != "Last") {
                         elem.drop();
@@ -429,7 +426,7 @@ namespace metron {
             if (qs != "") {
                 self._filters = metron.tools.formatOptions(qs, metron.OptionTypes.QUERYSTRING);
             }
-            var hash = self.getRouting(self._filters);
+            var hash = metron.routing.getRouteUrl(self, self._filters);
             if(hash != null) {
                 self.pageSize = (hash["PageSize"] != null) ? hash["PageSize"] : self.pageSize;
                 self.currentPageIndex = (hash["PageIndex"] != null) ? hash["PageIndex"] : self.currentPageIndex;
