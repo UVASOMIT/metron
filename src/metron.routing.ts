@@ -23,7 +23,9 @@ namespace metron {
                 hash = `/${baseType._name}/${hash}`;
             }
             metron.globals.hashLoadedFromApplication = true;
-            (wantsReplaceHash) ? document.location.hash = `#${hash}` : history.replaceState({ }, "", `#${hash}`);
+            if(hash != null && hash != "") {
+                (wantsReplaceHash) ? document.location.hash = `#${hash}` : history.replaceState({ }, "", `#${hash}`);
+            }
         }
         export function getRouteUrl(baseType: any, filters?: any): any {
             var hash = document.location.hash;
