@@ -219,7 +219,7 @@ namespace metron {
                     }
                 });
             });
-            document.selectAll(`[data-m-type='list'][data-m-model='${self.model}'] th[data-m-action='sort']`).each(function (idx: number, elem: Element) {
+            document.selectAll(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='sort']`).each(function (idx: number, elem: Element) {
                 elem.removeClass("pointer").addClass("pointer");
                 elem.removeEvent("click").addEvent("click", function (e) {
                     self.sortOrder = elem.attribute("data-m-col");
