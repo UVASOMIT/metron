@@ -134,8 +134,10 @@ namespace metron {
                 if (self._list != null) {
                     self._list.elem.attribute("data-m-state", "show");
                     self._list.elem.show();
-                    self._list.callListing();
                 }
+            }
+            if(self._list) {
+                self._list.callListing();
             }
             if ((<any>self).save_m_inject != null) {
                 (<any>self).save_m_inject();
