@@ -168,7 +168,7 @@ namespace metron {
                         }
                     }
                     if ((<any>self).loadForm_m_inject != null) {
-                        (<any>self).loadForm_m_inject();
+                        (<any>self).loadForm_m_inject(data);
                     }
                 });
             }
