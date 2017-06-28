@@ -103,7 +103,7 @@ namespace metron {
                                         metron.globals.actions[el.attribute("data-m-action").lower()]();
                                     }
                                     else {
-                                        document.location.href = `${metron.fw.getBaseUrl()}/${self.model}/download`;
+                                        document.location.href = `${metron.fw.getAppUrl()}/${self.model}/download`;
                                     }
                                 });
                                 break;
