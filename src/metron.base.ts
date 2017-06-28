@@ -33,7 +33,7 @@ namespace metron {
             }
             return self;
         }
-        public on(method: string, func: Function, overwrite: boolean = false): base {
+        public on(method: metron.Event, func: Function, overwrite: boolean = false): base {
             var self = this;
             self.inject((overwrite) ? "overwrite" : "append", method, func);
             return self;
