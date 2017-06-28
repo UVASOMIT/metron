@@ -1,6 +1,6 @@
 {
   "name": "metron",
-  "version": "1.5.8",
+  "version": "1.5.9",
   "description": "A lightweight library and front-end framework utilizing data attributes",
   "main": "dist/gen/metron.js",
   "authors": [

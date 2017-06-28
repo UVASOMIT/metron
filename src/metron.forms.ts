@@ -227,6 +227,9 @@ namespace metron {
             if (callback != null) {
                 callback();
             }
+            if ((<any>self).clearForm_m_inject != null) {
+                (<any>self).clearForm_m_inject();
+            }
         }
         public isValid(selector?: string): boolean {
             var self = this;
