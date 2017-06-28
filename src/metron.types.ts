@@ -34,6 +34,18 @@ namespace metron {
           QUERYSTRING = 1
         , KEYVALUE = 2
     }
+    export enum Event {
+          INIT = "init"
+        , LOAD_FILTERS = "loadFilters"
+        , APPLY_VIEW_EVENTS = "applyViewEvents"
+        , POPULATE_LISTING = "populateListing"
+        , UNDO_LAST = "undoLast"
+        , CALL_LISTING = "callListing"
+        , SAVE = "save"
+        , LOAD_FORM = "loadForm"
+        , LOAD_SELECTS = "loadSelects"
+        , CLEAR_FORM = "clearForm"
+    }
     export const LIST = "list";
     export const LOOKUP = "lookup";
     export const FORM = "form";

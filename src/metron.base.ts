@@ -33,6 +33,11 @@ namespace metron {
             }
             return self;
         }
+        public on(method: string, func: Function, overwrite: boolean = false): base {
+            var self = this;
+            self.inject((overwrite) ? "overwrite" : "append", method, func);
+            return self;
+        }
         public action(action: string, model: string, func: Function): base {
             var self = this;
             metron.globals.actions[`${model}_${action}`] = func;
