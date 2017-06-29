@@ -562,6 +562,8 @@ HTMLElement.prototype.val = function(val?: string): string {
         }
         else if(this.nodeName.lower() == "input") {
             switch(this.attribute("type").lower()) {
+                case "file":
+                    break;
                 case "checkbox":
                     if (<boolean><any>val) {
                         this.checked = true;

@@ -44,16 +44,14 @@ namespace metron {
             if (asscForm != null) {
                 self._form = asscForm;
             }
-            var qs: string = <string><any>metron.web.querystring();
-            if (qs != "") {
-                self._filters = metron.tools.formatOptions(qs, metron.OptionTypes.QUERYSTRING);
-            }
+            self.setFilters();
         }
         public init(): list<T> {
             var self = this;
             self._elem = document.selectOne(`[data-m-type='list'][data-m-model='${self.model}']`);
             if (self._elem != null) {
                 self._pivot = self.attachPivot(self._elem);
+                self._name = self._elem.attribute("data-m-page");
                 let f: metron.form<any> = (self.asscForm != null) ? self.asscForm : self.attachForm(self.model);
                 let filterBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='filters']");
                 filterBlocks.each(function (idx: number, elem: Element) {
@@ -82,6 +80,7 @@ namespace metron {
                                             self._elem.attribute("data-m-state", "hide");
                                             self._elem.hide();
                                         }
+                                        metron.routing.setRouteUrl(self, metron.web.querystringify({ }), true);
                                     }
                                 });
                                 break;
@@ -104,7 +103,7 @@ namespace metron {
                                         metron.globals.actions[el.attribute("data-m-action").lower()]();
                                     }
                                     else {
-                                        document.location.href = `${metron.fw.getBaseUrl()}/${self.model}/download`;
+                                        document.location.href = `${metron.fw.getAppUrl()}/${self.model}/download`;
                                     }
                                 });
                                 break;
@@ -139,9 +138,14 @@ namespace metron {
                     let ajx = new RSVP.Promise(function (resolve, reject) {
                         metron.web.get(`${metron.fw.getAPIURL(binding)}${metron.web.querystringify(options)}`, {}, null, "json", function (data: Array<T>) {
                             data.each(function (i: number, item: any) {
-                                el.append(`<option value="${item[key]}">${item[nText]}</option>`);
+                                if(self._filters[key] != null && self._filters[key] == item[key]) {
+                                    el.append(`<option value="${item[key]}" selected="selected">${item[nText]}</option>`);
+                                }
+                                else {
+                                    el.append(`<option value="${item[key]}">${item[nText]}</option>`);
+                                }
                                 if (f.elem != null && f.elem.selectOne(`#${self.model}_${key}`) != null && String.isNullOrEmpty(f.elem.selectOne(`#${self.model}_${key}`).attribute("data-m-binding"))) {
-                                    (<HTMLElement>f.elem.selectOne(`#${self.model}_${nm}`)).append(`<option value="${item[key]}">${item[nText]}</option>`);
+                                    let t = (<HTMLElement>f.elem.selectOne(`#${self.model}_${nm}`)).append(`<option value="${item[key]}">${item[nText]}</option>`);
                                 }
                             });
                             resolve(data);
@@ -215,7 +219,7 @@ namespace metron {
                     }
                 });
             });
-            document.selectAll(`[data-m-type='list'][data-m-model='${self.model}'] th[data-m-action='sort']`).each(function (idx: number, elem: Element) {
+            document.selectAll(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='sort']`).each(function (idx: number, elem: Element) {
                 elem.removeClass("pointer").addClass("pointer");
                 elem.removeEvent("click").addEvent("click", function (e) {
                     self.sortOrder = elem.attribute("data-m-col");
@@ -274,7 +278,9 @@ namespace metron {
             self.clearAlerts();
             var parameters: any = Object.extend({ PageIndex: self.currentPageIndex, PageSize: self.pageSize, _SortOrder: self.sortOrder, _SortDirection: self.sortDirection }, self._filters);
             var url = (self.fetchURL != null) ? self.fetchURL : self.model;
-            metron.web.get(`${metron.fw.getAPIURL(url)}${metron.web.querystringify(metron.tools.normalizeModelData(parameters))}`, {}, null, "json", function (data: Array<T>) {
+            var wsqs = metron.web.querystringify(metron.tools.normalizeModelData(parameters));
+            metron.routing.setRouteUrl(self, wsqs);
+            metron.web.get(`${metron.fw.getAPIURL(url)}${wsqs}`, {}, null, "json", function (data: Array<T>) {
                 self._items = data;
                 self.populateListing();
                 if ((<any>self).callListing_m_inject != null) {
@@ -334,9 +340,7 @@ namespace metron {
                 self.totalPageSize = self.calculateTotalPageSize(totalCount);
                 var startPage: number = ((parseInt(this.currentPageIndex.toString(), 10) - 5) < 1) ? 1 : (parseInt(this.currentPageIndex.toString(), 10) - 5);
                 var endPage: number = ((parseInt(this.currentPageIndex.toString(), 10) + 5) > this.totalPageSize) ? this.totalPageSize : (parseInt(this.currentPageIndex.toString(), 10) + 5);
-
                 self.setupPagingEvents(selector, filters);
-
                 document.selectAll(`${selector} > li`).each(function (idx: number, elem: Element) {
                     if (elem.first("a").attribute("title") != "Previous" && elem.first("a").attribute("title") != "Next" && elem.first("a").attribute("title") != "First" && elem.first("a").attribute("title") != "Last") {
                         elem.drop();
@@ -415,6 +419,31 @@ namespace metron {
             }
             self._form = f;
             return self._form;
+        }
+        private setFilters(): void {
+            var self = this;
+            var qs: string = <string><any>metron.web.querystring();
+            if (qs != "") {
+                self._filters = metron.tools.formatOptions(qs, metron.OptionTypes.QUERYSTRING);
+            }
+            var hash = metron.routing.getRouteUrl(self, self._filters);
+            if(hash != null) {
+                self.pageSize = (hash["PageSize"] != null) ? hash["PageSize"] : self.pageSize;
+                self.currentPageIndex = (hash["PageIndex"] != null) ? hash["PageIndex"] : self.currentPageIndex;
+                self.sortOrder = (hash["_SortOrder"] != null) ? hash["_SortOrder"] : self.sortOrder;
+                self.sortDirection = (hash["_SortDirection"] != null) ? hash["_SortDirection"] : self.sortDirection;
+                delete hash["PageSize"];
+                delete hash["PageIndex"];
+                delete hash["_SortOrder"];
+                delete hash["_SortDirection"];
+                for(let h in hash) {
+                    if(hash.hasOwnProperty(h)) {
+                        if(self._filters[h] == null) {
+                            self._filters[h] = hash[h];
+                        }
+                    }
+                }
+            }
         }
         public get elem(): Element {
             return this._elem;

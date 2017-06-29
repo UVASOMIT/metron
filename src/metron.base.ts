@@ -1,5 +1,6 @@
 namespace metron {
     export abstract class base {
+        protected _name: string;
         protected _pivot: metron.controls.pivot;
         constructor(public model: string, private baseType: string) {
         }
@@ -30,6 +31,11 @@ namespace metron {
                 default:
                     throw new Error("Error: Invalid injection type!");
             }
+            return self;
+        }
+        public on(method: metron.Event, func: Function, overwrite: boolean = false): base {
+            var self = this;
+            self.inject((overwrite) ? "overwrite" : "append", method, func);
             return self;
         }
         public action(action: string, model: string, func: Function): base {

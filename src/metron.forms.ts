@@ -34,6 +34,7 @@ namespace metron {
             self._elem = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
             if (self._elem != null) {
                 self._pivot = self.attachPivot(self._elem);
+                self._name = self._elem.attribute("data-m-page");
                 let selects = self._elem.selectAll("select");
                 self.loadSelects(selects, () => {
                     var qs: string = <string><any>metron.web.querystring();
@@ -96,6 +97,9 @@ namespace metron {
                                                 self._list.elem.show();
                                             }
                                         }
+                                        if(self._list != null) {
+                                            self._list.callListing();
+                                        }
                                     }
                                 });
                                 break;
@@ -130,8 +134,10 @@ namespace metron {
                 if (self._list != null) {
                     self._list.elem.attribute("data-m-state", "show");
                     self._list.elem.show();
-                    self._list.callListing();
                 }
+            }
+            if(self._list) {
+                self._list.callListing();
             }
             if ((<any>self).save_m_inject != null) {
                 (<any>self).save_m_inject();
@@ -140,6 +146,7 @@ namespace metron {
         public loadForm(parameters: any, toggle: boolean = true, pivotPosition?: number): void {
             var self = this;
             if (toggle) {
+                metron.routing.setRouteUrl(self, metron.web.querystringify(parameters), true);
                 metron.web.get(`${metron.fw.getAPIURL(self.model)}${metron.web.querystringify(parameters)}`, parameters, null, "json", function (data: T) {
                     if (data instanceof Array) {
                         data = data[0];
@@ -161,7 +168,7 @@ namespace metron {
                         }
                     }
                     if ((<any>self).loadForm_m_inject != null) {
-                        (<any>self).loadForm_m_inject();
+                        (<any>self).loadForm_m_inject(data);
                     }
                 });
             }
@@ -219,6 +226,9 @@ namespace metron {
             self.clearAlerts();
             if (callback != null) {
                 callback();
+            }
+            if ((<any>self).clearForm_m_inject != null) {
+                (<any>self).clearForm_m_inject();
             }
         }
         public isValid(selector?: string): boolean {

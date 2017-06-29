@@ -14,7 +14,7 @@ namespace metron {
                 self.localDBStore = metron.config["config.storage.localDBStore"];
             }
         }
-        public init(): RSVP.Promise<metron.store> {
+        public init(): any {
             var self = this;
             var p = new RSVP.Promise(function(resolve, reject) {
                 try {
@@ -63,7 +63,7 @@ namespace metron {
                 return null;
             }
         }
-        public getItem(s: string, val?: string): RSVP.Promise<metron.store> {
+        public getItem(s: string, val?: string): any {
             var self = this;
             var p = new RSVP.Promise(function(resolve, reject) {
                 try {
@@ -90,7 +90,7 @@ namespace metron {
             });
             return p;
         }
-        public setItem(s: string, a: any): RSVP.Promise<metron.store> {
+        public setItem(s: string, a: any): any {
             var self = this;
             var p = new RSVP.Promise(function(resolve, reject) {
                 try {
@@ -125,7 +125,7 @@ namespace metron {
             });
             return p;
         }
-        public removeItem(s: string): RSVP.Promise<metron.store> {
+        public removeItem(s: string): any {
             var self = this;
             var p = new RSVP.Promise(function(resolve, reject) {
                 try {
