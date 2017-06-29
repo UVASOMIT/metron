@@ -23,8 +23,16 @@ namespace metron {
                     let section: Element = <Element>pivots[i];
                     let page: string = section.attribute("data-m-page");
                     if (metron.globals["pivots"][page] == null) {
-                        let p: pivot = new controls.pivot(<Element>section);
+                        let p = new controls.pivot(<Element>section);
                         metron.globals["pivots"][page] = p;
+                        section.selectAll("[data-m-pivot]").each((idx: number, elem: Element) => {
+                            if(elem.closest("[data-m-type='pivot']").attribute("data-m-page") === page) {
+                                elem.addEvent("click", (e) => {
+                                    e.preventDefault();
+                                    p.exact(elem.attribute("data-m-pivot"));
+                                }, true);
+                            }
+                        });
                     }
                 }
                 if (callback != null) {
@@ -140,7 +148,7 @@ namespace metron {
                 }
                 self._items[idx].show();
                 if(self._items[idx].attribute("data-m-page") != null) {
-                    metron.routing.setRouteUrl(self._items[idx].attribute("data-m-page"), "");
+                    metron.routing.setRouteUrl(self._items[idx].attribute("data-m-page"), "", true);
                 }
                 self.init(self._items[idx]);
                 return true;
