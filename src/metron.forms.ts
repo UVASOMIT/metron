@@ -10,7 +10,6 @@ namespace metron {
                     let model: string = section.attribute("data-m-model");
                     if (metron.globals["forms"][model] == null) {
                         let f: form<any> = new form(model).init();
-                        metron.globals["forms"][model] = f;
                     }
                 }
             }
@@ -18,20 +17,17 @@ namespace metron {
     }
     export class form<T> extends base {
         private _elem: Element;
-        private _list: metron.list<any>;
         private _fields: Array<string> = [];
         public hasLoaded: boolean = false;
-        constructor(public model: string, public asscListing?: list<T>) {
+        constructor(public model: string) {
             super(model, FORM);
             var self = this;
-            if (asscListing != null) {
-                self._list = asscListing;
-            }
+            metron.globals["forms"][model] = self;
+            self._elem = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
         }
         public init(toggle: boolean = false): form<T> {
             var self = this;
             self.hasLoaded = true;
-            self._elem = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
             if (self._elem != null) {
                 self._pivot = self.attachPivot(self._elem);
                 self._name = self._elem.attribute("data-m-page");
@@ -40,7 +36,7 @@ namespace metron {
                     var qs: string = <string><any>metron.web.querystring();
                     if (qs != "") {
                         let parameters = metron.tools.formatOptions(qs, metron.OptionTypes.QUERYSTRING);
-                        self.loadForm(parameters, toggle);
+                        self.loadForm(parameters);
                     }
                 });
                 let controlBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='controls']");
@@ -76,7 +72,7 @@ namespace metron {
                                             }
                                         }
                                     }
-                                });
+                                }, true);
                                 break;
                             case "cancel":
                                 el.addEvent("click", function (e) {
@@ -87,28 +83,20 @@ namespace metron {
                                     else {
                                         self.clearForm();
                                         if(self._pivot != null) {
-                                            (el.attribute("data-m-pivot") != null) ? self._pivot.exact(<number><any>el.attribute("data-m-pivot")) : self._pivot.previous();
+                                            (el.attribute("data-m-pivot") != null) ? self._pivot.exact(<any>el.attribute("data-m-pivot")) : self._pivot.previous();
                                         }
-                                        else {
-                                            self._elem.attribute("data-m-state", "hide");
-                                            self._elem.hide();
-                                            if (self._list != null) {
-                                                self._list.elem.attribute("data-m-state", "show");
-                                                self._list.elem.show();
-                                            }
-                                        }
-                                        if(self._list != null) {
-                                            self._list.callListing();
+                                        if(metron.globals["lists"][self.model] != null) {
+                                            metron.globals["lists"][self.model].callListing();
                                         }
                                     }
-                                });
+                                }, true);
                                 break;
                             default:
                                 if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`] != null) {
                                     el.addEvent("click", function (e) {
                                         e.preventDefault();
                                         metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`]();
-                                    });
+                                    }, true);
                                 }
                                 break;
                         }
@@ -128,25 +116,18 @@ namespace metron {
             if(self._pivot != null) {
                 (pivotPosition != null) ? self._pivot.exact(pivotPosition) : self._pivot.previous();
             }
-            else {
-                self.elem.attribute("data-m-state", "hide");
-                self.elem.hide();
-                if (self._list != null) {
-                    self._list.elem.attribute("data-m-state", "show");
-                    self._list.elem.show();
-                }
-            }
-            if(self._list) {
-                self._list.callListing();
+            if(metron.globals["lists"][self.model] != null) {
+                metron.globals["lists"][self.model].callListing();
             }
             if ((<any>self).save_m_inject != null) {
                 (<any>self).save_m_inject();
             }
         }
-        public loadForm(parameters: any, toggle: boolean = true, pivotPosition?: number): void {
+        public loadForm(parameters?: any): void {
             var self = this;
-            if (toggle) {
-                metron.routing.setRouteUrl(self, metron.web.querystringify(parameters), true);
+            self.clearForm();
+            metron.routing.setRouteUrl(self._name, metron.web.querystringify(parameters), true);
+            if(parameters != null) {
                 metron.web.get(`${metron.fw.getAPIURL(self.model)}${metron.web.querystringify(parameters)}`, parameters, null, "json", function (data: T) {
                     if (data instanceof Array) {
                         data = data[0];
@@ -154,17 +135,6 @@ namespace metron {
                     for (let prop in data) {
                         if (data.hasOwnProperty(prop) && data[prop] != null && document.selectOne(`#${self.model}_${prop}`) != null) {
                             (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(<any>data[prop]);
-                        }
-                    }
-                    if(self._pivot != null) {
-                        (pivotPosition != null) ? self._pivot.exact(pivotPosition) : self._pivot.next();
-                    }
-                    else {
-                        self._elem.attribute("data-m-state", "show");
-                        self._elem.show();
-                        if (self._list != null) {
-                            self._list.elem.attribute("data-m-state", "hide");
-                            self._list.elem.hide();
                         }
                     }
                     if ((<any>self).loadForm_m_inject != null) {
@@ -263,12 +233,6 @@ namespace metron {
         }
         public set elem(f: Element) {
             this._elem = f;
-        }
-        public get list(): metron.list<any> {
-            return this._list;
-        }
-        public set list(l: metron.list<any>) {
-            this._list = l;
         }
     }
 }

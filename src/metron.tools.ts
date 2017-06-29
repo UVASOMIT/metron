@@ -124,6 +124,32 @@ namespace metron {
             }
             return message;
         }
+        export function eventEnumToString(e: metron.Event): string {
+            switch(e) {
+                case metron.Event.INIT:
+                    return "init";
+                case metron.Event.LOAD_FILTERS:
+                    return "loadFilters";
+                case metron.Event.APPLY_VIEW_EVENTS:
+                    return "applyViewEvents";
+                case metron.Event.POPULATE_LISTING:
+                    return "populateListing";
+                case metron.Event.UNDO_LAST:
+                    return "undoLast";
+                case metron.Event.CALL_LISTING:
+                    return "callListing";
+                case metron.Event.SAVE:
+                    return "save";
+                case metron.Event.LOAD_FORM:
+                    return "loadForm";
+                case metron.Event.LOAD_SELECTS:
+                    return "loadSelects";
+                case metron.Event.CLEAR_FORM:
+                    return "clearForm";
+                default:
+                    throw new Error("Error: Invalid enum.");
+            }
+        }
         export function formatDecimal(num: number): string {
             return num.toFixed(2);
         }
