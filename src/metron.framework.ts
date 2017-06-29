@@ -145,7 +145,19 @@ namespace metron {
     }
     window.onhashchange = function() {
         if(!metron.globals.hashLoadedFromApplication) {
-            window.location.reload(false); 
+            let hasPivoted = false;
+            let section = document.selectOne("[data-m-type='pivot']");
+            if(section != null) {
+                let page = section.attribute("data-m-page");
+                if(page != null) {
+                    let p = metron.controls.getPivot(page);
+                    p.previous();
+                    hasPivoted = true;
+                }
+            }
+            if(!hasPivoted) {
+                window.location.reload(false); 
+            }
         }
         metron.globals.hashLoadedFromApplication = false;
     }
