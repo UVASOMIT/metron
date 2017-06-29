@@ -42,7 +42,6 @@ namespace metron {
                 self._pivotContainer = pivotCollection;
                 self._nextButton = (nextButton != null) ? document.selectOne(`#${nextButton}`): self._pivotContainer.selectOne("[data-m-segment='controls'] [data-m-action='next']");
                 self._previousButton = (previousButton != null) ? document.selectOne(`#${previousButton}`): self._pivotContainer.selectOne("[data-m-segment='controls'] [data-m-action='previous']");
-                
             }
 
             public initPivot(){
