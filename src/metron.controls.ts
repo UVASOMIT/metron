@@ -55,7 +55,9 @@ namespace metron {
                             self.init(elem);
                             elem.show();
                             if (elem.attribute('data-m-page') != null){
-                                self._postEventFunctions[elem.attribute('data-m-page')]();
+                                if (self._postEventFunctions[elem.attribute('data-m-page')] != undefined){
+                                    self._postEventFunctions[elem.attribute('data-m-page')]();
+                                }
                             }
                         }
                         else {
@@ -104,12 +106,17 @@ namespace metron {
                     return false;
                 }
                 if (self._item.current.attribute('data-m-page') != null){
-                    self._preEventFuntions[self._item.current.attribute('data-m-page')]();
+                    if (self._preEventFuntions[self._item.current.attribute('data-m-page')] != undefined){
+                        self._preEventFuntions[self._item.current.attribute('data-m-page')]();
+                    }
+                    
                 }
                 self._item.current.toggle();
                 self._item.next.show();
                 if (self._item.next.attribute('data-m-page') != null){
-                    self._postEventFunctions[self._item.next.attribute('data-m-page')]();
+                    if (self._postEventFunctions[self._item.next.attribute('data-m-page')] != undefined){
+                        self._postEventFunctions[self._item.next.attribute('data-m-page')]();
+                    }
                 }
                 self.init(self._item.next);
                 return true;
@@ -121,12 +128,16 @@ namespace metron {
                     return false;
                 }
                 if (self._item.current.attribute('data-m-page') != null){
-                    self._preEventFuntions[self._item.current.attribute('data-m-page')]();
+                    if (self._preEventFuntions[self._item.current.attribute('data-m-page')] != undefined){
+                        self._preEventFuntions[self._item.current.attribute('data-m-page')]();
+                    }
                 }
                 self._item.current.toggle();
                 self._item.previous.show();
                 if (self._item.previous.attribute('data-m-page') != null){
-                    self._postEventFunctions[self._item.previous.attribute('data-m-page')]();
+                    if (self._postEventFunctions[self._item.previous.attribute('data-m-page')] != undefined){
+                        self._postEventFunctions[self._item.previous.attribute('data-m-page')]();
+                    }
                 }
                 self.init(self._item.previous);
                 return true;
@@ -138,12 +149,16 @@ namespace metron {
                     return false;
                 }
                 if (self._item.current.attribute('data-m-page') != null){
-                    self._preEventFuntions[self._item.current.attribute('data-m-page')]();
+                    if (self._preEventFuntions[self._item.current.attribute('data-m-page')] != undefined){
+                        self._preEventFuntions[self._item.current.attribute('data-m-page')]();
+                    }
                 }
                 self._item.current.hide();
                 self._items[idx].show();
                 if (self._items[idx].attribute('data-m-page') != null){
-                    self._postEventFunctions[self._items[idx].attribute('data-m-page')]();
+                    if (self._postEventFunctions[self._items[idx].attribute('data-m-page')] != undefined){
+                        self._postEventFunctions[self._items[idx].attribute('data-m-page')]();
+                    }
                 }
                 self.init(self._items[idx]);
                 return true;
