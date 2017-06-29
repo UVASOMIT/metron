@@ -154,11 +154,12 @@ namespace metron {
         document.selectAll("[data-m-state='hide']").each((idx: number, elem: Element) => {
             elem.hide();
         });
-        metron.controls.pivots.bindAll();
-        if (wantsAutoload) {
-            metron.lists.bindAll(() => {
-                metron.forms.bindAll();
-            });
-        }
+        metron.controls.pivots.bindAll(() => {
+            if (wantsAutoload) {
+                metron.lists.bindAll(() => {
+                    metron.forms.bindAll();
+                });
+            }
+        });
     });
 }

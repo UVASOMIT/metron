@@ -35,16 +35,16 @@ namespace metron {
         , KEYVALUE = 2
     }
     export enum Event {
-          INIT = "init"
-        , LOAD_FILTERS = "loadFilters"
-        , APPLY_VIEW_EVENTS = "applyViewEvents"
-        , POPULATE_LISTING = "populateListing"
-        , UNDO_LAST = "undoLast"
-        , CALL_LISTING = "callListing"
-        , SAVE = "save"
-        , LOAD_FORM = "loadForm"
-        , LOAD_SELECTS = "loadSelects"
-        , CLEAR_FORM = "clearForm"
+          INIT = 0
+        , LOAD_FILTERS = 1
+        , APPLY_VIEW_EVENTS = 2
+        , POPULATE_LISTING = 3
+        , UNDO_LAST = 4
+        , CALL_LISTING = 5
+        , SAVE = 6
+        , LOAD_FORM = 7
+        , LOAD_SELECTS = 8
+        , CLEAR_FORM = 9
     }
     export const LIST = "list";
     export const LOOKUP = "lookup";
