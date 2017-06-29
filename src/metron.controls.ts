@@ -34,8 +34,8 @@ namespace metron {
             private _item: Pivot;
             private _previousButton: any;
             private _nextButton: any;
-            public _preEventFuntions: EventFunction;
-            public _postEventFunctions: EventFunction;
+            public _preEventFuntions: EventFunction = {};
+            public _postEventFunctions: EventFunction = {};
 
             constructor(private pivotCollection: Element, private displayIndex: number = 0, private nextButton?: any, private previousButton?: any, private eventFunction?: Function, private preEventFunction?: Function) {
                 var self = this;
