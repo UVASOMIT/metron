@@ -10,12 +10,12 @@ namespace metron {
                     let page: string = section.attribute("data-m-page");
                     if (metron.globals["pivots"][page] == null) {
                         let p: pivot = new controls.pivot(<Element>section);
-                        p._postEventFunctions["hello"] = function(){
+                        /*p._postEventFunctions["hello"] = function(){
                             console.log("Hello");
                         };
                         p._postEventFunctions["hi"] = function(){
                             console.log("Hi");
-                        };
+                        };*/
                         p.initPivot();
                         metron.globals["pivots"][page] = p;
                     }
