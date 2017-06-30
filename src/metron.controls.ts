@@ -126,7 +126,7 @@ namespace metron {
             public addPreEvent(name:string, func:Function){
                 var self = this;
                 if (self._preEventFunctions[name] == undefined){
-                    self._preEventFunctions[name] = func();
+                    self._preEventFunctions[name] = func;
                 }
                 else {
                     console.log(`${name} pre-event function already exists.`);
@@ -135,7 +135,7 @@ namespace metron {
             public addPostEvent(name:string, func:Function){
                 var self = this;
                 if (self._postEventFunctions[name] == undefined){
-                    self._postEventFunctions[name] = func();
+                    self._postEventFunctions[name] = func;
                 }
                 else {
                     console.log(`${name} pre-event function already exists.`);
