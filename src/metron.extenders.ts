@@ -75,6 +75,7 @@ interface Element {
     selectAll: (selector: string) => NodeListOf<Element>;
     hasMatches: (selector: string) => boolean;
     up: (selector: string) => Element;
+    isHidden: () => Boolean;
 }
 
 interface HTMLElement {
@@ -541,6 +542,10 @@ Element.prototype.removeClass = function(className: string) : Element {
 
 Element.prototype.asString = function(): string {
     return this.outerHTML;
+};
+
+Element.prototype.isHidden = function(): boolean {
+    return (this.offsetParent === null);
 };
 
 HTMLElement.prototype.clean = function(): HTMLElement {

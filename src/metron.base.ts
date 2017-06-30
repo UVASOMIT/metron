@@ -7,9 +7,7 @@ namespace metron {
         protected attachPivot(elem: Element): metron.controls.pivot {
             if(elem.up("[data-m-type='pivot']")) {
                 let pivotName = elem.up("[data-m-type='pivot']").attribute("data-m-page");
-                if(metron.globals["pivots"][pivotName] != null) {
-                    return metron.globals["pivots"][pivotName];
-                }
+                return metron.controls.getPivot(pivotName);
             }
             return undefined;
         }
@@ -35,7 +33,7 @@ namespace metron {
         }
         public on(method: metron.Event, func: Function, overwrite: boolean = false): base {
             var self = this;
-            self.inject((overwrite) ? "overwrite" : "append", method, func);
+            self.inject((overwrite) ? "overwrite" : "append", metron.tools.eventEnumToString(method), func);
             return self;
         }
         public action(action: string, model: string, func: Function): base {
