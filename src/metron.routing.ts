@@ -1,6 +1,6 @@
 namespace metron {
     export namespace routing {
-        export function setRouteUrl(baseType: any, wsqs: string, wantsReplaceHash: boolean = false): void {
+        export function setRouteUrl(name: string, wsqs: string, wantsReplaceHash: boolean = false): void {
             var hash = (wsqs.length > 1) ? wsqs.substr(1) : "";
             if(hash != "" && document.location.search != null) {
                 try {
@@ -19,15 +19,15 @@ namespace metron {
                     console.log(`Error: failed to parse query string and hash. ${e}`);
                 }
             }
-            if(baseType._name != null) {
-                hash = `/${baseType._name}/${hash}`;
+            if(name != null) {
+                hash = `/${name}/${hash}`;
             }
             metron.globals.hashLoadedFromApplication = true;
             if(hash != null && hash != "") {
                 (wantsReplaceHash) ? document.location.hash = `#${hash}` : history.replaceState({ }, "", `#${hash}`);
             }
         }
-        export function getRouteUrl(baseType: any, filters?: any): any {
+        export function getRouteUrl(filters?: any): any {
             var hash = document.location.hash;
             if(hash.substr(0, 1) == "#") {
                 hash = hash.substr(1);

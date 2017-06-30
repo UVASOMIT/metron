@@ -145,7 +145,19 @@ namespace metron {
     }
     window.onhashchange = function() {
         if(!metron.globals.hashLoadedFromApplication) {
-            window.location.reload(false); 
+            let hasPivoted = false;
+            let section = document.selectOne("[data-m-type='pivot']");
+            if(section != null) {
+                let page = section.attribute("data-m-page");
+                if(page != null) {
+                    let p = metron.controls.getPivot(page);
+                    p.previous();
+                    hasPivoted = true;
+                }
+            }
+            if(!hasPivoted) {
+                window.location.reload(false); 
+            }
         }
         metron.globals.hashLoadedFromApplication = false;
     }
@@ -154,11 +166,12 @@ namespace metron {
         document.selectAll("[data-m-state='hide']").each((idx: number, elem: Element) => {
             elem.hide();
         });
-        metron.controls.pivots.bindAll();
-        if (wantsAutoload) {
-            metron.lists.bindAll(() => {
-                metron.forms.bindAll();
-            });
-        }
+        metron.controls.pivots.bindAll(() => {
+            if (wantsAutoload) {
+                metron.lists.bindAll(() => {
+                    metron.forms.bindAll();
+                });
+            }
+        });
     });
 }

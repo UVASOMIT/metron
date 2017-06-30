@@ -6,13 +6,10 @@ namespace metron {
     }
     export class view<T> extends base {
         private _elem: Element;
-        private _form: metron.form<any>;
-        constructor(public model: string, public asscForm?: form<T>) {
+        private _form: string;
+        constructor(public model: string) {
             super(model, VIEW);
             var self = this;
-            if(asscForm != null) {
-                self._form = asscForm;
-            }
         }
         public init(): view<T> {
             var self = this;
@@ -37,12 +34,6 @@ namespace metron {
                         (<HTMLElement>document.selectOne(`#View_${self.model}_${prop}`)).innerText = <any>data[prop];
                     }
                 }
-                /*
-                self._form.elem.attribute("data-m-state", "show");
-                self._elem.attribute("data-m-state", "hide");
-                self._form.elem.show();
-                self._elem.hide();
-                */
             });
         }
         public get elem(): Element {
@@ -51,10 +42,10 @@ namespace metron {
         public set elem(v: Element) {
             this._elem = v;
         }
-        public get form(): metron.form<any> {
+        public get form(): string {
             return this._form;
         }
-        public set form(f: metron.form<any>) {
+        public set form(f: string) {
             this._form = f;
         }
     }
