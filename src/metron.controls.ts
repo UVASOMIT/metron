@@ -40,9 +40,6 @@ namespace metron {
                 }
             }
         }
-        export interface EventFunction {
-            [name: string]: ()=>void;
-        }
         export class pivot {
             private _pivotContainer: Element;
             private _items: Array<Element> = [];
