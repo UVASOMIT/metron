@@ -34,6 +34,10 @@ namespace metron {
           QUERYSTRING = 1
         , KEYVALUE = 2
     }
+    export interface EventFunction {
+        [name: string]: ()=>void;
+    }
+
     export enum Event {
           INIT = 0
         , LOAD_FILTERS = 1
