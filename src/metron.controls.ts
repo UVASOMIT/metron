@@ -45,7 +45,6 @@ namespace metron {
                 }
             }
         }
-        
         export class pivot {
             private _pivotContainer: Element;
             private _items: Array<Element> = [];
