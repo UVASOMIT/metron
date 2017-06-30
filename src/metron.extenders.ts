@@ -87,6 +87,7 @@ interface XMLHttpRequest {
     responseJSON: () => JSON;
 }
 
+
 String.prototype.lower = function (): string {
     return this.toLowerCase();
 };

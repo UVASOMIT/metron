@@ -35,7 +35,7 @@ namespace metron {
         , KEYVALUE = 2
     }
     export interface EventFunction {
-        [name: string]: ()=>void;
+        [name: string]: Function;
     }
 
     export enum Event {
