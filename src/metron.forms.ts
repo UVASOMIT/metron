@@ -61,13 +61,17 @@ namespace metron {
                                                 }
                                             });
                                             if (!hasPrimary) {
-                                                metron.web.post(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
+                                                metron.web.post(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", (data: T) => {
                                                     self.save(data, <number><any>el.attribute("data-m-pivot"))
+                                                }, (txt, jsn, xml) => {
+                                                    self.showAlerts(metron.DANGER, txt, jsn, xml);
                                                 });
                                             }
                                             else {
-                                                metron.web.put(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
+                                                metron.web.put(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", (data: T) => {
                                                     self.save(data, <number><any>el.attribute("data-m-pivot"));
+                                                }, (txt, jsn, xml) => {
+                                                    self.showAlerts(metron.DANGER, txt, jsn, xml);
                                                 });
                                             }
                                         }
