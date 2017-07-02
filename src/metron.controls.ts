@@ -23,17 +23,12 @@ namespace metron {
                     let page: string = section.attribute("data-m-page");
                     if (metron.globals["pivots"][page] == null) {
                         let p: pivot = new controls.pivot(<Element>section);
-                        p.addPostEvent("hello", ()=>{
-                            console.log("Hello");
-                        });
-                        p.addPreEvent("hi", ()=>{
-                            console.log("Hi");
-                        });
                         metron.globals["pivots"][page] = p;
                         section.selectAll("[data-m-pivot]").each((idx: number, elem: Element) => {
-                            if(elem.closest("[data-m-type='pivot']").attribute("data-m-page") === page) {
+                            if(elem.closest("[data-m-type='pivot']").attribute("data-m-page") == null || elem.closest("[data-m-type='pivot']").attribute("data-m-page") === page) {
                                 elem.addEvent("click", (e) => {
                                     e.preventDefault();
+                                    let p1 = <metron.controls.pivot>metron.globals["pivots"][page];
                                     p.exact(elem.attribute("data-m-pivot"));
                                 }, true);
                             }
@@ -46,6 +41,7 @@ namespace metron {
             }
         }
         export class pivot {
+            private _name: string;
             private _pivotContainer: Element;
             private _items: Array<Element> = [];
             private _item: Pivot;
@@ -53,9 +49,9 @@ namespace metron {
             private _nextButton: any;
             private _preEventFunctions: EventFunction = {};
             private _postEventFunctions: EventFunction = {};
-
             constructor(private pivotCollection: Element, private displayIndex: number = 0, private nextButton?: any, private previousButton?: any) {
                 var self = this;
+                self._name = pivotCollection.attribute("data-m-page");
                 self._pivotContainer = pivotCollection;
                 self._nextButton = (nextButton != null) ? document.selectOne(`#${nextButton}`): self._pivotContainer.selectOne("[data-m-segment='controls'] [data-m-action='next']");
                 self._previousButton = (previousButton != null) ? document.selectOne(`#${previousButton}`): self._pivotContainer.selectOne("[data-m-segment='controls'] [data-m-action='previous']");
@@ -64,18 +60,19 @@ namespace metron {
                     let i = 0;
                     let itemList = self._pivotContainer.selectAll("[data-m-segment='pivot-item']");
                     itemList.each(function (idx: number, elem: Element) {
-                        self._items.push(elem);
-                        if (idx == self.displayIndex) {
-                            self.init(elem);
-                            elem.show();
-                        }
-                        else {
-                            elem.hide();
+                        if(elem.closest("[data-m-type='pivot']").attribute("data-m-page") == null || elem.closest("[data-m-type='pivot']").attribute("data-m-page") === self._name) {
+                            self._items.push(elem);
+                            if (idx == self.displayIndex) {
+                                self.init(elem);
+                                elem.show();
+                            }
+                            else {
+                                elem.hide();
+                            }
                         }
                     });
                 }
             }
-            
             private init(el: Element) {
                 var self = this;
                 self._item = {
@@ -115,7 +112,7 @@ namespace metron {
             }
             private applyPreEvent(el: Element) {
                 var self = this;
-                if (el.attribute('data-m-page') != null){
+                if (el.attribute('data-m-page') != null) {
                     if (self._preEventFunctions[el.attribute('data-m-page')] != undefined){
                         self._preEventFunctions[el.attribute('data-m-page')]();
                     }
@@ -124,7 +121,7 @@ namespace metron {
             }
             public addPreEvent(name:string, func:Function){
                 var self = this;
-                if (self._preEventFunctions[name] == undefined){
+                if (self._preEventFunctions[name] == undefined) {
                     self._preEventFunctions[name] = func;
                 }
                 else {
@@ -133,17 +130,17 @@ namespace metron {
             }
             public addPostEvent(name:string, func:Function){
                 var self = this;
-                if (self._postEventFunctions[name] == undefined){
+                if (self._postEventFunctions[name] == undefined) {
                     self._postEventFunctions[name] = func;
                 }
                 else {
                     console.log(`${name} pre-event function already exists.`);
                 }
             }
-            public removePostEvent(name: string){
+            public removePostEvent(name: string) {
                 delete this._postEventFunctions[name];
             }
-            public removePreEvent(name: string){
+            public removePreEvent(name: string) {
                 delete this._preEventFunctions[name];
             }
             public next(): boolean {

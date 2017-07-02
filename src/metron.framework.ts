@@ -9,13 +9,23 @@ namespace metron {
     };
     export function onready(callback: Function) {
         document.addEventListener("DOMContentLoaded", function (e) {
-            if (metron.templates.master.hasMaster(document.documentElement.outerHTML)) {
-                metron.templates.master.loadMaster(document.documentElement.outerHTML);
-            }
-            document.selectAll("[data-m-type='markdown']").each((idx: number, elem: Element) => {
-                (<HTMLElement>elem).innerHTML = metron.templates.markdown.toHTML((<HTMLElement>elem).innerHTML);
+            metron.templates.master.loadMaster(document.documentElement.outerHTML).then(() => {
+                document.selectAll("[data-m-include]").each((idx: number, elem: Element) => {
+                    metron.templates.load(elem.attribute("data-m-include")).then(result => {
+                        (<HTMLElement>elem).innerHTML = result;
+                        if(elem.attribute("data-m-type") != null && elem.attribute("data-m-type") == "markdown") {
+                            (<HTMLElement>elem).innerHTML = metron.templates.markdown.toHTML((<HTMLElement>elem).innerHTML);
+                        }
+                    });
+                });
+                document.selectAll("[data-m-type='markdown']").each((idx: number, elem: Element) => {
+                    if(elem.attribute("data-m-include") == null) {
+                        (<HTMLElement>elem).innerHTML = metron.templates.markdown.toHTML((<HTMLElement>elem).innerHTML);
+                    }
+                });
+                metron.fw.loadOptionalFunctionality();
             });
-            metron.fw.loadOptionalFunctionality();
+
             let root: string = metron.fw.getApplicationRoot(document.documentElement.outerHTML);
             
             let store = new metron.store(metron.DB, metron.DBVERSION, metron.STORE);
