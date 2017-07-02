@@ -1,5 +1,16 @@
 namespace metron {
     export namespace templates {
+        export function load(includesFile: string): RSVP.Promise<any> {
+            var url =`${metron.fw.getAppUrl()}/${includesFile}`;
+            return new RSVP.Promise((resolve, reject) => {
+                metron.web.ajax(url, {}, "GET", true, "text/html", "text", (content) => {
+                    resolve(content)
+                }, (txt, jsn, xml) => {
+                    console.log(`Error loading ${includesFile}: ${txt}`);
+                    reject(txt);
+                });
+            });
+        }
         export namespace list {
             export function row<T>(template: string, item: T, isTable: boolean = true): string {
                 var result = template;
@@ -77,22 +88,22 @@ namespace metron {
                 }
                 return false;
             }
-            export function loadMaster(page: string): void {
-                var root: string = metron.tools.getMatching(page, /\{\{m:root=\"(.*)\"\}\}/g);
-                var fileName: string = metron.tools.getMatching(page, /\{\{m:master=\"(.*)\"\}\}/g);
-                var ajx = new RSVP.Promise(function (resolve, reject) {
-                    metron.web.get(`${root}/${fileName}`, {}, "text/html", "text", (resp: string) => {
-                        metron.templates.master.merge(resp);
-                        resolve(resp);
-                    }, (err) => {
-                        document.documentElement.append(`<h1>Error: Failed to load [${root}/${fileName}].</h1><p>${err}</p>`);
-                        reject(err);
-                    });
-                });
-                RSVP.all([ajx]).then(function () {
-                    console.log("Info: Loaded master template through Promise.");
-                }).catch(function (reason) {
-                    console.log("Error: Promise execution failed!");
+            export function loadMaster(page: string): RSVP.Promise<any> {
+                return new RSVP.Promise(function (resolve, reject) {
+                    if (master.hasMaster(page)) {
+                        let root: string = metron.tools.getMatching(page, /\{\{m:root=\"(.*)\"\}\}/g);
+                        let fileName: string = metron.tools.getMatching(page, /\{\{m:master=\"(.*)\"\}\}/g);
+                        metron.web.get(`${root}/${fileName}`, {}, "text/html", "text", (resp: string) => {
+                            metron.templates.master.merge(resp);
+                            resolve(resp);
+                        }, (err) => {
+                            document.documentElement.append(`<h1>Error: Failed to load [${root}/${fileName}].</h1><p>${err}</p>`);
+                            reject(err);
+                        });
+                    }
+                    else {
+                        resolve();
+                    }
                 });
             }
             export function merge(template: string): void {
