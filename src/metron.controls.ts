@@ -25,7 +25,7 @@ namespace metron {
                         let p: pivot = new controls.pivot(<Element>section);
                         metron.globals["pivots"][page] = p;
                         section.selectAll("[data-m-pivot]").each((idx: number, elem: Element) => {
-                            if(elem.closest("[data-m-type='pivot']").attribute("data-m-page") == null || elem.closest("[data-m-type='pivot']").attribute("data-m-page") === page) {
+                            if(elem.up("[data-m-type='pivot']").attribute("data-m-page") == null || elem.up("[data-m-type='pivot']").attribute("data-m-page") === page) {
                                 elem.addEvent("click", (e) => {
                                     e.preventDefault();
                                     let p1 = <metron.controls.pivot>metron.globals["pivots"][page];
@@ -60,7 +60,7 @@ namespace metron {
                     let i = 0;
                     let itemList = self._pivotContainer.selectAll("[data-m-segment='pivot-item']");
                     itemList.each(function (idx: number, elem: Element) {
-                        if(elem.closest("[data-m-type='pivot']").attribute("data-m-page") == null || elem.closest("[data-m-type='pivot']").attribute("data-m-page") === self._name) {
+                        if(elem.up("[data-m-type='pivot']").attribute("data-m-page") == null || elem.up("[data-m-type='pivot']").attribute("data-m-page") === self._name) {
                             self._items.push(elem);
                             if (idx == self.displayIndex) {
                                 self.init(elem);
