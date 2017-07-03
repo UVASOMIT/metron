@@ -29,7 +29,7 @@ namespace metron {
             var self = this;
             self.hasLoaded = true;
             if (self._elem != null) {
-                self._pivot = self.attachPivot(self._elem);
+                self.pivot = self.attachPivot(self._elem);
                 self._name = self._elem.attribute("data-m-page");
                 let selects = self._elem.selectAll("select");
                 self.loadSelects(selects, () => {
@@ -86,8 +86,8 @@ namespace metron {
                                     }
                                     else {
                                         self.clearForm();
-                                        if(self._pivot != null) {
-                                            (el.attribute("data-m-pivot") != null) ? self._pivot.exact(<any>el.attribute("data-m-pivot")) : self._pivot.previous();
+                                        if(self.pivot != null) {
+                                            (el.attribute("data-m-pivot") != null) ? self.pivot.exact(<any>el.attribute("data-m-pivot")) : self.pivot.previous();
                                         }
                                         if(metron.globals["lists"][self.model] != null) {
                                             metron.globals["lists"][self.model].callListing();
@@ -117,8 +117,8 @@ namespace metron {
             self.elem.selectAll("[data-m-primary]").each((idx: number, elem: Element) => {
                 (<HTMLElement>elem).val(<string><any>data[<string><any>elem.attribute("name")]);
             });
-            if(self._pivot != null) {
-                (pivotPosition != null) ? self._pivot.exact(pivotPosition) : self._pivot.previous();
+            if(self.pivot != null) {
+                (pivotPosition != null) ? self.pivot.exact(pivotPosition) : self.pivot.previous();
             }
             if(metron.globals["lists"][self.model] != null) {
                 metron.globals["lists"][self.model].callListing();

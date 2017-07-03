@@ -15,7 +15,7 @@ namespace metron {
             var self = this;
             self._elem = document.selectOne(`[data-m-type='view'][data-m-model='${self.model}']`);
             if(self._elem != null) {
-                self._pivot = self.attachPivot(self._elem);
+                self.pivot = self.attachPivot(self._elem);
                 self._name = self._elem.attribute("[data-m-page]");
                 let querystring = metron.web.querystring();
                 self.callView(<any>querystring);
