@@ -47,7 +47,7 @@ namespace metron {
             var self = this;
             self._elem = document.selectOne(`[data-m-type='list'][data-m-model='${self.model}']`);
             if (self._elem != null) {
-                self._pivot = self.attachPivot(self._elem);
+                self.pivot = self.attachPivot(self._elem);
                 self._name = self._elem.attribute("data-m-page");
                 let filterBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='filters']");
                 filterBlocks.each(function (idx: number, elem: Element) {
@@ -66,8 +66,8 @@ namespace metron {
                                         metron.globals.actions[el.attribute("data-m-action").lower()]();
                                     }
                                     else {
-                                        if(self._pivot != null) {
-                                            (el.attribute("data-m-pivot") != null) ? self._pivot.exact(<any>el.attribute("data-m-pivot")) : self._pivot.next();
+                                        if(self.pivot != null) {
+                                            (el.attribute("data-m-pivot") != null) ? self.pivot.exact(<any>el.attribute("data-m-pivot")) : self.pivot.next();
                                         }
                                         if(metron.globals["forms"][self.model] != null) {
                                             metron.globals["forms"][self.model].loadForm();
@@ -180,8 +180,8 @@ namespace metron {
                     }
                     else {
                         let parameters = metron.tools.formatOptions(elem.attribute("data-m-primary"));
-                        if(self._pivot != null) {
-                            (elem.attribute("data-m-pivot") != null) ? self._pivot.exact(<any>elem.attribute("data-m-pivot")) : self._pivot.next();
+                        if(self.pivot != null) {
+                            (elem.attribute("data-m-pivot") != null) ? self.pivot.exact(<any>elem.attribute("data-m-pivot")) : self.pivot.next();
                         }
                         if(metron.globals["forms"][self.model] != null) {
                             metron.globals["forms"][self.model].loadForm(parameters);
