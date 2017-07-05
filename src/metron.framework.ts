@@ -12,9 +12,11 @@ namespace metron {
             metron.templates.master.loadMaster(document.documentElement.outerHTML).then(() => {
                 document.selectAll("[data-m-include]").each((idx: number, elem: Element) => {
                     metron.templates.load(elem.attribute("data-m-include")).then(result => {
-                        (<HTMLElement>elem).innerHTML = result;
                         if(elem.attribute("data-m-type") != null && elem.attribute("data-m-type") == "markdown") {
-                            (<HTMLElement>elem).innerHTML = metron.templates.markdown.toHTML((<HTMLElement>elem).innerHTML);
+                            (<HTMLElement>elem).innerHTML = metron.templates.markdown.toHTML(result);
+                        }
+                        else {
+                            (<HTMLElement>elem).innerHTML = result;
                         }
                     });
                 });
