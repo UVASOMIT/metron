@@ -10,9 +10,10 @@ namespace metron {
                     let model: string = section.attribute("data-m-model");
                     if (metron.globals["lists"][model] == null) {
                         let l: list<any> = new list(model).init();
-                        metron.globals["lists"][model] = l;
                     }
                 }
+            
+
             }
             if (callback != null) {
                 callback();
@@ -24,7 +25,7 @@ namespace metron {
         private _filters: any = {};
         private _items: Array<T>;
         private _rowTemplate: string;
-        private _form: metron.form<any>;
+        private _form: string;
         public recycleBin: Array<T> = [];
         public currentPageIndex: number = 1;
         public pageSize: number = 10;
@@ -33,29 +34,25 @@ namespace metron {
         public sortOrder: string = "DateCreated";
         public sortDirection: string = "DESC";
         public fetchURL: string;
-        constructor(public model: string, public listType: string = LIST, public asscForm?: form<T>) {
+        constructor(public model: string, public listType: string = LIST) {
             super(model, listType);
             var self = this;
-            if (!isNaN(<number><any>metron.globals["config.options.pageSize"])) {
-                self.pageSize = <number><any>metron.globals["config.options.pageSize"];
+            metron.globals["lists"][model] = self;
+            if (!isNaN(<number><any>metron.config["config.options.pageSize"])) {
+                self.pageSize = <number><any>metron.config["config.options.pageSize"];
             }
-            if (asscForm != null) {
-                self._form = asscForm;
-            }
-            var qs: string = <string><any>metron.web.querystring();
-            if (qs != "") {
-                self._filters = metron.tools.formatOptions(qs, metron.OptionTypes.QUERYSTRING);
-            }
+            self.setFilters();
         }
         public init(): list<T> {
             var self = this;
             self._elem = document.selectOne(`[data-m-type='list'][data-m-model='${self.model}']`);
             if (self._elem != null) {
-                let f: metron.form<any> = (self.asscForm != null) ? self.asscForm : self.attachForm(self.model);
+                self.pivot = self.attachPivot(self._elem);
+                self._name = self._elem.attribute("data-m-page");
                 let filterBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='filters']");
                 filterBlocks.each(function (idx: number, elem: Element) {
                     let filters = elem.selectAll("[data-m-action='filter']");
-                    self.loadFilters(f, filters);
+                    self.loadFilters(filters);
                 });
                 var controlBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='controls']");
                 controlBlocks.each(function (idx: number, elem: Element) {
@@ -69,13 +66,14 @@ namespace metron {
                                         metron.globals.actions[el.attribute("data-m-action").lower()]();
                                     }
                                     else {
-                                        f.clearForm();
-                                        f.elem.attribute("data-m-state", "show");
-                                        f.elem.show();
-                                        self._elem.attribute("data-m-state", "hide");
-                                        self._elem.hide();
+                                        if(self.pivot != null) {
+                                            (el.attribute("data-m-pivot") != null) ? self.pivot.exact(<any>el.attribute("data-m-pivot")) : self.pivot.next();
+                                        }
+                                        if(metron.globals["forms"][self.model] != null) {
+                                            metron.globals["forms"][self.model].loadForm();
+                                        }
                                     }
-                                });
+                                }, true);
                                 break;
                             case "undo":
                                 el.addEvent("click", function (e) {
@@ -86,7 +84,7 @@ namespace metron {
                                     else {
                                         self.undoLast();
                                     }
-                                });
+                                }, true);
                                 el.hide();
                                 break;
                             case "download":
@@ -96,9 +94,9 @@ namespace metron {
                                         metron.globals.actions[el.attribute("data-m-action").lower()]();
                                     }
                                     else {
-                                        document.location.href = `${metron.fw.getBaseUrl()}/${self.model}/download`;
+                                        document.location.href = `${metron.fw.getAppUrl()}/${self.model}/download`;
                                     }
-                                });
+                                }, true);
                                 break;
                             default:
                                 if (metron.globals.actions != null && metron.globals.actions[el.attribute("data-m-action").lower()] != null) {
@@ -118,7 +116,7 @@ namespace metron {
             }
             return self;
         }
-        private loadFilters(f: metron.form<T>, filters: NodeListOf<Element>): void {
+        private loadFilters(filters: NodeListOf<Element>): void {
             var self = this;
             var promises: Array<any> = [];
             filters.each(function (indx: number, el: Element) {
@@ -131,9 +129,11 @@ namespace metron {
                     let ajx = new RSVP.Promise(function (resolve, reject) {
                         metron.web.get(`${metron.fw.getAPIURL(binding)}${metron.web.querystringify(options)}`, {}, null, "json", function (data: Array<T>) {
                             data.each(function (i: number, item: any) {
-                                el.append(`<option value="${item[key]}">${item[nText]}</option>`);
-                                if (f.elem != null && f.elem.selectOne(`#${self.model}_${key}`) != null && String.isNullOrEmpty(f.elem.selectOne(`#${self.model}_${key}`).attribute("data-m-binding"))) {
-                                    (<HTMLElement>f.elem.selectOne(`#${self.model}_${nm}`)).append(`<option value="${item[key]}">${item[nText]}</option>`);
+                                if(self._filters[key] != null && self._filters[key] == item[key]) {
+                                    el.append(`<option value="${item[key]}" selected="selected">${item[nText]}</option>`);
+                                }
+                                else {
+                                    el.append(`<option value="${item[key]}">${item[nText]}</option>`);
                                 }
                             });
                             resolve(data);
@@ -167,7 +167,7 @@ namespace metron {
                     (<any>self).loadFilters_m_inject();
                 }
             }).catch(function (reason) {
-                console.log("Error: Promise execution failed!");
+                console.log(`Error: Promise execution failed! ${reason}`);
             });
         }
         private applyViewEvents(): void {
@@ -179,11 +179,15 @@ namespace metron {
                         metron.globals.actions[`${self.model}_${elem.attribute("data-m-action").lower()}`](elem);
                     }
                     else {
-                        self._form.clearForm();
                         let parameters = metron.tools.formatOptions(elem.attribute("data-m-primary"));
-                        self._form.loadForm(parameters);
+                        if(self.pivot != null) {
+                            (elem.attribute("data-m-pivot") != null) ? self.pivot.exact(<any>elem.attribute("data-m-pivot")) : self.pivot.next();
+                        }
+                        if(metron.globals["forms"][self.model] != null) {
+                            metron.globals["forms"][self.model].loadForm(parameters);
+                        }
                     }
-                });
+                }, true);
             });
             document.selectAll(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='delete']`).each(function (idx: number, elem: Element) {
                 elem.removeEvent("click").addEvent("click", function (e) {
@@ -205,9 +209,9 @@ namespace metron {
                             });
                         }
                     }
-                });
+                }, true);
             });
-            document.selectAll(`[data-m-type='list'][data-m-model='${self.model}'] th[data-m-action='sort']`).each(function (idx: number, elem: Element) {
+            document.selectAll(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='sort']`).each(function (idx: number, elem: Element) {
                 elem.removeClass("pointer").addClass("pointer");
                 elem.removeEvent("click").addEvent("click", function (e) {
                     self.sortOrder = elem.attribute("data-m-col");
@@ -266,7 +270,11 @@ namespace metron {
             self.clearAlerts();
             var parameters: any = Object.extend({ PageIndex: self.currentPageIndex, PageSize: self.pageSize, _SortOrder: self.sortOrder, _SortDirection: self.sortDirection }, self._filters);
             var url = (self.fetchURL != null) ? self.fetchURL : self.model;
-            metron.web.get(`${metron.fw.getAPIURL(url)}${metron.web.querystringify(metron.tools.normalizeModelData(parameters))}`, {}, null, "json", function (data: Array<T>) {
+            var wsqs = metron.web.querystringify(metron.tools.normalizeModelData(parameters));
+            if(!self._elem.isHidden()) {
+                metron.routing.setRouteUrl(self._name, wsqs);
+            }
+            metron.web.get(`${metron.fw.getAPIURL(url)}${wsqs}`, {}, null, "json", function (data: Array<T>) {
                 self._items = data;
                 self.populateListing();
                 if ((<any>self).callListing_m_inject != null) {
@@ -326,9 +334,7 @@ namespace metron {
                 self.totalPageSize = self.calculateTotalPageSize(totalCount);
                 var startPage: number = ((parseInt(this.currentPageIndex.toString(), 10) - 5) < 1) ? 1 : (parseInt(this.currentPageIndex.toString(), 10) - 5);
                 var endPage: number = ((parseInt(this.currentPageIndex.toString(), 10) + 5) > this.totalPageSize) ? this.totalPageSize : (parseInt(this.currentPageIndex.toString(), 10) + 5);
-
                 self.setupPagingEvents(selector, filters);
-
                 document.selectAll(`${selector} > li`).each(function (idx: number, elem: Element) {
                     if (elem.first("a").attribute("title") != "Previous" && elem.first("a").attribute("title") != "Next" && elem.first("a").attribute("title") != "First" && elem.first("a").attribute("title") != "Last") {
                         elem.drop();
@@ -366,10 +372,20 @@ namespace metron {
             var self = this;
             var parent = document.selectOne(`${selector}`).parent();
             var control = parent.selectOne("[data-m-segment='controls'] [data-m-segment='paging']");
+            (<HTMLElement>control).val(<string><any>self.pageSize);
             control.addEvent("change", function (e) {
                 self.pageSize = <number><any>(<HTMLElement>control).val();
-                self.callListing();
-            });
+                metron.config["config.options.pageSize"] = self.pageSize;
+                let store = new metron.store(metron.DB, metron.DBVERSION, metron.STORE);
+                store.init().then((result) => {
+                    return store.setItem("metron.config", metron.config);
+                }).then((result) => {
+                    self.callListing();
+                }).catch((reason) => {
+                    console.log(`Error: Failed to access storage. ${reason}`);
+                    self.callListing();
+                });
+            }, true);
         }
         private calculateTotalPageSize(totalCount: number): number {
             return Math.ceil(totalCount / this.pageSize);
@@ -384,19 +400,30 @@ namespace metron {
         private getNextPage(): number {
             return (this.currentPageIndex === this.totalPageSize) ? this.currentPageIndex : (parseInt(<any>this.currentPageIndex, 10) + 1);
         }
-        private attachForm(m: string): metron.form<any> {
+        private setFilters(): void {
             var self = this;
-            var f: metron.form<T> = (metron.globals["forms"][self.model] != null) ? metron.globals["forms"][self.model] : new metron.form(m, self);
-            if (f.list == null) {
-                f.list = self;
+            var qs: string = <string><any>metron.web.querystring();
+            if (qs != "") {
+                self._filters = metron.tools.formatOptions(qs, metron.OptionTypes.QUERYSTRING);
             }
-            metron.globals["forms"][self.model] = f;
-            var elem = document.selectOne(`[data-m-type='form'][data-m-model='${m}']`);
-            if (!f.hasLoaded && elem != null && (elem.attribute("data-m-autoload") == null || elem.attribute("data-m-autoload") == "true")) {
-                f.init();
+            var hash = metron.routing.getRouteUrl(self._filters);
+            if(hash != null) {
+                self.pageSize = (hash["PageSize"] != null) ? hash["PageSize"] : self.pageSize;
+                self.currentPageIndex = (hash["PageIndex"] != null) ? hash["PageIndex"] : self.currentPageIndex;
+                self.sortOrder = (hash["_SortOrder"] != null) ? hash["_SortOrder"] : self.sortOrder;
+                self.sortDirection = (hash["_SortDirection"] != null) ? hash["_SortDirection"] : self.sortDirection;
+                delete hash["PageSize"];
+                delete hash["PageIndex"];
+                delete hash["_SortOrder"];
+                delete hash["_SortDirection"];
+                for(let h in hash) {
+                    if(hash.hasOwnProperty(h)) {
+                        if(self._filters[h] == null) {
+                            self._filters[h] = hash[h];
+                        }
+                    }
+                }
             }
-            self._form = f;
-            return self._form;
         }
         public get elem(): Element {
             return this._elem;
@@ -404,10 +431,10 @@ namespace metron {
         public set elem(f: Element) {
             this._elem = f;
         }
-        public get form(): metron.form<any> {
+        public get form(): string {
             return this._form;
         }
-        public set form(f: metron.form<any>) {
+        public set form(f: string) {
             this._form = f;
         }
         public get filters(): T {

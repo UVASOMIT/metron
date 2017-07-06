@@ -1,35 +1,71 @@
 namespace metron {
+    export var config: any = { };
     export var globals: any = {
           actions: { }
         , forms: { }
         , lists: { }
+        , pivots: { }
+        , hashLoadedFromApplication: false
     };
     export function onready(callback: Function) {
         document.addEventListener("DOMContentLoaded", function (e) {
-            if (metron.templates.master.hasMaster(document.documentElement.outerHTML)) {
-                metron.templates.master.loadMaster(document.documentElement.outerHTML);
-            }
-            document.selectAll("[data-m-type='markdown']").each((idx: number, elem: Element) => {
-                (<HTMLElement>elem).innerHTML = metron.templates.markdown.toHTML((<HTMLElement>elem).innerHTML);
-            });
-            metron.fw.loadOptionalFunctionality();
-            let root: string = metron.fw.getApplicationRoot(document.documentElement.outerHTML);
-            let ajx = new RSVP.Promise(function (resolve, reject) {
-                metron.tools.loadJSON(`${root}/metron.json`, (configData: JSON) => {
-                    for (let obj in configData) {
-                        if (globals[obj] == null) {
-                            globals[obj] = configData[obj];
+            metron.templates.master.loadMaster(document.documentElement.outerHTML).then(() => {
+                document.selectAll("[data-m-include]").each((idx: number, elem: Element) => {
+                    metron.templates.load(elem.attribute("data-m-include")).then(result => {
+                        if(elem.attribute("data-m-type") != null && elem.attribute("data-m-type") == "markdown") {
+                            (<HTMLElement>elem).innerHTML = metron.templates.markdown.toHTML(result);
                         }
-                    }
-                    resolve(configData);
+                        else {
+                            (<HTMLElement>elem).innerHTML = result;
+                        }
+                    });
                 });
+                document.selectAll("[data-m-type='markdown']").each((idx: number, elem: Element) => {
+                    if(elem.attribute("data-m-include") == null) {
+                        (<HTMLElement>elem).innerHTML = metron.templates.markdown.toHTML((<HTMLElement>elem).innerHTML);
+                    }
+                });
+                metron.fw.loadOptionalFunctionality();
             });
-            RSVP.all([ajx]).then(function () {
-                if (callback != null) {
-                    callback(e);
+
+            let root: string = metron.fw.getApplicationRoot(document.documentElement.outerHTML);
+            
+            let store = new metron.store(metron.DB, metron.DBVERSION, metron.STORE);
+            store.init().then((result) => {
+                return store.getItem("metron.config", "value");
+            }).then((result) => {
+                if(result != null) {
+                    metron.config = JSON.parse(<string><any>result);
+                    if (callback != null) {
+                            callback(e);
+                    }
                 }
-            }).catch(function (reason) {
-                console.log("Error: Promise execution failed!");
+                else {
+                    new RSVP.Promise(function (resolve, reject) {
+                        metron.tools.loadJSON(`${root}/metron.json`, (configData: JSON) => {
+                            for (let obj in configData) {
+                                if (metron.config[obj] == null) {
+                                    metron.config[obj] = configData[obj];
+                                }
+                            }
+                            store.init().then((result) => {
+                                return store.setItem("metron.config", JSON.stringify(metron.config));
+                            }).then((result) => {
+                                resolve(configData);
+                            }).catch((rs) => {
+                                console.log(`Error: Failed to access storage. ${rs}`);
+                            });
+                        });
+                    }).then(() => {
+                        if (callback != null) {
+                            callback(e);
+                        }
+                    }).catch((rsn) => {
+                        console.log(`Error: Promise execution failed! ${rsn}`);
+                    });
+                }
+            }).catch((reason) => {
+                console.log(`Error: Failed to access storage. ${reason}`);
             });
         });
     }
@@ -53,32 +89,32 @@ namespace metron {
             if (root == null) {
                 root = metron.tools.getMatching(page, /\{\{m:root=\"(.*)\"\}\}/g);
             }
-            metron.globals["config.root"] = root;
+            metron.config["config.root"] = root;
             return root;
         }
         export function getBaseUrl(): string {
-            if (metron.globals["config.baseURL"] != null) {
-                return ((<string>metron.globals["config.baseURL"]).endsWith("/")) ? (<string>metron.globals["config.baseURL"]).substr(0, (<string>metron.globals["config.baseURL"]).length - 2) : `${metron.globals["config.baseURL"]}`;
+            if (metron.config["config.baseURL"] != null) {
+                return ((<string>metron.config["config.baseURL"]).endsWith("/")) ? (<string>metron.config["config.baseURL"]).substr(0, (<string>metron.config["config.baseURL"]).length - 2) : `${metron.config["config.baseURL"]}`;
             }
             return "";
         }
         export function getAppUrl(): string {
-            if (metron.globals["config.baseURL"] != null) {
-                let url = ((<string>metron.globals["config.baseURL"]).endsWith("/")) ? (<string>metron.globals["config.baseURL"]).substr(0, (<string>metron.globals["config.baseURL"]).length - 2) : `${metron.globals["config.baseURL"]}`;
-                return (metron.globals["config.root"] != null && metron.globals["config.root"] != "") ? `${url}/${metron.globals["config.root"]}` : url;
+            if (metron.config["config.baseURL"] != null) {
+                let url = ((<string>metron.config["config.baseURL"]).endsWith("/")) ? (<string>metron.config["config.baseURL"]).substr(0, (<string>metron.config["config.baseURL"]).length - 2) : `${metron.config["config.baseURL"]}`;
+                return (metron.config["config.root"] != null && metron.config["config.root"] != "") ? `${url}/${metron.config["config.root"]}` : url;
             }
             return "";
         }
         export function getBaseAPI(): string {
-            if (metron.globals["config.api.dir"] != null) {
-                let url = ((<string>metron.globals["config.api.dir"]).endsWith("/")) ? (<string>metron.globals["config.api.dir"]).substr(0, (<string>metron.globals["config.api.dir"]).length - 2) : `${metron.globals["config.api.dir"]}`;
-                return (metron.globals["config.root"] != null && metron.globals["config.root"] != "") ? `${metron.globals["config.root"]}/${url}` : url;
+            if (metron.config["config.api.dir"] != null) {
+                let url = ((<string>metron.config["config.api.dir"]).endsWith("/")) ? (<string>metron.config["config.api.dir"]).substr(0, (<string>metron.config["config.api.dir"]).length - 2) : `${metron.config["config.api.dir"]}`;
+                return (metron.config["config.root"] != null && metron.config["config.root"] != "") ? `${metron.config["config.root"]}/${url}` : url;
             }
             return "";
         }
         export function getAPIExtension(): string {
-            if (metron.globals["config.api.extension"] != null) {
-                return metron.globals["config.api.extension"];
+            if (metron.config["config.api.extension"] != null) {
+                return metron.config["config.api.extension"];
             }
             return "";
         }
@@ -119,15 +155,35 @@ namespace metron {
             }
         }
     }
+    window.onhashchange = function() {
+        if(!metron.globals.hashLoadedFromApplication) {
+            let hasPivoted = false;
+            let section = document.selectOne("[data-m-type='pivot']");
+            if(section != null) {
+                let page = section.attribute("data-m-page");
+                if(page != null) {
+                    let p = metron.controls.getPivot(page);
+                    p.previous();
+                    hasPivoted = true;
+                }
+            }
+            if(!hasPivoted) {
+                window.location.reload(false); 
+            }
+        }
+        metron.globals.hashLoadedFromApplication = false;
+    }
     metron.onready(function (e: Event) {
         let wantsAutoload: boolean = ((document.selectOne("[data-m-autoload]") != null) && (document.selectOne("[data-m-autoload]").attribute("data-m-autoload") == "true"));
         document.selectAll("[data-m-state='hide']").each((idx: number, elem: Element) => {
             elem.hide();
         });
-        if (wantsAutoload) {
-            metron.lists.bindAll(() => {
-                metron.forms.bindAll();
-            });
-        }
+        metron.controls.pivots.bindAll(() => {
+            if (wantsAutoload) {
+                metron.lists.bindAll(() => {
+                    metron.forms.bindAll();
+                });
+            }
+        });
     });
 }

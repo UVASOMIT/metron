@@ -1,6 +1,15 @@
 namespace metron {
     export abstract class base {
+        protected _name: string;
+        public pivot: metron.controls.pivot;
         constructor(public model: string, private baseType: string) {
+        }
+        protected attachPivot(elem: Element): metron.controls.pivot {
+            if(elem.up("[data-m-type='pivot']")) {
+                let pivotName = elem.up("[data-m-type='pivot']").attribute("data-m-page");
+                return metron.controls.getPivot(pivotName);
+            }
+            return undefined;
         }
         public inject(type: string, method: string, func: Function): base {
             var self = this;
@@ -20,6 +29,11 @@ namespace metron {
                 default:
                     throw new Error("Error: Invalid injection type!");
             }
+            return self;
+        }
+        public on(method: metron.Event, func: Function, overwrite: boolean = false): base {
+            var self = this;
+            self.inject((overwrite) ? "overwrite" : "append", metron.tools.eventEnumToString(method), func);
             return self;
         }
         public action(action: string, model: string, func: Function): base {

@@ -2,84 +2,165 @@ namespace metron {
     export class store {
         private _db;
         private _hasIndexedDB: boolean = false;
-        constructor() {
+        constructor(public localDBName?: string, public localDBVersion?: number, public localDBStore?: string) {
             var self = this;
-            self.init();
+            if(localDBName == null) {
+                self.localDBName = metron.config["config.storage.localDBName"];
+            }
+            if(localDBVersion == null) {
+                self.localDBVersion = metron.config["config.storage.localDBVersion"];
+            }
+            if(localDBStore == null) {
+                self.localDBStore = metron.config["config.storage.localDBStore"];
+            }
         }
-        private init(): metron.store {
+        public init(): any {
             var self = this;
-            try {
-                (<any>window).indexedDB = (<any>window).indexedDB || (<any>window).mozIndexedDB || (<any>window).webkitIndexedDB || (<any>window).msIndexedDB;
-                (<any>window).IDBTransaction = (<any>window).IDBTransaction || (<any>window).webkitIDBTransaction || (<any>window).msIDBTransaction || { READ_WRITE: "readwrite" }; 
-                (<any>window).IDBKeyRange = (<any>window).IDBKeyRange || (<any>window).webkitIDBKeyRange || (<any>window).msIDBKeyRange;
-                if (!window.indexedDB) {
-                    console.log("Warning: IndexedDB is unavailable. Using localStorage instead.");
-                }
-                else {
-                    self._hasIndexedDB = true;
-                    let request = window.indexedDB.open(metron.globals["config.storage.localDBName"], <number><any>metron.globals["config.storage.localDBVersion"]);
-                    request.onerror = function(evt) {
-                        self._hasIndexedDB = false;
-                        console.log("Warning: Access to IndexedDB for application has been rejected.");
-                    };
-                    request.onsuccess = function(evt) {
-                        self._db = (<any>evt.target).result;
-                        let objectStore = self._db.createObjectStore("metron.store", { keyPath: "name" });
-                        objectStore.createIndex("name", "name", { unique: true });
-                        objectStore.transaction.oncomplete = function(oevt) {
-                            console.log("Info: Object store has been successfully created.");
+            var p = new RSVP.Promise(function(resolve, reject) {
+                try {
+                    (<any>window).indexedDB = (<any>window).indexedDB || (<any>window).mozIndexedDB || (<any>window).webkitIndexedDB || (<any>window).msIndexedDB;
+                    (<any>window).IDBTransaction = (<any>window).IDBTransaction || (<any>window).webkitIDBTransaction || (<any>window).msIDBTransaction || { READ_WRITE: "readwrite" }; 
+                    (<any>window).IDBKeyRange = (<any>window).IDBKeyRange || (<any>window).webkitIDBKeyRange || (<any>window).msIDBKeyRange;
+                    if (!window.indexedDB) {
+                        console.log("Warning: IndexedDB is unavailable. Using localStorage instead.");
+                    }
+                    else {
+                        self._hasIndexedDB = true;
+                        let request = window.indexedDB.open(self.localDBName, self.localDBVersion);
+                        request.onerror = function(evt) {
+                            self._hasIndexedDB = false;
+                            console.log("Warning: Access to IndexedDB for application has been rejected.");
+                        };
+                        request.onupgradeneeded = function (evt) {
+                            let objectStore = (<any>evt.currentTarget).result.createObjectStore(self.localDBStore, { keyPath: "name" });
+                            objectStore.createIndex("name", "name", { unique: true });
+                            objectStore.transaction.oncomplete = function(oevt) {
+                                console.log(`Info: Object store has been successfully created. ${objectStore}`);
+                            };
+                        };
+                        request.onsuccess = function(evt) {
+                            self._db = (<any>evt.target).result;
+                            console.log(`Info: Database initialized. ${self._db}`);
+                            resolve(self._db);
                         };
                     }
                 }
-            }
-            catch(e) {
-                console.log("Error: Failed to initialize storage.");
-            }
-            return self;
-        }
-        public getItem(s: string): any {
-            try {
-                if(localStorage != null) {
-                    return localStorage.getItem(s);
+                catch(e) {
+                    console.log(`Error: Failed to initialize storage. ${e}`);
+                    reject(e);
                 }
-            }
-            catch(e) {
-                return null;        
-            }
-            return null;
+            });
+            return p;
         }
-        public setItem(s: string, a: any): boolean {
+        private getObjectStore(): any {
+            var self = this;
             try {
-                if(localStorage != null) {
-                    localStorage.setItem(s, a);
-                    return true;
-                }
+                let transaction = self._db.transaction(self.localDBStore, "readwrite");
+                return transaction.objectStore(self.localDBStore);
             }
             catch(e) {
-                return false;
+                console.log(`Error: Failed to get object store. ${e}`);
+                return null;
             }
-            return false;
         }
-        public removeItem(s: string): boolean {
-            try {
-                if(localStorage != null) {
-                    localStorage.removeItem(s);
-                    return true;
+        public getItem(s: string, val?: string): any {
+            var self = this;
+            var p = new RSVP.Promise(function(resolve, reject) {
+                try {
+                    if(window.indexedDB != null) {
+                        let objectStore = self.getObjectStore();
+                        var request = objectStore.get(s);
+                        request.onsuccess = function(evt) {
+                            if(val != null && evt.target.result != null) {
+                                resolve(evt.target.result[val]);
+                            }
+                            else {
+                                resolve(evt.target.result);
+                            }
+                        };
+                    }
+                    else if(sessionStorage != null) {
+                        resolve(sessionStorage.getItem(s));
+                    }
                 }
-            }
-            catch(e) {
-                return false;
-            }
-            return false;
+                catch(e) {
+                    console.log(`Error: Failed to retrieve item. ${e}`);
+                    reject(e);      
+                }
+            });
+            return p;
+        }
+        public setItem(s: string, a: any): any {
+            var self = this;
+            var p = new RSVP.Promise(function(resolve, reject) {
+                try {
+                    if(window.indexedDB != null) {
+                        let objectStore = self.getObjectStore();
+                        if(!(typeof a === "string")) {
+                            let b = { };
+                            for(let prop in a) {
+                                if(a.hasOwnProperty(prop) && (!(a[prop] instanceof Function))) {
+                                    b[prop] = a[prop];
+                                }
+                            }
+                            delete b["__proto__"];
+                            a = JSON.stringify(b);
+                        }
+                        let item = { "name": s, "value": a };
+                        var request = objectStore.put(item);
+                            request.onsuccess = function(evt) {
+                                console.log(`Info: Item added to the object store. ${evt.target.result}`);
+                                resolve(evt.target.result);
+                        };
+                    }
+                    else if(sessionStorage != null) {
+                        sessionStorage.setItem(s, a);
+                        resolve(true);
+                    }
+                }
+                catch(e) {
+                    console.log(`Error: Failed to set item. ${e}`);
+                    reject(e);
+                }
+            });
+            return p;
+        }
+        public removeItem(s: string): any {
+            var self = this;
+            var p = new RSVP.Promise(function(resolve, reject) {
+                try {
+                    if(window.indexedDB != null) {
+                        var request = self.getObjectStore().delete(s);
+                        request.onsuccess = function(evt) {
+                            console.log("Info: Object deleted.");
+                            resolve(true);
+                        };
+                    }
+                    else if(sessionStorage != null) {
+                        sessionStorage.removeItem(s);
+                        resolve(true);
+                    }
+                }
+                catch(e) {
+                    console.log(`Error: Failed to remove item. ${e}`);
+                    reject(e);
+                }
+            });
+            return p;
         }
         public clearItems(): boolean {
+            var self = this;
             try {
-                if(localStorage != null) {
-                    localStorage.clear();
+                if(window.indexedDB != null) {
+                    self.getObjectStore().clear();
+                }
+                if(sessionStorage != null) {
+                    sessionStorage.clear();
                     return true;
                 }
             }
             catch(e) {
+                console.log(`Error: Failed to clear items. ${e}`);
                 return false;
             }
             return false;

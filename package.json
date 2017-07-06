@@ -1,6 +1,6 @@
 {
   "name": "metronical.metron",
-  "version": "1.0.14",
+  "version": "2.2.3",
   "description": "A lightweight library and front-end framework utilizing data attributes",
   "main": "dist/gen/metron.js",
   "homepage": "https://github.com/metronical/metron",
@@ -8,17 +8,12 @@
     "@types/awesomplete": "^1.1.4",
     "@types/rsvp": "^3.3.0",
     "awesomplete": "^1.1.1",
-    "grunt": "~0.4.5",
-    "grunt-contrib-uglify": "~0.9.1",
-    "grunt-typescript": "^0.8.0",
-    "load-grunt-parent-tasks": "^0.1.1",
-    "load-grunt-tasks": "^3.5.2",
     "milligram": "^1.3.0",
     "rsvp": "^3.5.0",
-    "typescript": "^2.3.4"
+    "typescript": "^2.4.1"
   },
   "scripts": {
-    "postinstall": "tsc -p . && grunt default"
+    "postinstall": "tsc -p ."
   },
   "repository": {
     "type": "git",

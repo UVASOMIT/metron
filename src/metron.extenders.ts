@@ -67,6 +67,7 @@ interface Element {
     addEvent: (event: string, callback: Function, overwrite?: boolean) => Element;
     show: (t?: string) => Element;
     hide: () => Element;
+    toggle:()=> Element;
     addClass: (className: string) => Element;
     removeClass: (className: string) => Element;
     asString: () => string;
@@ -74,6 +75,7 @@ interface Element {
     selectAll: (selector: string) => NodeListOf<Element>;
     hasMatches: (selector: string) => boolean;
     up: (selector: string) => Element;
+    isHidden: () => Boolean;
 }
 
 interface HTMLElement {
@@ -84,6 +86,7 @@ interface HTMLElement {
 interface XMLHttpRequest {
     responseJSON: () => JSON;
 }
+
 
 String.prototype.lower = function (): string {
     return this.toLowerCase();
@@ -517,6 +520,14 @@ Element.prototype.hide = function(): Element {
     }
     return this.attribute("style", `display:none;`);
 };
+Element.prototype.toggle = function(): Element {
+    if (!(this.offsetWidth || this.offsetHeight || this.getClientRects().length)){
+        return this.show();
+    }
+    else {
+        return this.hide();
+    }
+};
 
 Element.prototype.addClass = function(className: string) : Element {
     this.className += ` ${className}`;
@@ -531,6 +542,10 @@ Element.prototype.removeClass = function(className: string) : Element {
 
 Element.prototype.asString = function(): string {
     return this.outerHTML;
+};
+
+Element.prototype.isHidden = function(): boolean {
+    return (this.offsetParent === null);
 };
 
 HTMLElement.prototype.clean = function(): HTMLElement {
@@ -553,6 +568,8 @@ HTMLElement.prototype.val = function(val?: string): string {
         }
         else if(this.nodeName.lower() == "input") {
             switch(this.attribute("type").lower()) {
+                case "file":
+                    break;
                 case "checkbox":
                     if (<boolean><any>val) {
                         this.checked = true;
