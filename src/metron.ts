@@ -71,7 +71,7 @@ namespace metron {
         })();
     }
     export namespace web {
-        function parseUrl(url: string, obj: any): string {
+        function parseUrl(url: string, obj: any, encode: boolean = false): string {
             let paramPairs: Array<string> = [];
             if (url.contains('?')) {
                 let parts: Array<string> = url.split('?');
@@ -80,10 +80,12 @@ namespace metron {
             }
             for (let prop in obj) {
                 if (obj.hasOwnProperty(prop) && !paramPairs.contains(prop, true)) {
-                    paramPairs.push(prop + '=' + obj[prop]);
+                    let item = (encode) ? encodeURIComponent(obj[prop]) : obj[prop];
+                    paramPairs.push(prop + '=' + item);
                 }
                 else if (obj.hasOwnProperty(prop) && paramPairs.contains(prop, true)) {
-                    paramPairs[paramPairs.indexOfPartial(prop)] = prop + '=' + obj[prop];
+                    let item = (encode) ? encodeURIComponent(obj[prop]) : obj[prop];
+                    paramPairs[paramPairs.indexOfPartial(prop)] = prop + '=' +item;
                 }
             }
             return url + '?' + paramPairs.join('&');
@@ -113,8 +115,8 @@ namespace metron {
                 throw 'Error: No document object found. Environment may not contain a DOM.';
             }
         }
-        export function querystringify(obj: any): string {
-            return parseUrl("", obj);
+        export function querystringify(obj: any, encode = false): string {
+            return parseUrl("", obj, encode);
         }
         export namespace cookie {
             export function get(name: string): string {
@@ -216,7 +218,7 @@ namespace metron {
                 request.send(data);
             }
             let request: XMLHttpRequest = new XMLHttpRequest();
-            let requestData = metron.web.querystringify(data);
+            let requestData = metron.web.querystringify(data, true);
             if (requestData.startsWith("?")) {
                 requestData = requestData.substr(1);
             }
