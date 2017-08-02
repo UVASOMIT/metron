@@ -12,7 +12,7 @@
     "rsvp": "^3.6.2",
     "typescript": "^2.4.2"
   },
-  "scripts":{
+  "scripts": {
     "postinstall": "tsc -p ."
   },
   "repository": {
