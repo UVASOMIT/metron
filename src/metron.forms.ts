@@ -92,6 +92,9 @@ namespace metron {
                                         if(metron.globals["lists"][self.model] != null) {
                                             metron.globals["lists"][self.model].callListing();
                                         }
+                                        if ((<any>self).cancel_m_inject != null) {
+                                            (<any>self).cancel_m_inject();
+                                        }
                                     }
                                 }, true);
                                 break;
