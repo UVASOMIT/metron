@@ -72,6 +72,9 @@ namespace metron {
                                         if(metron.globals["forms"][self.model] != null) {
                                             metron.globals["forms"][self.model].loadForm();
                                         }
+                                        if ((<any>self).new_m_inject != null) {
+                                            (<any>self).new_m_inject();
+                                        }
                                     }
                                 }, true);
                                 break;
@@ -84,6 +87,9 @@ namespace metron {
                                     else {
                                         self.undoLast();
                                     }
+                                    if ((<any>self).undo_m_inject != null) {
+                                        (<any>self).undo_m_inject();
+                                    }
                                 }, true);
                                 el.hide();
                                 break;
@@ -95,6 +101,9 @@ namespace metron {
                                     }
                                     else {
                                         document.location.href = `${metron.fw.getAppUrl()}/${self.model}/download`;
+                                    }
+                                    if ((<any>self).download_m_inject != null) {
+                                        (<any>self).download_m_inject();
                                     }
                                 }, true);
                                 break;
@@ -186,6 +195,9 @@ namespace metron {
                         if(metron.globals["forms"][self.model] != null) {
                             metron.globals["forms"][self.model].loadForm(parameters);
                         }
+                        if ((<any>self).edit_m_inject != null) {
+                            (<any>self).edit_m_inject();
+                        }
                     }
                 }, true);
             });
@@ -211,6 +223,9 @@ namespace metron {
                                     current.up(".row").drop();
                                 }
                                 document.selectOne(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='undo']`).show();
+                                if ((<any>self).delete_m_inject != null) {
+                                    (<any>self).delete_m_inject();
+                                }
                             });
                         }
                     }

@@ -49,6 +49,12 @@ namespace metron {
         , LOAD_FORM = 7
         , LOAD_SELECTS = 8
         , CLEAR_FORM = 9
+        , NEW = 10
+        , UNDO = 11
+        , DOWNLOAD = 12
+        , EDIT = 13
+        , DELETE = 14
+        , CANCEL = 15
     }
     export const LIST = "list";
     export const LOOKUP = "lookup";

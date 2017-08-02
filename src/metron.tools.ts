@@ -146,6 +146,18 @@ namespace metron {
                     return "loadSelects";
                 case metron.Event.CLEAR_FORM:
                     return "clearForm";
+                case metron.Event.NEW:
+                    return "new";
+                case metron.Event.UNDO:
+                    return "undo";
+                case metron.Event.DOWNLOAD:
+                    return "download";
+                case metron.Event.EDIT:
+                    return "edit";
+                case metron.Event.DELETE:
+                    return "delete";
+                case metron.Event.CANCEL:
+                    return "cancel";
                 default:
                     throw new Error("Error: Invalid enum.");
             }
