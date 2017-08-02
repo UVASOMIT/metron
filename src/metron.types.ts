@@ -1,3 +1,5 @@
+declare var RSVP: any;
+
 type AjaxRequest = string | JSON | XMLDocument;
 
 namespace metron {
