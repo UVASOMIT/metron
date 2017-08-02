@@ -1,6 +1,6 @@
 {
   "name": "metronical.metron",
-  "version": "2.2.9",
+  "version": "2.2.10",
   "description": "A lightweight library and front-end framework utilizing data attributes",
   "main": "dist/gen/metron.js",
   "homepage": "https://github.com/metronical/metron",
@@ -12,14 +12,6 @@
     "@types/awesomplete": "^1.1.4",
     "@types/rsvp": "^3.3.0"
   },
-  "files": [
-    "./dist/css/app.css",
-    "./dist/gen/metron.d.ts",
-    "./dist/gen/metron.js",
-    "./dist/gen/metron.js.map",
-    "./dist/gen/metron.min.js",
-    "./dist/gen/metron.min.js.map"
-  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/metronical/metron.git"
