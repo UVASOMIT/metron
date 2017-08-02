@@ -1,4 +1,5 @@
 declare var Awesomplete: any;
+
 namespace metron {
     export namespace controls {
         export function getPivot(name: string, callback?: Function): metron.controls.pivot {

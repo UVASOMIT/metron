@@ -1,6 +1,8 @@
+/// <reference path="metron.types.ts" />
+
 namespace metron {
     export namespace templates {
-        export function load(includesFile: string): RSVP.Promise<any> {
+        export function load(includesFile: string): any {
             var url =`${metron.fw.getAppUrl()}/${includesFile}`;
             return new RSVP.Promise((resolve, reject) => {
                 metron.web.ajax(url, {}, "GET", true, "text/html", "text", (content) => {
@@ -88,7 +90,7 @@ namespace metron {
                 }
                 return false;
             }
-            export function loadMaster(page: string): RSVP.Promise<any> {
+            export function loadMaster(page: string): any {
                 return new RSVP.Promise(function (resolve, reject) {
                     if (master.hasMaster(page)) {
                         let root: string = metron.tools.getMatching(page, /\{\{m:root=\"(.*)\"\}\}/g);
