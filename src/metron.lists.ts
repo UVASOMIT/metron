@@ -216,7 +216,12 @@ namespace metron {
                                     data = data[0];
                                 }
                                 self.recycleBin.push(data);
-                                current.up("tr").drop();
+                                if(current.up("tr") != null) {
+                                    current.up("tr").drop();
+                                }
+                                else {
+                                    current.up(".row").drop();
+                                }
                                 document.selectOne(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='undo']`).show();
                                 if ((<any>self).delete_m_inject != null) {
                                     (<any>self).delete_m_inject();
