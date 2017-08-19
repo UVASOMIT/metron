@@ -7,7 +7,7 @@ namespace metron {
         , pivots: { }
         , hashLoadedFromApplication: false
     };
-    export function onready(callback: Function) {
+    export function onready(callback: Function, appName?: string) {
         document.addEventListener("DOMContentLoaded", function (e) {
             metron.templates.master.loadMaster(document.documentElement.outerHTML).then(() => {
                 document.selectAll("[data-m-include]").each((idx: number, elem: Element) => {
@@ -30,7 +30,10 @@ namespace metron {
 
             let root: string = metron.fw.getApplicationRoot(document.documentElement.outerHTML);
             
-            let store = new metron.store(metron.DB, metron.DBVERSION, metron.STORE);
+            let iDB = (appName == null) ? metron.DB : `${metron.DB}.${appName.lower()}`;
+            let iDBStore = (appName == null) ? metron.STORE : `${metron.STORE}.${appName.lower()}`;
+
+            let store = new metron.store(iDB, metron.DBVERSION, iDBStore);
             store.init().then((result) => {
                 return store.getItem("metron.config", "value");
             }).then((result) => {
@@ -69,9 +72,16 @@ namespace metron {
             });
         });
     }
-    export function load(segment: string, model: string, func: Function) {
-        if (document.selectOne(`[data-m-type="${segment}"][data-m-model="${model}"]`) != null) {
-            func();
+    export function load(segment: string, model: string, func: Function, name?: string) {
+        if(name == null) {
+            if (document.selectOne(`[data-m-type="${segment}"][data-m-model="${model}"]`) != null) {
+                func();
+            }
+        }
+        else {
+            if (document.selectOne(`[data-m-type="${segment}"][data-m-model="${model}"][data-m-page="${name}"]`) != null) {
+                func();
+            }
         }
     }
     export function ifQuerystring(callback: Function): void {
