@@ -28,19 +28,16 @@ namespace metron {
         private _form: string;
         public recycleBin: Array<T> = [];
         public currentPageIndex: number = 1;
-        public pageSize: number = 10;
+        public pageSize: number = (!isNaN(<number><any>metron.config["config.options.pageSize"])) ? <number><any>metron.config["config.options.pageSize"] : 10;
         public totalPageSize: number = 0;
         public totalCount: number = 0;
-        public sortOrder: string = "DateCreated";
-        public sortDirection: string = "DESC";
+        public sortOrder: string = (metron.config["config.options.sortOrder"] != null) ? metron.config["config.options.sortOrder"] : "DateCreated";
+        public sortDirection: string = (metron.config["config.options.sortDirection"] != null) ? metron.config["config.options.sortDirection"] : "DESC";
         public fetchURL: string;
         constructor(public model: string, public listType: string = LIST) {
             super(model, listType);
             var self = this;
             metron.globals["lists"][model] = self;
-            if (!isNaN(<number><any>metron.config["config.options.pageSize"])) {
-                self.pageSize = <number><any>metron.config["config.options.pageSize"];
-            }
             self.setFilters();
         }
         public init(): list<T> {
@@ -135,9 +132,9 @@ namespace metron {
                     let nm: string = el.attribute("name");
                     let nText: string = el.attribute("data-m-text");
                     let options: any = (el.attribute("data-m-options") != null) ? metron.tools.formatOptions(el.attribute("data-m-options")) : {};
-                    let ajx = new RSVP.Promise(function (resolve, reject) {
+                    let ajx = new RSVP.Promise((resolve, reject) => {
                         metron.web.get(`${metron.fw.getAPIURL(binding)}${metron.web.querystringify(options)}`, {}, null, "json", function (data: Array<T>) {
-                            data.each(function (i: number, item: any) {
+                            data.each((i: number, item: any) => {
                                 if(self._filters[key] != null && self._filters[key] == item[key]) {
                                     el.append(`<option value="${item[key]}" selected="selected">${item[nText]}</option>`);
                                 }
@@ -153,6 +150,7 @@ namespace metron {
                         let fil = self._filters;
                         fil[key] = ((<HTMLElement>this).val() == '') ? null : <any>(<HTMLElement>this).val();
                         self._filters = fil;
+                        self.currentPageIndex = 1;
                         self.callListing();
                     });
                 }
@@ -167,11 +165,12 @@ namespace metron {
                             fil[term.trim()] = ((<HTMLElement>parent.selectOne(`#${itm.attribute("data-m-search-for")}`)).val() == '') ? null : <any>(<HTMLElement>parent.selectOne(`#${itm.attribute("data-m-search-for")}`)).val();
                         });
                         self._filters = fil;
+                        self.currentPageIndex = 1;
                         self.callListing();
                     });
                 }
             });
-            RSVP.all(promises).then(function () {
+            RSVP.all(promises).then(() => {
                 if ((<any>self).loadFilters_m_inject != null) {
                     (<any>self).loadFilters_m_inject();
                 }
