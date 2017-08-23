@@ -1,5 +1,7 @@
 /// <reference types="rsvp" />
 
+declare var RSVP;
+
 namespace metron {
     export namespace dictionary {
         (function () {
