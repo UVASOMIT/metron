@@ -7,7 +7,7 @@ namespace metron {
         , pivots: { }
         , hashLoadedFromApplication: false
     };
-    export function onready(callback: Function) {
+    export function onready(callback: Function, appName?: string) {
         document.addEventListener("DOMContentLoaded", function (e) {
             metron.templates.master.loadMaster(document.documentElement.outerHTML).then(() => {
                 let proms = [];
@@ -32,7 +32,10 @@ namespace metron {
     
                     let root: string = metron.fw.getApplicationRoot(document.documentElement.outerHTML);
                     
-                    let store = new metron.store(metron.DB, metron.DBVERSION, metron.STORE);
+                    let iDB = (appName == null) ? metron.DB : `${metron.DB}.${appName.lower()}`;
+                    let iDBStore = (appName == null) ? metron.STORE : `${metron.STORE}.${appName.lower()}`;
+
+                    let store = new metron.store(iDB, metron.DBVERSION, iDBStore);
                     store.init().then((result) => {
                         return store.getItem("metron.config", "value");
                     }).then((result) => {
@@ -43,7 +46,7 @@ namespace metron {
                             }
                         }
                         else {
-                            new RSVP.Promise(function (resolve, reject) {
+                            new RSVP.Promise((resolve, reject) => {
                                 metron.tools.loadJSON(`${root}/metron.json`, (configData: JSON) => {
                                     for (let obj in configData) {
                                         if (metron.config[obj] == null) {
