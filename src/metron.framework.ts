@@ -7,11 +7,12 @@ namespace metron {
         , pivots: { }
         , hashLoadedFromApplication: false
     };
-    export function onready(callback: Function, appName?: string) {
+    export function onready(callback: Function) {
         document.addEventListener("DOMContentLoaded", function (e) {
             metron.templates.master.loadMaster(document.documentElement.outerHTML).then(() => {
+                let proms = [];
                 document.selectAll("[data-m-include]").each((idx: number, elem: Element) => {
-                    metron.templates.load(elem.attribute("data-m-include")).then(result => {
+                    let prom = metron.templates.load(elem.attribute("data-m-include")).then(result => {
                         if(elem.attribute("data-m-type") != null && elem.attribute("data-m-type") == "markdown") {
                             (<HTMLElement>elem).innerHTML = metron.templates.markdown.toHTML(result);
                         }
@@ -19,56 +20,56 @@ namespace metron {
                             (<HTMLElement>elem).innerHTML = result;
                         }
                     });
+                    proms.push(prom);
                 });
-                document.selectAll("[data-m-type='markdown']").each((idx: number, elem: Element) => {
-                    if(elem.attribute("data-m-include") == null) {
-                        (<HTMLElement>elem).innerHTML = metron.templates.markdown.toHTML((<HTMLElement>elem).innerHTML);
-                    }
-                });
-                metron.fw.loadOptionalFunctionality();
-            });
-
-            let root: string = metron.fw.getApplicationRoot(document.documentElement.outerHTML);
-            
-            let iDB = (appName == null) ? metron.DB : `${metron.DB}.${appName.lower()}`;
-            let iDBStore = (appName == null) ? metron.STORE : `${metron.STORE}.${appName.lower()}`;
-
-            let store = new metron.store(iDB, metron.DBVERSION, iDBStore);
-            store.init().then((result) => {
-                return store.getItem("metron.config", "value");
-            }).then((result) => {
-                if(result != null) {
-                    metron.config = JSON.parse(<string><any>result);
-                    if (callback != null) {
-                            callback(e);
-                    }
-                }
-                else {
-                    new RSVP.Promise(function (resolve, reject) {
-                        metron.tools.loadJSON(`${root}/metron.json`, (configData: JSON) => {
-                            for (let obj in configData) {
-                                if (metron.config[obj] == null) {
-                                    metron.config[obj] = configData[obj];
-                                }
-                            }
-                            store.init().then((result) => {
-                                return store.setItem("metron.config", JSON.stringify(metron.config));
-                            }).then((result) => {
-                                resolve(configData);
-                            }).catch((rs) => {
-                                console.log(`Error: Failed to access storage. ${rs}`);
-                            });
-                        });
-                    }).then(() => {
-                        if (callback != null) {
-                            callback(e);
+                RSVP.all(proms).then(() => {
+                    document.selectAll("[data-m-type='markdown']").each((idx: number, elem: Element) => {
+                        if(elem.attribute("data-m-include") == null) {
+                            (<HTMLElement>elem).innerHTML = metron.templates.markdown.toHTML((<HTMLElement>elem).innerHTML);
                         }
-                    }).catch((rsn) => {
-                        console.log(`Error: Promise execution failed! ${rsn}`);
                     });
-                }
-            }).catch((reason) => {
-                console.log(`Error: Failed to access storage. ${reason}`);
+                    metron.fw.loadOptionalFunctionality();
+    
+                    let root: string = metron.fw.getApplicationRoot(document.documentElement.outerHTML);
+                    
+                    let store = new metron.store(metron.DB, metron.DBVERSION, metron.STORE);
+                    store.init().then((result) => {
+                        return store.getItem("metron.config", "value");
+                    }).then((result) => {
+                        if(result != null) {
+                            metron.config = JSON.parse(<string><any>result);
+                            if (callback != null) {
+                                    callback(e);
+                            }
+                        }
+                        else {
+                            new RSVP.Promise(function (resolve, reject) {
+                                metron.tools.loadJSON(`${root}/metron.json`, (configData: JSON) => {
+                                    for (let obj in configData) {
+                                        if (metron.config[obj] == null) {
+                                            metron.config[obj] = configData[obj];
+                                        }
+                                    }
+                                    store.init().then((result) => {
+                                        return store.setItem("metron.config", JSON.stringify(metron.config));
+                                    }).then((result) => {
+                                        resolve(configData);
+                                    }).catch((rs) => {
+                                        console.log(`Error: Failed to access storage. ${rs}`);
+                                    });
+                                });
+                            }).then(() => {
+                                if (callback != null) {
+                                    callback(e);
+                                }
+                            }).catch((rsn) => {
+                                console.log(`Error: Promise execution failed! ${rsn}`);
+                            });
+                        }
+                    }).catch((reason) => {
+                        console.log(`Error: Failed to access storage. ${reason}`);
+                    });
+                });
             });
         });
     }
