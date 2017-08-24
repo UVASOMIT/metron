@@ -15,6 +15,7 @@ namespace metron {
                     let prom = metron.templates.load(elem.attribute("data-m-include")).then(result => {
                         if(elem.attribute("data-m-type") != null && elem.attribute("data-m-type") == "markdown") {
                             (<HTMLElement>elem).innerHTML = metron.templates.markdown.toHTML(result);
+                            (<HTMLElement>elem).show();
                         }
                         else {
                             (<HTMLElement>elem).innerHTML = result;
@@ -26,6 +27,7 @@ namespace metron {
                     document.selectAll("[data-m-type='markdown']").each((idx: number, elem: Element) => {
                         if(elem.attribute("data-m-include") == null) {
                             (<HTMLElement>elem).innerHTML = metron.templates.markdown.toHTML((<HTMLElement>elem).innerHTML);
+                            (<HTMLElement>elem).show();
                         }
                     });
                     metron.fw.loadOptionalFunctionality();
