@@ -51,34 +51,42 @@ namespace metron {
             }
         }
         export namespace markdown {
-            export function toHTML(src: string): string { //Adapted from Mathieu 'p01' Henri: https://github.com/p01/mmd.js/blob/master/mmd.js
+            export function toHTML(src: string): string {
                 let html: string = "";
                 function escape(text: string): string {
                     return new Option(text).innerHTML;
                 }
                 function inlineEscape(str: string) {
-                    return escape(str)
-                        .replace(/!\[([^\]]*)]\(([^(]+)\)/g, '<img alt="$1" src="$2" />')
-                        .replace(/\[([^\]]+)]\(([^(]+)\)/g, (<any>'$1').link('$2'))
-                        .replace(/`([^`]+)`/g, '<code>$1</code>')
-                        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-                        .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-                        .replace(/  \n/g, '<br />')
+                    return str.replace(/!\[([^\]]*)]\(([^(]+)\)/g, '<img alt="$1" src="$2" />')
+                            .replace(/\[([^\]]+)]\(([^(]+)\)/g, (<any>'$1').link('$2'))
+                            .replace(/`([^`]+)`/g, (match, p1, offset, string) => {
+                                return `<code>${escape(p1)}</code>`
+                            })
+                            .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                            .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+                            .replace(/  \n/g, '<br />')
                 }
-
-                src.replace(/&gt;/g, ">").replace(/^\s+|\r|\s+$/g, "").replace(/\t/g, "    ").split(/\n\n+/).forEach(function (b: string, f: number, R: Array<string>) {
-                    f = <number><any>b[0];
-                    R = {
+                function processWrappedMarkdown(prependType: Array<string>, line: string): string {
+                    return prependType[1] + ("\n" + line)
+                        .split(prependType[0])
+                        .slice(1)
+                        .map(prependType[3] ? escape : inlineEscape)
+                        .join(prependType[3] || "</li>\n<li>") + prependType[2];
+                }
+                function processSemanticMarkdown(char: any, line: string): string {
+                    return (char == "#")
+                        ? ("<h" + (char = line.indexOf(" ")) + ">" + inlineEscape(line.slice(char + 1)) + "</h" + char + ">")
+                        : (char == "<" ? line : "<p>" + inlineEscape(line) + "</p>")
+                }
+                src.replace(/&gt;/g, ">").replace(/^\s+|\r|\s+$/g, "").replace(/\t/g, "    ").split(/\n\n+/).forEach((line: string, idx: number, lines: Array<string>) => {
+                    let char = line[0];
+                    let prependType = {
                         '*': [/\n\* /, "<ul><li>", "</li></ul>"],
                         '1': [/\n[1-9]\d*\.? /, "<ol><li>", "</li></ol>"],
                         ' ': [/\n    /, "<pre><code>", "</pre></code>", "\n"],
                         '>': [/\n> /, "<blockquote>", "</blockquote>", "\n"],
-                    }[f];
-                    html += R ? R[1] + ("\n" + b)
-                        .split(R[0])
-                        .slice(1)
-                        .map(R[3] ? escape : inlineEscape)
-                        .join(R[3] || "</li>\n<li>") + R[2] : <string><any>f == "#" ? "<h" + (f = b.indexOf(" ")) + ">" + inlineEscape(b.slice(f + 1)) + "</h" + f + ">" : <string><any>f == "<" ? b : "<p>" + inlineEscape(b) + "</p>";
+                    }[char];
+                    html += prependType ? processWrappedMarkdown(prependType, line) : processSemanticMarkdown(char, line);
                 });
                 return html;
             }
