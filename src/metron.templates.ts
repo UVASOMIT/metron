@@ -43,7 +43,7 @@ namespace metron {
                         return metron.tools.formatDateTime(<string><any>val);
                     case "time":
                         return metron.tools.formatTime(<Date><any>val);
-                    case "formatMessage":
+                    case "formatmessage":
                         return metron.tools.formatMessage(<string><any>val, options["length"]);
                     default:
                         return metron.globals[type](<Element>val, options);
