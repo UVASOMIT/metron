@@ -144,29 +144,31 @@ namespace metron {
             public removePreEvent(name: string) {
                 delete this._preEventFunctions[name];
             }
-            public next(): boolean {
+            public next(): void {
                 var self = this;
                 if (!self._item.next) {
-                    console.log("Couldn't find next pivot");
-                    return false;
+                    console.log("Couldn't find next pivot. Using last pivot instead.");
+                    self._item.next = self._items[self._items.length - 1];
                 }
                 self.applyPreEvent(self._item.current);
-                self._item.current.hide();
+                for (let i = 0; i < self._items.length; i++) {
+                    self._items[i].hide();
+                }
                 self._item.next.show();
                 self.init(self._item.next);
-                return true;
             }
-            public previous(): boolean {
+            public previous(): void {
                 var self = this;
                 if (!self._item.previous) {
-                    console.log("Couldn't find previous pivot");
-                    return false;
+                    console.log("Couldn't find previous pivot. Using first pivot instead.");
+                    self._item.previous = self._items[0];
                 }
                 self.applyPreEvent(self._item.current);
-                self._item.current.hide();
+                for (let i = 0; i < self._items.length; i++) {
+                    self._items[i].hide();
+                }
                 self._item.previous.show();
                 self.init(self._item.previous);
-                return true;
             }
             public exact(target: number | string): boolean {
                 var self = this;

@@ -290,7 +290,7 @@ namespace metron {
             var parameters: any = Object.extend({ PageIndex: self.currentPageIndex, PageSize: self.pageSize, _SortOrder: self.sortOrder, _SortDirection: self.sortDirection }, self._filters);
             var url = (self.fetchURL != null) ? self.fetchURL : self.model;
             var wsqs = metron.web.querystringify(metron.tools.normalizeModelData(parameters));
-            if(!self._elem.isHidden()) {
+            if(!self._elem.isHidden()) { //This might not be needed anymore since we check the app name against the hash in setRouteUrl()
                 metron.routing.setRouteUrl(self._name, wsqs);
             }
             metron.web.get(`${metron.fw.getAPIURL(url)}${wsqs}`, {}, null, "json", function (data: Array<T>) {
@@ -421,24 +421,28 @@ namespace metron {
         }
         private setFilters(): void {
             var self = this;
-            var qs: string = <string><any>metron.web.querystring();
-            if (qs != "") {
-                self._filters = metron.tools.formatOptions(qs, metron.OptionTypes.QUERYSTRING);
-            }
-            var hash = metron.routing.getRouteUrl(self._filters);
-            if(hash != null) {
-                self.pageSize = (hash["PageSize"] != null) ? hash["PageSize"] : self.pageSize;
-                self.currentPageIndex = (hash["PageIndex"] != null) ? hash["PageIndex"] : self.currentPageIndex;
-                self.sortOrder = (hash["_SortOrder"] != null) ? hash["_SortOrder"] : self.sortOrder;
-                self.sortDirection = (hash["_SortDirection"] != null) ? hash["_SortDirection"] : self.sortDirection;
-                delete hash["PageSize"];
-                delete hash["PageIndex"];
-                delete hash["_SortOrder"];
-                delete hash["_SortDirection"];
-                for(let h in hash) {
-                    if(hash.hasOwnProperty(h)) {
-                        if(self._filters[h] == null) {
-                            self._filters[h] = hash[h];
+            var elem = (self._elem != null) ? self._elem : document.selectOne(`[data-m-type='list'][data-m-model='${self.model}']`);
+            var page = (elem != null) ? elem.attribute("data-m-page") : null;
+            if (metron.routing.getRouteName() == page) {
+                let qs: string = <string><any>metron.web.querystring();
+                if (qs != "") {
+                    self._filters = metron.tools.formatOptions(qs, metron.OptionTypes.QUERYSTRING);
+                }
+                let hash = metron.routing.getRouteUrl(self._filters);
+                if (hash != null) {
+                    self.pageSize = (hash["PageSize"] != null) ? hash["PageSize"] : self.pageSize;
+                    self.currentPageIndex = (hash["PageIndex"] != null) ? hash["PageIndex"] : self.currentPageIndex;
+                    self.sortOrder = (hash["_SortOrder"] != null) ? hash["_SortOrder"] : self.sortOrder;
+                    self.sortDirection = (hash["_SortDirection"] != null) ? hash["_SortDirection"] : self.sortDirection;
+                    delete hash["PageSize"];
+                    delete hash["PageIndex"];
+                    delete hash["_SortOrder"];
+                    delete hash["_SortDirection"];
+                    for (let h in hash) {
+                        if (hash.hasOwnProperty(h)) {
+                            if (self._filters[h] == null) {
+                                self._filters[h] = hash[h];
+                            }
                         }
                     }
                 }

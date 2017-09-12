@@ -33,11 +33,15 @@ namespace metron {
                 self._name = self._elem.attribute("data-m-page");
                 let selects = self._elem.selectAll("select");
                 self.loadSelects(selects, () => {
-                    var qs: string = <string><any>metron.web.querystring();
+                    let parameters: any;
+                    let qs: string = <string><any>metron.web.querystring();
                     if (qs != "") {
-                        let parameters = metron.tools.formatOptions(qs, metron.OptionTypes.QUERYSTRING);
-                        self.loadForm(parameters);
+                        parameters = metron.tools.formatOptions(qs, metron.OptionTypes.QUERYSTRING);
                     }
+                    else if (metron.globals.firstLoad) {
+                        parameters = metron.routing.getRouteUrl();
+                    }
+                    self.loadForm(parameters);
                 });
                 let controlBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='controls']");
                 controlBlocks.each((idx: number, elem: Element) => {
@@ -133,7 +137,9 @@ namespace metron {
         public loadForm(parameters?: any): void {
             var self = this;
             self.clearForm();
-            metron.routing.setRouteUrl(self._name, metron.web.querystringify(parameters), true);
+            if (!self._elem.isHidden()) {
+                metron.routing.setRouteUrl(self._name, metron.web.querystringify(parameters), true);
+            }
             if(parameters != null) {
                 metron.web.get(`${metron.fw.getAPIURL(self.model)}${metron.web.querystringify(parameters)}`, parameters, null, "json", function (data: T) {
                     if (data instanceof Array) {
