@@ -198,6 +198,25 @@ namespace metron {
         metron.globals.hashLoadedFromApplication = false;
     }
     metron.onready(function (e: Event) {
+        function recursePivot(elem: Element): void {
+            if (elem != null) {
+                elem.show();
+                let route = elem.attribute("data-m-page");
+                let pivot = elem.up("[data-m-type='pivot']");
+                let pivotPageName = pivot.attribute("data-m-page");
+                elem.up("[data-m-type='pivot']").selectAll("[data-m-segment='pivot-item']").each((idx: number, el: Element) => {
+                    if(el.up("[data-m-type='pivot']").attribute("data-m-page") === pivotPageName) {
+                        if (el.attribute("data-m-page") != route) {
+                            el.hide();
+                        }
+                    }
+                });
+                let parent = elem.parent().up("[data-m-segment='pivot-item']");
+                if(parent != null) {
+                    recursePivot(parent);
+                }
+            }
+        }
         let wantsAutoload: boolean = ((document.selectOne("[data-m-autoload]") != null) && (document.selectOne("[data-m-autoload]").attribute("data-m-autoload") == "true"));
         document.selectAll("[data-m-state='hide']").each((idx: number, elem: Element) => {
             elem.hide();
@@ -205,17 +224,8 @@ namespace metron {
         metron.controls.pivots.bindAll(() => {
             let route = metron.routing.getRouteName();
             if (route != null) {
-                let page = document.querySelector(`[data-m-page="${route}"]`);
-                if (page != null) {
-                    page.show();
-                    document.querySelectorAll("[data-m-type]").each((idx: number, elem: Element) => {
-                        if (elem.attribute("data-m-type") == "list" || elem.attribute("data-m-type") == "form" || elem.attribute("data-m-type") == "view") {
-                            if (elem.attribute("data-m-page") != route) {
-                                elem.hide();
-                            }
-                        }
-                    });
-                }
+                let page = document.selectOne(`[data-m-segment='pivot-item'][data-m-page="${route}"]`);
+                recursePivot(page);
             }
             if (wantsAutoload) {
                 metron.lists.bindAll(() => {
