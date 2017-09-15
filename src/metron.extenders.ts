@@ -41,7 +41,6 @@ interface Array<T> {
 }
 
 interface Object {
-    getObjName: () => string;
     extend: (dest: any, src: any) => any;
 }
 
@@ -363,12 +362,6 @@ Array.prototype.toObjectArray = function (objName: string): Array<any> {
     else {
         return this;
     }
-};
-
-Object.prototype.getObjName = function (): string {
-    let regex: RegExp = /function (.{1,})\(/;
-    let results: RegExpExecArray = regex.exec((this).constructor.toString());
-    return (results && results.length > 1) ? results[1] : "";
 };
 
 (<any>Object).extend = function(dest: any, src: any) {
