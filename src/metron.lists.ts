@@ -423,7 +423,8 @@ namespace metron {
             var self = this;
             var elem = (self._elem != null) ? self._elem : document.selectOne(`[data-m-type='list'][data-m-model='${self.model}']`);
             var page = (elem != null) ? elem.attribute("data-m-page") : null;
-            if (metron.routing.getRouteName() == page) {
+            var routeName = metron.routing.getRouteName();
+            if (routeName == null || routeName == page) {
                 let qs: string = <string><any>metron.web.querystring();
                 if (qs != "") {
                     self._filters = metron.tools.formatOptions(qs, metron.OptionTypes.QUERYSTRING);
