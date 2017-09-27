@@ -140,7 +140,7 @@ namespace metron {
             if (!self._elem.isHidden()) {
                 metron.routing.setRouteUrl(self._name, metron.web.querystringify(parameters), true);
             }
-            if(parameters != null) {
+            if (parameters != null && Object.keys(parameters).length > 0) {
                 metron.web.get(`${metron.fw.getAPIURL(self.model)}${metron.web.querystringify(parameters)}`, parameters, null, "json", function (data: T) {
                     if (data instanceof Array) {
                         data = data[0];
