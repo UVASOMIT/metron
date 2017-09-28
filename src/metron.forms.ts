@@ -18,12 +18,32 @@ namespace metron {
     export class form<T> extends base {
         private _elem: Element;
         private _fields: Array<string> = [];
+        private _defaults: Array<any> = (metron.config["config.forms.defaults"] != null) ? metron.config["config.forms.defaults"] : [];
         public hasLoaded: boolean = false;
         constructor(public model: string) {
             super(model, FORM);
             var self = this;
             metron.globals["forms"][model] = self;
             self._elem = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
+        }
+        private loadDefaults(): void {
+            var self = this;
+            if (self._defaults != null && self._defaults.length > 0) {
+                for (let i = 0; i < self._defaults.length; i++) {
+                    let pair: any = self._defaults[i];
+                    for (let k in pair) {
+                        if (pair.hasOwnProperty(k)) {
+                            let v = pair[k];
+                            if ((<string>k).contains(`${self.model}_`) && document.selectOne(`#${k}`) != null) {
+                                (<HTMLElement>document.selectOne(`#${k}`)).val(v);
+                            }
+                            else if (!(<string>k).contains("_") && document.selectOne(`#${self.model}_${k}`) != null) {
+                                (<HTMLElement>document.selectOne(`#${self.model}_${k}`)).val(v);
+                            }
+                        }
+                    }
+                }
+            }
         }
         public init(toggle: boolean = false): form<T> {
             var self = this;
@@ -34,14 +54,15 @@ namespace metron {
                 let selects = self._elem.selectAll("select");
                 self.loadSelects(selects, () => {
                     let parameters: any;
+                    let defaults: any;
                     let qs: string = <string><any>metron.web.querystring();
                     if (qs != "") {
-                        parameters = metron.tools.formatOptions(qs, metron.OptionTypes.QUERYSTRING);
+                        defaults = metron.tools.formatOptions(qs, metron.OptionTypes.QUERYSTRING);
                     }
-                    else if (metron.globals.firstLoad) {
+                    if (metron.globals.firstLoad) {
                         parameters = metron.routing.getRouteUrl();
                     }
-                    self.loadForm(parameters);
+                    self.loadForm(parameters, defaults);
                 });
                 let controlBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='controls']");
                 controlBlocks.each((idx: number, elem: Element) => {
@@ -93,7 +114,7 @@ namespace metron {
                                         if(self.pivot != null) {
                                             (el.attribute("data-m-pivot") != null) ? self.pivot.exact(<any>el.attribute("data-m-pivot")) : self.pivot.previous();
                                         }
-                                        if(metron.globals["lists"][self.model] != null) {
+                                        if (metron.globals["lists"][self.model] != null) {
                                             metron.globals["lists"][self.model].callListing();
                                         }
                                         if ((<any>self).cancel_m_inject != null) {
@@ -127,18 +148,25 @@ namespace metron {
             if(self.pivot != null) {
                 (pivotPosition != null) ? self.pivot.exact(pivotPosition) : self.pivot.previous();
             }
-            if(metron.globals["lists"][self.model] != null) {
+            if (metron.globals["lists"][self.model] != null) {
                 metron.globals["lists"][self.model].callListing();
             }
             if ((<any>self).save_m_inject != null) {
                 (<any>self).save_m_inject();
             }
         }
-        public loadForm(parameters?: any): void {
+        public loadForm(parameters?: any, defaults?: any): void {
             var self = this;
             self.clearForm();
             if (!self._elem.isHidden()) {
                 metron.routing.setRouteUrl(self._name, metron.web.querystringify(parameters), true);
+            }
+            if (defaults != null) {
+                for (let prop in defaults) {
+                    if (defaults.hasOwnProperty(prop) && defaults[prop] != null && document.selectOne(`#${self.model}_${prop}`) != null) {
+                        (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(<any>defaults[prop]);
+                    }
+                }
             }
             if (parameters != null && Object.keys(parameters).length > 0) {
                 metron.web.get(`${metron.fw.getAPIURL(self.model)}${metron.web.querystringify(parameters)}`, parameters, null, "json", function (data: T) {
@@ -207,6 +235,7 @@ namespace metron {
                 (<HTMLElement>elem).val("");
             });
             self.clearAlerts();
+            self.loadDefaults();
             if (callback != null) {
                 callback();
             }
