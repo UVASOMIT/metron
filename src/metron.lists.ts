@@ -59,8 +59,8 @@ namespace metron {
                             case "new":
                                 el.addEvent("click", function (e) {
                                     e.preventDefault();
-                                    if (metron.globals.actions != null && metron.globals.actions[el.attribute("data-m-action").lower()] != null) { //Refactor getting the action overrides
-                                        metron.globals.actions[el.attribute("data-m-action").lower()]();
+                                    if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`] != null) { //Refactor getting the action overrides
+                                        metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`]();
                                     }
                                     else {
                                         if(self.pivot != null) {
@@ -78,8 +78,8 @@ namespace metron {
                             case "undo":
                                 el.addEvent("click", function (e) {
                                     e.preventDefault();
-                                    if (metron.globals.actions != null && metron.globals.actions[el.attribute("data-m-action").lower()] != null) {
-                                        metron.globals.actions[el.attribute("data-m-action").lower()]();
+                                    if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`] != null) {
+                                        metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`]();
                                     }
                                     else {
                                         self.undoLast();
@@ -93,8 +93,8 @@ namespace metron {
                             case "download":
                                 el.addEvent("click", function (e) {
                                     e.preventDefault();
-                                    if (metron.globals.actions != null && metron.globals.actions[el.attribute("data-m-action").lower()] != null) {
-                                        metron.globals.actions[el.attribute("data-m-action").lower()]();
+                                    if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`] != null) {
+                                        metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`]();
                                     }
                                     else {
                                         document.location.href = `${metron.fw.getAppUrl()}/${self.model}/download`;
@@ -105,10 +105,10 @@ namespace metron {
                                 }, true);
                                 break;
                             default:
-                                if (metron.globals.actions != null && metron.globals.actions[el.attribute("data-m-action").lower()] != null) {
+                                if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`] != null) {
                                     el.addEvent("click", function (e) {
                                         e.preventDefault();
-                                        metron.globals.actions[el.attribute("data-m-action").lower()]();
+                                        metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`]();
                                     });
                                 }
                                 break;
@@ -424,21 +424,21 @@ namespace metron {
             var elem = (self._elem != null) ? self._elem : document.selectOne(`[data-m-type='list'][data-m-model='${self.model}']`);
             var page = (elem != null) ? elem.attribute("data-m-page") : null;
             var routeName = metron.routing.getRouteName();
-            if (routeName == null || routeName == page) {
-                let qs: string = <string><any>metron.web.querystring();
-                if (qs != "") {
-                    self._filters = metron.tools.formatOptions(qs, metron.OptionTypes.QUERYSTRING);
-                }
-                let hash = metron.routing.getRouteUrl(self._filters);
-                if (hash != null) {
-                    self.pageSize = (hash["PageSize"] != null) ? hash["PageSize"] : self.pageSize;
-                    self.currentPageIndex = (hash["PageIndex"] != null) ? hash["PageIndex"] : self.currentPageIndex;
-                    self.sortOrder = (hash["_SortOrder"] != null) ? hash["_SortOrder"] : self.sortOrder;
-                    self.sortDirection = (hash["_SortDirection"] != null) ? hash["_SortDirection"] : self.sortDirection;
-                    delete hash["PageSize"];
-                    delete hash["PageIndex"];
-                    delete hash["_SortOrder"];
-                    delete hash["_SortDirection"];
+            var qs: string = <string><any>metron.web.querystring();
+            if (qs != "") {
+                self._filters = metron.tools.formatOptions(qs, metron.OptionTypes.QUERYSTRING);
+            }
+            let hash = metron.routing.getRouteUrl(self._filters);
+            if (hash != null) {
+                self.pageSize = (hash["PageSize"] != null) ? hash["PageSize"] : self.pageSize;
+                self.currentPageIndex = (hash["PageIndex"] != null) ? hash["PageIndex"] : self.currentPageIndex;
+                self.sortOrder = (hash["_SortOrder"] != null) ? hash["_SortOrder"] : self.sortOrder;
+                self.sortDirection = (hash["_SortDirection"] != null) ? hash["_SortDirection"] : self.sortDirection;
+                delete hash["PageSize"];
+                delete hash["PageIndex"];
+                delete hash["_SortOrder"];
+                delete hash["_SortDirection"];
+                if (routeName == null || routeName == page) {
                     for (let h in hash) {
                         if (hash.hasOwnProperty(h)) {
                             if (self._filters[h] == null) {

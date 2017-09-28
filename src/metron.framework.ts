@@ -58,6 +58,7 @@ namespace metron {
                                                 metron.config[obj] = configData[obj];
                                             }
                                         }
+                                        metron.config["config.baseURL"] = `${document.location.protocol}//${document.location.host}`;
                                         store.init().then((result) => {
                                             return store.setItem("metron.config", JSON.stringify(metron.config));
                                         }).then((result) => {
