@@ -28,19 +28,16 @@ namespace metron {
         private _form: string;
         public recycleBin: Array<T> = [];
         public currentPageIndex: number = 1;
-        public pageSize: number = 10;
+        public pageSize: number = (!isNaN(<number><any>metron.config["config.options.pageSize"])) ? <number><any>metron.config["config.options.pageSize"] : 10;
         public totalPageSize: number = 0;
         public totalCount: number = 0;
-        public sortOrder: string = "DateCreated";
-        public sortDirection: string = "DESC";
+        public sortOrder: string = (metron.config["config.options.sortOrder"] != null) ? metron.config["config.options.sortOrder"] : "DateCreated";
+        public sortDirection: string = (metron.config["config.options.sortDirection"] != null) ? metron.config["config.options.sortDirection"] : "DESC";
         public fetchURL: string;
         constructor(public model: string, public listType: string = LIST) {
             super(model, listType);
             var self = this;
             metron.globals["lists"][model] = self;
-            if (!isNaN(<number><any>metron.config["config.options.pageSize"])) {
-                self.pageSize = <number><any>metron.config["config.options.pageSize"];
-            }
             self.setFilters();
         }
         public init(): list<T> {
@@ -62,8 +59,8 @@ namespace metron {
                             case "new":
                                 el.addEvent("click", function (e) {
                                     e.preventDefault();
-                                    if (metron.globals.actions != null && metron.globals.actions[el.attribute("data-m-action").lower()] != null) { //Refactor getting the action overrides
-                                        metron.globals.actions[el.attribute("data-m-action").lower()]();
+                                    if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`] != null) { //Refactor getting the action overrides
+                                        metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`]();
                                     }
                                     else {
                                         if(self.pivot != null) {
@@ -72,17 +69,23 @@ namespace metron {
                                         if(metron.globals["forms"][self.model] != null) {
                                             metron.globals["forms"][self.model].loadForm();
                                         }
+                                        if ((<any>self).new_m_inject != null) {
+                                            (<any>self).new_m_inject();
+                                        }
                                     }
                                 }, true);
                                 break;
                             case "undo":
                                 el.addEvent("click", function (e) {
                                     e.preventDefault();
-                                    if (metron.globals.actions != null && metron.globals.actions[el.attribute("data-m-action").lower()] != null) {
-                                        metron.globals.actions[el.attribute("data-m-action").lower()]();
+                                    if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`] != null) {
+                                        metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`]();
                                     }
                                     else {
                                         self.undoLast();
+                                    }
+                                    if ((<any>self).undo_m_inject != null) {
+                                        (<any>self).undo_m_inject();
                                     }
                                 }, true);
                                 el.hide();
@@ -90,19 +93,22 @@ namespace metron {
                             case "download":
                                 el.addEvent("click", function (e) {
                                     e.preventDefault();
-                                    if (metron.globals.actions != null && metron.globals.actions[el.attribute("data-m-action").lower()] != null) {
-                                        metron.globals.actions[el.attribute("data-m-action").lower()]();
+                                    if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`] != null) {
+                                        metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`]();
                                     }
                                     else {
                                         document.location.href = `${metron.fw.getAppUrl()}/${self.model}/download`;
                                     }
+                                    if ((<any>self).download_m_inject != null) {
+                                        (<any>self).download_m_inject();
+                                    }
                                 }, true);
                                 break;
                             default:
-                                if (metron.globals.actions != null && metron.globals.actions[el.attribute("data-m-action").lower()] != null) {
+                                if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`] != null) {
                                     el.addEvent("click", function (e) {
                                         e.preventDefault();
-                                        metron.globals.actions[el.attribute("data-m-action").lower()]();
+                                        metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`]();
                                     });
                                 }
                                 break;
@@ -126,9 +132,9 @@ namespace metron {
                     let nm: string = el.attribute("name");
                     let nText: string = el.attribute("data-m-text");
                     let options: any = (el.attribute("data-m-options") != null) ? metron.tools.formatOptions(el.attribute("data-m-options")) : {};
-                    let ajx = new RSVP.Promise(function (resolve, reject) {
+                    let ajx = new RSVP.Promise((resolve, reject) => {
                         metron.web.get(`${metron.fw.getAPIURL(binding)}${metron.web.querystringify(options)}`, {}, null, "json", function (data: Array<T>) {
-                            data.each(function (i: number, item: any) {
+                            data.each((i: number, item: any) => {
                                 if(self._filters[key] != null && self._filters[key] == item[key]) {
                                     el.append(`<option value="${item[key]}" selected="selected">${item[nText]}</option>`);
                                 }
@@ -144,6 +150,7 @@ namespace metron {
                         let fil = self._filters;
                         fil[key] = ((<HTMLElement>this).val() == '') ? null : <any>(<HTMLElement>this).val();
                         self._filters = fil;
+                        self.currentPageIndex = 1;
                         self.callListing();
                     });
                 }
@@ -158,11 +165,12 @@ namespace metron {
                             fil[term.trim()] = ((<HTMLElement>parent.selectOne(`#${itm.attribute("data-m-search-for")}`)).val() == '') ? null : <any>(<HTMLElement>parent.selectOne(`#${itm.attribute("data-m-search-for")}`)).val();
                         });
                         self._filters = fil;
+                        self.currentPageIndex = 1;
                         self.callListing();
                     });
                 }
             });
-            RSVP.all(promises).then(function () {
+            RSVP.all(promises).then(() => {
                 if ((<any>self).loadFilters_m_inject != null) {
                     (<any>self).loadFilters_m_inject();
                 }
@@ -186,6 +194,9 @@ namespace metron {
                         if(metron.globals["forms"][self.model] != null) {
                             metron.globals["forms"][self.model].loadForm(parameters);
                         }
+                        if ((<any>self).edit_m_inject != null) {
+                            (<any>self).edit_m_inject();
+                        }
                     }
                 }, true);
             });
@@ -204,8 +215,16 @@ namespace metron {
                                     data = data[0];
                                 }
                                 self.recycleBin.push(data);
-                                current.up("tr").drop();
+                                if(current.up("tr") != null) {
+                                    current.up("tr").drop();
+                                }
+                                else {
+                                    current.up(".row").drop();
+                                }
                                 document.selectOne(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='undo']`).show();
+                                if ((<any>self).delete_m_inject != null) {
+                                    (<any>self).delete_m_inject();
+                                }
                             });
                         }
                     }
@@ -271,7 +290,7 @@ namespace metron {
             var parameters: any = Object.extend({ PageIndex: self.currentPageIndex, PageSize: self.pageSize, _SortOrder: self.sortOrder, _SortDirection: self.sortDirection }, self._filters);
             var url = (self.fetchURL != null) ? self.fetchURL : self.model;
             var wsqs = metron.web.querystringify(metron.tools.normalizeModelData(parameters));
-            if(!self._elem.isHidden()) {
+            if(!self._elem.isHidden()) { //This might not be needed anymore since we check the app name against the hash in setRouteUrl()
                 metron.routing.setRouteUrl(self._name, wsqs);
             }
             metron.web.get(`${metron.fw.getAPIURL(url)}${wsqs}`, {}, null, "json", function (data: Array<T>) {
@@ -402,12 +421,15 @@ namespace metron {
         }
         private setFilters(): void {
             var self = this;
+            var elem = (self._elem != null) ? self._elem : document.selectOne(`[data-m-type='list'][data-m-model='${self.model}']`);
+            var page = (elem != null) ? elem.attribute("data-m-page") : null;
+            var routeName = metron.routing.getRouteName();
             var qs: string = <string><any>metron.web.querystring();
             if (qs != "") {
                 self._filters = metron.tools.formatOptions(qs, metron.OptionTypes.QUERYSTRING);
             }
-            var hash = metron.routing.getRouteUrl(self._filters);
-            if(hash != null) {
+            let hash = metron.routing.getRouteUrl(self._filters);
+            if (hash != null) {
                 self.pageSize = (hash["PageSize"] != null) ? hash["PageSize"] : self.pageSize;
                 self.currentPageIndex = (hash["PageIndex"] != null) ? hash["PageIndex"] : self.currentPageIndex;
                 self.sortOrder = (hash["_SortOrder"] != null) ? hash["_SortOrder"] : self.sortOrder;
@@ -416,10 +438,12 @@ namespace metron {
                 delete hash["PageIndex"];
                 delete hash["_SortOrder"];
                 delete hash["_SortDirection"];
-                for(let h in hash) {
-                    if(hash.hasOwnProperty(h)) {
-                        if(self._filters[h] == null) {
-                            self._filters[h] = hash[h];
+                if (routeName == null || routeName == page) {
+                    for (let h in hash) {
+                        if (hash.hasOwnProperty(h)) {
+                            if (self._filters[h] == null) {
+                                self._filters[h] = hash[h];
+                            }
                         }
                     }
                 }

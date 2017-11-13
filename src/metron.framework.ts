@@ -1,77 +1,102 @@
 namespace metron {
-    export var config: any = { };
+    export var config: any = {};
     export var globals: any = {
-          actions: { }
-        , forms: { }
-        , lists: { }
-        , pivots: { }
+        actions: {}
+        , forms: {}
+        , lists: {}
+        , pivots: {}
         , hashLoadedFromApplication: false
+        , firstLoad: false
     };
-    export function onready(callback: Function) {
+    export function onready(callback: Function, appName?: string) {
         document.addEventListener("DOMContentLoaded", function (e) {
-            metron.templates.master.loadMaster(document.documentElement.outerHTML).then(() => {
-                document.selectAll("[data-m-include]").each((idx: number, elem: Element) => {
-                    metron.templates.load(elem.attribute("data-m-include")).then(result => {
-                        if(elem.attribute("data-m-type") != null && elem.attribute("data-m-type") == "markdown") {
-                            (<HTMLElement>elem).innerHTML = metron.templates.markdown.toHTML(result);
-                        }
-                        else {
-                            (<HTMLElement>elem).innerHTML = result;
-                        }
+            if (!metron.globals.firstLoad) {
+                metron.templates.master.loadMaster(document.documentElement.outerHTML).then(() => {
+                    let proms = [];
+                    document.selectAll("[data-m-include]").each((idx: number, elem: Element) => {
+                        let prom = metron.templates.load(elem.attribute("data-m-include")).then(result => {
+                            if (elem.attribute("data-m-type") != null && elem.attribute("data-m-type") == "markdown") {
+                                (<HTMLElement>elem).innerHTML = metron.templates.markdown.toHTML(result);
+                                (<HTMLElement>elem).show();
+                            }
+                            else {
+                                (<HTMLElement>elem).innerHTML = result;
+                            }
+                        });
+                        proms.push(prom);
                     });
-                });
-                document.selectAll("[data-m-type='markdown']").each((idx: number, elem: Element) => {
-                    if(elem.attribute("data-m-include") == null) {
-                        (<HTMLElement>elem).innerHTML = metron.templates.markdown.toHTML((<HTMLElement>elem).innerHTML);
-                    }
-                });
-                metron.fw.loadOptionalFunctionality();
-            });
+                    RSVP.all(proms).then(() => {
+                        document.selectAll("[data-m-type='markdown']").each((idx: number, elem: Element) => {
+                            if (elem.attribute("data-m-include") == null) {
+                                (<HTMLElement>elem).innerHTML = metron.templates.markdown.toHTML((<HTMLElement>elem).innerHTML);
+                                (<HTMLElement>elem).show();
+                            }
+                        });
+                        metron.fw.loadOptionalFunctionality();
 
-            let root: string = metron.fw.getApplicationRoot(document.documentElement.outerHTML);
-            
-            let store = new metron.store(metron.DB, metron.DBVERSION, metron.STORE);
-            store.init().then((result) => {
-                return store.getItem("metron.config", "value");
-            }).then((result) => {
-                if(result != null) {
-                    metron.config = JSON.parse(<string><any>result);
-                    if (callback != null) {
-                            callback(e);
-                    }
-                }
-                else {
-                    new RSVP.Promise(function (resolve, reject) {
-                        metron.tools.loadJSON(`${root}/metron.json`, (configData: JSON) => {
-                            for (let obj in configData) {
-                                if (metron.config[obj] == null) {
-                                    metron.config[obj] = configData[obj];
+                        let root: string = metron.fw.getApplicationRoot(document.documentElement.outerHTML);
+
+                        let iDB = (appName == null) ? metron.DB : `${metron.DB}.${appName.lower()}`;
+                        let iDBStore = (appName == null) ? metron.STORE : `${metron.STORE}.${appName.lower()}`;
+
+                        let store = new metron.store(iDB, metron.DBVERSION, iDBStore);
+                        store.init().then((result) => {
+                            return store.getItem("metron.config", "value");
+                        }).then((result) => {
+                            if (result != null) {
+                                metron.config = JSON.parse(<string><any>result);
+                                metron.globals.firstLoad = true;
+                                if (callback != null) {
+                                    callback(e);
                                 }
                             }
-                            store.init().then((result) => {
-                                return store.setItem("metron.config", JSON.stringify(metron.config));
-                            }).then((result) => {
-                                resolve(configData);
-                            }).catch((rs) => {
-                                console.log(`Error: Failed to access storage. ${rs}`);
-                            });
+                            else {
+                                new RSVP.Promise((resolve, reject) => {
+                                    metron.tools.loadJSON(`${root}/metron.json`, (configData: JSON) => {
+                                        for (let obj in configData) {
+                                            if (metron.config[obj] == null) {
+                                                metron.config[obj] = configData[obj];
+                                            }
+                                        }
+                                        metron.config["config.baseURL"] = `${document.location.protocol}//${document.location.host}`;
+                                        store.init().then((result) => {
+                                            return store.setItem("metron.config", JSON.stringify(metron.config));
+                                        }).then((result) => {
+                                            resolve(configData);
+                                        }).catch((rs) => {
+                                            console.log(`Error: Failed to access storage. ${rs}`);
+                                        });
+                                    });
+                                }).then(() => {
+                                    metron.globals.firstLoad = true;
+                                    if (callback != null) {
+                                        callback(e);
+                                    }
+                                }).catch((rsn) => {
+                                    console.log(`Error: Promise execution failed! ${rsn}`);
+                                });
+                            }
+                        }).catch((reason) => {
+                            console.log(`Error: Failed to access storage. ${reason}`);
                         });
-                    }).then(() => {
-                        if (callback != null) {
-                            callback(e);
-                        }
-                    }).catch((rsn) => {
-                        console.log(`Error: Promise execution failed! ${rsn}`);
                     });
-                }
-            }).catch((reason) => {
-                console.log(`Error: Failed to access storage. ${reason}`);
-            });
+                });
+            }
+            else {
+                callback();
+            }
         });
     }
-    export function load(segment: string, model: string, func: Function) {
-        if (document.selectOne(`[data-m-type="${segment}"][data-m-model="${model}"]`) != null) {
-            func();
+    export function load(segment: string, model: string, func: Function, name?: string) {
+        if (name == null) {
+            if (document.selectOne(`[data-m-type="${segment}"][data-m-model="${model}"]`) != null) {
+                func();
+            }
+        }
+        else {
+            if (document.selectOne(`[data-m-type="${segment}"][data-m-model="${model}"][data-m-page="${name}"]`) != null) {
+                func();
+            }
         }
     }
     export function ifQuerystring(callback: Function): void {
@@ -89,7 +114,7 @@ namespace metron {
             if (root == null) {
                 root = metron.tools.getMatching(page, /\{\{m:root=\"(.*)\"\}\}/g);
             }
-            metron.config["config.root"] = root;
+            metron.config["config.root"] = (root != null) ? root : "";
             return root;
         }
         export function getBaseUrl(): string {
@@ -124,7 +149,7 @@ namespace metron {
         export function loadOptionalFunctionality(): void {
             if (typeof Awesomplete !== undefined) {
                 if (metron.globals.autolists == null) {
-                    metron.globals.autolists = { };
+                    metron.globals.autolists = {};
                 }
                 document.selectAll("[data-m-autocomplete]").each((idx: number, elem: Element) => {
                     let endpoint = elem.attribute("data-m-autocomplete");
@@ -155,30 +180,54 @@ namespace metron {
             }
         }
     }
-    window.onhashchange = function() {
-        if(!metron.globals.hashLoadedFromApplication) {
+    window.onhashchange = function () {
+        if (!metron.globals.hashLoadedFromApplication) {
             let hasPivoted = false;
             let section = document.selectOne("[data-m-type='pivot']");
-            if(section != null) {
+            if (section != null) {
                 let page = section.attribute("data-m-page");
-                if(page != null) {
+                if (page != null) {
                     let p = metron.controls.getPivot(page);
                     p.previous();
                     hasPivoted = true;
                 }
             }
-            if(!hasPivoted) {
-                window.location.reload(false); 
+            if (!hasPivoted) {
+                window.location.reload(false);
             }
         }
         metron.globals.hashLoadedFromApplication = false;
     }
     metron.onready(function (e: Event) {
+        function recursePivot(elem: Element): void {
+            if (elem != null) {
+                elem.show();
+                let route = elem.attribute("data-m-page");
+                let pivot = elem.up("[data-m-type='pivot']");
+                let pivotPageName = pivot.attribute("data-m-page");
+                elem.up("[data-m-type='pivot']").selectAll("[data-m-segment='pivot-item']").each((idx: number, el: Element) => {
+                    if(el.up("[data-m-type='pivot']").attribute("data-m-page") === pivotPageName) {
+                        if (el.attribute("data-m-page") != route) {
+                            el.hide();
+                        }
+                    }
+                });
+                let parent = elem.parent().up("[data-m-segment='pivot-item']");
+                if(parent != null) {
+                    recursePivot(parent);
+                }
+            }
+        }
         let wantsAutoload: boolean = ((document.selectOne("[data-m-autoload]") != null) && (document.selectOne("[data-m-autoload]").attribute("data-m-autoload") == "true"));
         document.selectAll("[data-m-state='hide']").each((idx: number, elem: Element) => {
             elem.hide();
         });
         metron.controls.pivots.bindAll(() => {
+            let route = metron.routing.getRouteName();
+            if (route != null) {
+                let page = document.selectOne(`[data-m-segment='pivot-item'][data-m-page="${route}"]`);
+                recursePivot(page);
+            }
             if (wantsAutoload) {
                 metron.lists.bindAll(() => {
                     metron.forms.bindAll();

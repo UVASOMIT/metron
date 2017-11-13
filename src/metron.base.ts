@@ -16,9 +16,6 @@ namespace metron {
             if (func == null) {
                 throw new Error("Error: No function passed for injection!");
             }
-            if ((<any>self)[method] == null) {
-                throw new Error(`Error: [${method}] does not exist!`);
-            }
             switch (type.lower()) {
                 case "append":
                     (<any>self)[`${method}_m_inject`] = func;
@@ -38,7 +35,7 @@ namespace metron {
         }
         public action(action: string, model: string, func: Function): base {
             var self = this;
-            metron.globals.actions[`${model}_${action}`] = func;
+            component.action(action, model, func);
             return self;
         }
         public clearAlerts(): void {
@@ -56,6 +53,11 @@ namespace metron {
             elem.addClass(className);
             elem.attribute("data-m-state", "show");
             elem.show();
+        }
+    }
+    export class component extends base {
+        public static action(action: string, prefix: string, func: Function) {
+            metron.globals.actions[`${prefix}_${action}`] = func;
         }
     }
 }
