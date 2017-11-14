@@ -5,6 +5,7 @@ namespace metron {
         , forms: {}
         , lists: {}
         , pivots: {}
+        , handlers: {}
         , hashLoadedFromApplication: false
         , firstLoad: false
     };
