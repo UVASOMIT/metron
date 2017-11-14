@@ -474,27 +474,30 @@ Element.prototype.drop = function(): Element {
 };
 
 Element.prototype.removeEvent = function (event: string): Element {
-    let evt = this[`on${event}`] || this[`${event}`];
-    try {
-        this.removeEventListener(event, evt);
+    if (metron.globals.handlers[this.id])
+    {
+        if (metron.globals.handlers[this.id][event])
+        {
+            for (var i = 0; i < metron.globals.handlers[this.id][event].length; i++)
+                this.removeEventListener(event, metron.globals.handlers[this.id][event][i]);
+            metron.globals.handlers[this.id][event].empty();
+        }
     }
-    catch (e) { }
-    try {
-        this.detachEvent(`on${event}`, evt);
-    }
-    catch (e) { }
-    this[`on${event}`] = null;
-    this[`${event}`] = null;
     return this;
 };
 
 Element.prototype.addEvent = function (event: string, callback: Function, overwrite: boolean = false): Element {
     if (overwrite) {
-        this[`on${event}`] = callback;
+        this.removeEvent(event);
     }
-    else {
-        this.addEventListener(event, callback);
+    this.addEventListener(event, callback);
+    if (!metron.globals.handlers[this.id]) {
+        metron.globals.handlers[this.id] = {};
     }
+    if (!metron.globals.handlers[this.id][event]) {
+        metron.globals.handlers[this.id][event] = [];
+    }
+    metron.globals.handlers[this.id][event].push(callback);
     return this;
 };
 
