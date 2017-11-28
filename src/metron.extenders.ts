@@ -474,6 +474,9 @@ Element.prototype.drop = function(): Element {
 };
 
 Element.prototype.removeEvent = function (event: string): Element {
+    if (this.id == "")
+        return this;
+
     if (metron.globals.handlers[this.id])
     {
         if (metron.globals.handlers[this.id][event])
@@ -491,6 +494,9 @@ Element.prototype.addEvent = function (event: string, callback: Function, overwr
         this.removeEvent(event);
     }
     this.addEventListener(event, callback);
+    if (this.id == "") {
+        this.id = metron.guid.newGuid();
+    }
     if (!metron.globals.handlers[this.id]) {
         metron.globals.handlers[this.id] = {};
     }
