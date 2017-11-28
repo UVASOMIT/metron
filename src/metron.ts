@@ -316,18 +316,14 @@ namespace metron {
         })();
     }
     export namespace guid {
-        (function () {
-            function generateGUIDPart(): string {
-                return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-            }
-            return {
-                //Note that JavaScript doesn't actually have GUID or UUID functionality.
-                //This is as best as it gets.
-                newGuid: function (): string {
-                    return (generateGUIDPart() + generateGUIDPart() + "-" + generateGUIDPart() + "-" + generateGUIDPart() + "-" + generateGUIDPart() + "-" + generateGUIDPart() + generateGUIDPart() + generateGUIDPart());
-                }
-            };
-        })();
+        function generateGUIDPart(): string {
+            return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+        }
+        //Note that JavaScript doesn't actually have GUID or UUID functionality.
+        //This is as best as it gets.
+        export function newGuid(): string {
+            return (generateGUIDPart() + generateGUIDPart() + "-" + generateGUIDPart() + "-" + generateGUIDPart() + "-" + generateGUIDPart() + "-" + generateGUIDPart() + generateGUIDPart() + generateGUIDPart());
+        }
     }
 }
 
