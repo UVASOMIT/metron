@@ -64,7 +64,7 @@ interface Element {
     drop: () => Element;
     removeEvent: (event: string) => Element;
     addEvent: (event: string, callback: Function, overwrite?: boolean) => Element;
-    show: (t?: string) => Element;
+    show: (t?: string) => Element | void;
     hide: () => Element;
     toggle:()=> Element;
     addClass: (className: string) => Element;
@@ -501,7 +501,7 @@ Element.prototype.addEvent = function (event: string, callback: Function, overwr
     return this;
 };
 
-Element.prototype.show = function(t: string = "block"): Element {
+Element.prototype.show = function(t: string = "block"): Element | void {
     let styles = this.attribute("style");
     if(styles != null && styles != "") {
         return this.attribute("style", styles.setValueByKey("display", t));
