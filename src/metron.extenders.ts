@@ -64,7 +64,7 @@ interface Element {
     drop: () => Element;
     removeEvent: (event: string) => Element;
     addEvent: (event: string, callback: Function, overwrite?: boolean) => Element;
-    show: (t?: string) => Element;
+    show: (t?: string) => Element | void;
     hide: () => Element;
     toggle:()=> Element;
     addClass: (className: string) => Element;
@@ -474,6 +474,9 @@ Element.prototype.drop = function(): Element {
 };
 
 Element.prototype.removeEvent = function (event: string): Element {
+    if (this.id == "")
+        return this;
+
     if (metron.globals.handlers[this.id])
     {
         if (metron.globals.handlers[this.id][event])
@@ -491,6 +494,9 @@ Element.prototype.addEvent = function (event: string, callback: Function, overwr
         this.removeEvent(event);
     }
     this.addEventListener(event, callback);
+    if (this.id == "") {
+        this.id = metron.guid.newGuid();
+    }
     if (!metron.globals.handlers[this.id]) {
         metron.globals.handlers[this.id] = {};
     }
@@ -501,7 +507,7 @@ Element.prototype.addEvent = function (event: string, callback: Function, overwr
     return this;
 };
 
-Element.prototype.show = function(t: string = "block"): Element {
+Element.prototype.show = function(t: string = "block"): Element | void {
     let styles = this.attribute("style");
     if(styles != null && styles != "") {
         return this.attribute("style", styles.setValueByKey("display", t));
