@@ -64,7 +64,7 @@ interface Element {
     drop: () => Element;
     removeEvent: (event: string) => Element;
     addEvent: (event: string, callback: Function, overwrite?: boolean) => Element;
-    show: (t?: string) => Element;
+    show: (t?: string) => Element | void;
     hide: () => Element;
     toggle:()=> Element;
     addClass: (className: string) => Element;
@@ -474,31 +474,40 @@ Element.prototype.drop = function(): Element {
 };
 
 Element.prototype.removeEvent = function (event: string): Element {
-    let evt = this[`on${event}`] || this[`${event}`];
-    try {
-        this.removeEventListener(event, evt);
+    if (this.id == "")
+        return this;
+
+    if (metron.globals.handlers[this.id])
+    {
+        if (metron.globals.handlers[this.id][event])
+        {
+            for (var i = 0; i < metron.globals.handlers[this.id][event].length; i++)
+                this.removeEventListener(event, metron.globals.handlers[this.id][event][i]);
+            metron.globals.handlers[this.id][event].empty();
+        }
     }
-    catch (e) { }
-    try {
-        this.detachEvent(`on${event}`, evt);
-    }
-    catch (e) { }
-    this[`on${event}`] = null;
-    this[`${event}`] = null;
     return this;
 };
 
 Element.prototype.addEvent = function (event: string, callback: Function, overwrite: boolean = false): Element {
     if (overwrite) {
-        this[`on${event}`] = callback;
+        this.removeEvent(event);
     }
-    else {
-        this.addEventListener(event, callback);
+    this.addEventListener(event, callback);
+    if (this.id == "") {
+        this.id = metron.guid.newGuid();
     }
+    if (!metron.globals.handlers[this.id]) {
+        metron.globals.handlers[this.id] = {};
+    }
+    if (!metron.globals.handlers[this.id][event]) {
+        metron.globals.handlers[this.id][event] = [];
+    }
+    metron.globals.handlers[this.id][event].push(callback);
     return this;
 };
 
-Element.prototype.show = function(t: string = "block"): Element {
+Element.prototype.show = function(t: string = "block"): Element | void {
     let styles = this.attribute("style");
     if(styles != null && styles != "") {
         return this.attribute("style", styles.setValueByKey("display", t));
