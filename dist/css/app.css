@@ -48,7 +48,10 @@
 a {
   color: #ff942b;
 }
-input[type='datetime-local'] {
+input[type='datetime-local']
+, input[type='date']
+, input[type='time']
+ {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
@@ -68,6 +71,9 @@ input[type='email']:focus
 ,input[type='tel']:focus
 ,input[type='text']:focus
 ,input[type='url']:focus
+,input[type='datetime-local']:focus
+,input[type='date']:focus
+,input[type='time']:focus
 ,textarea:focus
 ,select:focus {
     border-color: #ff942b;
