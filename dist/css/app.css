@@ -48,7 +48,10 @@
 a {
   color: #ff942b;
 }
-input[type='datetime-local'] {
+input[type='datetime-local']
+, input[type='date']
+, input[type='time']
+ {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
@@ -68,6 +71,9 @@ input[type='email']:focus
 ,input[type='tel']:focus
 ,input[type='text']:focus
 ,input[type='url']:focus
+,input[type='datetime-local']:focus
+,input[type='date']:focus
+,input[type='time']:focus
 ,textarea:focus
 ,select:focus {
     border-color: #ff942b;
@@ -113,12 +119,14 @@ div[data-m-segment='controls'] {
     border-bottom: 0.1rem solid #e1e1e1;
     padding: 1.2rem 1.5rem;
 }
-[data-m-segment='alert'] {
+[data-m-segment='alert']
+, [data-m-segment='notice'] {
     padding: 0.75rem 0rem 0.75rem 0rem;
     margin-bottom: 2rem;
     border-radius: 0.5rem;
 }
-[data-m-segment='alert'] p {
+[data-m-segment='alert'] p
+, [data-m-segment='notice'] p {
     margin: 0.15rem 1rem 0.15rem 1rem;
     font-size: 80%;
 }
