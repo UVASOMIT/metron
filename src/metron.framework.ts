@@ -231,7 +231,9 @@ namespace metron {
             }
             if (wantsAutoload) {
                 metron.lists.bindAll(() => {
-                    metron.forms.bindAll();
+                    metron.forms.bindAll(() => {
+                        metron.controls.polyfill();
+                    });
                 });
             }
         });
