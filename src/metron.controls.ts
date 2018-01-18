@@ -2,6 +2,144 @@ declare var Awesomplete: any;
 
 namespace metron {
     export namespace controls {
+        export function polyfill(): void {
+            function fillDateInput(currentDate: string, keyCode: number): string {
+                let currentLength: number = currentDate.length;
+                let lastCharEntered: string = currentDate[currentLength - 1];
+                let daysInMonth: string[] = ["0","31","28","31","30","31","30","31","31","30","31","30","31"];
+                let currentMonth: number = currentLength > 2 ? Number(currentDate.substring(0,2)) : 0;
+                if (currentLength == 2 && currentDate[0] == "1" && lastCharEntered == "/")
+                    return "01/";
+                if (!isNumber(lastCharEntered)) {
+                    return currentDate.substring(0, currentLength - 1);
+                }
+                if (currentLength > 10) {
+                    return currentDate.substring(0, 10);
+                }
+                if (currentLength == 1 && Number(currentDate) > 1) {
+                    return "0" + currentDate + '/';
+                } else if (currentLength == 3) {
+                    if (Number(lastCharEntered) > 3) {
+                        return currentDate.substring(0, 2) + "/0" + lastCharEntered + '/';
+                    } else {
+                        return currentDate.substring(0, 2) + "/" + lastCharEntered;
+                    }
+                } else if (currentLength == 4 && Number(currentDate[3]) > 3) {
+                    return currentDate.substring(0, 3) + "0" + currentDate[3] + '/';
+                } else if (currentLength == 4 && Number(currentDate[3]) == 3 && currentMonth == 2) {
+                    return currentDate.substring(0, 3) + "0" + currentDate[3] + '/';
+                } else if (currentLength == 4 && Number(currentDate[3]) == 3 && currentMonth != 0) {
+                    if (keyCode != 8) {
+                        if (daysInMonth[currentMonth] == "30") {
+                            return currentDate.substring(0, 3) + daysInMonth[currentMonth] + '/';
+                        } else {
+                            return currentDate;
+                        }
+                    }
+                else {
+                    return currentDate.substring(0, 3);
+                }
+                } else if (currentLength == 2) {
+                    if (keyCode != 8) {
+                        if (Number(lastCharEntered) > 2 && currentDate[0] == "1") {
+                            return currentDate.substring(0, currentLength - 1);
+                        } else {
+                            return currentDate + '/';
+                        }
+                    }
+                } else if (currentLength == 5) {
+                    if (keyCode != 8) {
+                        if (Number(currentDate[3]) == 3 && Number(lastCharEntered) > 1) {
+                            return currentDate.substring(0, currentLength - 1);
+                        } else {
+                            return currentDate + '/';
+                        }
+                    }
+                } else if (currentLength == 6) {
+                    return currentDate.substring(0, 5) + "/" + lastCharEntered;
+                } else if (currentLength == 10 && Number(currentDate[3]) == 2 && Number(currentDate[4]) == 9 && currentMonth == 2) {
+                    if (!isLeapYear(currentDate.substring(6))) {
+                        return currentDate.replace("29","28");
+                    }
+                }
+                return currentDate;
+            }
+            function fillTimeInput(currentTime: string, keyCode: number): string {
+                let currentLength: number = currentTime.length;
+                let lastCharEntered: string = currentTime[currentLength - 1];
+                if (currentLength < 6 && !isNumber(lastCharEntered)) {
+                    return currentTime.substring(0, currentLength - 1);
+                }
+                if ((currentLength == 6 || currentLength == 7) && !(lastCharEntered.toLowerCase() == "a" || lastCharEntered.toLowerCase() == "p")) {
+                    return currentTime.substring(0, currentLength - 1);
+                }
+                if (currentLength > 8) {
+                    return currentTime.substring(0, 8);
+                }
+                if (currentLength == 1 && Number(currentTime) > 1) {
+                    return "0" + currentTime + ':';
+                } else if (currentLength == 3) {
+                    if (Number(lastCharEntered) > 5) {
+                        return currentTime.substring(0, 2) + ":0" + lastCharEntered + ' ';
+                    } else {
+                        return currentTime.substring(0, 2) + ":" + lastCharEntered;
+                    }
+                } else if (currentLength == 4 && Number(currentTime[3]) > 5) {
+                    return currentTime.substring(0, 3) + "0" + currentTime[3] + ' ';
+                } else if (currentLength == 2) {
+                    return currentTime + ':';
+                } else if (currentLength == 5) {
+                    if (keyCode != 8) {
+                        return currentTime + ' ';
+                    }
+                } else if (currentLength == 6) {
+                    if (lastCharEntered.toLowerCase() == "a")
+                        return currentTime.substring(0, 5) + " AM";
+                    if (lastCharEntered.toLowerCase() == "p")
+                        return currentTime.substring(0, 5) + " PM";
+                } else if (currentLength == 6 || currentLength == 7) {
+                    if (keyCode == 8) {
+                        return currentTime.substring(0, currentLength - 1);
+                    } else {
+                        if (lastCharEntered.toLowerCase() == "a")
+                            return currentTime.substring(0, 5) + " AM";
+                        if (lastCharEntered.toLowerCase() == "p")
+                            return currentTime.substring(0, 5) + " PM";
+                    }
+                }
+                return currentTime;
+            }
+
+            function isNumber(n): boolean {
+                return !isNaN(parseFloat(n)) && isFinite(n);
+            }
+              
+            function isLeapYear(year): boolean {
+                return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
+            }
+
+            function checkDateInputSupport(): boolean {
+                let input: HTMLInputElement = document.createElement("input");
+                input.setAttribute("type", "date");
+                let notADateValue: string = "not-a-date";
+                input.setAttribute("value", notADateValue);
+                return !(input.value === notADateValue);
+            }
+            if (!checkDateInputSupport() && typeof window.orientation === 'undefined') {
+                document.selectAll("input[type=date]").each((idx: number, elem: HTMLInputElement) => {
+                    elem.placeholder = "mm/dd/yyyy";
+                    elem.addEventListener("keyup", (e) => {
+                        elem.val(fillDateInput(elem.val(), e.keyCode));
+                    });
+                });
+                document.selectAll("input[type=time]").each((idx: number, elem: HTMLInputElement) => {
+                    elem.placeholder = "--:-- --";
+                    elem.addEventListener("keyup", (e) => {
+                        elem.val(fillTimeInput(elem.val(), e.keyCode));
+                    });
+                });
+            }
+        }
         export function getPivot(name: string, callback?: Function): metron.controls.pivot {
             var p: metron.controls.pivot;
             if (metron.globals["pivots"][name] != null) {

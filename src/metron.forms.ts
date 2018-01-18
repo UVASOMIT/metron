@@ -2,7 +2,7 @@
 
 namespace metron {
     export class forms {
-        public static bindAll(): void {
+        public static bindAll(callback: Function): void {
             let sections: NodeListOf<Element> = document.selectAll("[data-m-type='form']");
             for (let i = 0; i < sections.length; i++) {
                 let section: Element = <Element>sections[i];
@@ -12,6 +12,9 @@ namespace metron {
                         let f: form<any> = new form(model).init();
                     }
                 }
+            }
+            if (callback != null) {
+                callback();
             }
         }
     }
