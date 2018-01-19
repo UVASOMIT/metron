@@ -148,6 +148,7 @@ namespace metron {
                 return !(input.value === notADateValue);
             }
             if (!checkDateInputSupport() && typeof window.orientation === 'undefined') {
+                metron.globals.requiresDateTimePolyfill = true;
                 document.selectAll("input[type=date]").each((idx: number, elem: HTMLInputElement) => {
                     elem.placeholder = "mm/dd/yyyy";
                     elem.addEventListener("keyup", (e) => {
@@ -157,7 +158,7 @@ namespace metron {
                 document.selectAll("input[type=time]").each((idx: number, elem: HTMLInputElement) => {
                     elem.placeholder = "--:-- --";
                     elem.addEventListener("keyup", (e) => {
-                        elem.val(fillTimeInput(elem.val(), e.keyCode));
+                        elem.value = fillTimeInput(elem.val(), e.keyCode); // don't set elem.value with val extender here. elem.val(fillTimeInput(elem.val(), e.keyCode));
                     });
                 });
             }
