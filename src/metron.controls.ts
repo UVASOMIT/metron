@@ -18,46 +18,58 @@ namespace metron {
                 }
                 if (currentLength == 1 && Number(currentDate) > 1) {
                     return "0" + currentDate + '/';
-                } else if (currentLength == 3) {
+                } 
+                else if (currentLength == 3) {
                     if (Number(lastCharEntered) > 3) {
                         return currentDate.substring(0, 2) + "/0" + lastCharEntered + '/';
-                    } else {
+                    } 
+                    else {
                         return currentDate.substring(0, 2) + "/" + lastCharEntered;
                     }
-                } else if (currentLength == 4 && Number(currentDate[3]) > 3) {
+                } 
+                else if (currentLength == 4 && Number(currentDate[3]) > 3) {
                     return currentDate.substring(0, 3) + "0" + currentDate[3] + '/';
-                } else if (currentLength == 4 && Number(currentDate[3]) == 3 && currentMonth == 2) {
+                } 
+                else if (currentLength == 4 && Number(currentDate[3]) == 3 && currentMonth == 2) {
                     return currentDate.substring(0, 3) + "0" + currentDate[3] + '/';
-                } else if (currentLength == 4 && Number(currentDate[3]) == 3 && currentMonth != 0) {
+                } 
+                else if (currentLength == 4 && Number(currentDate[3]) == 3 && currentMonth != 0) {
                     if (keyCode != 8) {
                         if (daysInMonth[currentMonth] == "30") {
                             return currentDate.substring(0, 3) + daysInMonth[currentMonth] + '/';
-                        } else {
+                        } 
+                        else {
                             return currentDate;
                         }
                     }
-                else {
-                    return currentDate.substring(0, 3);
-                }
-                } else if (currentLength == 2) {
+                    else {
+                        return currentDate.substring(0, 3);
+                    }
+                } 
+                else if (currentLength == 2) {
                     if (keyCode != 8) {
                         if (Number(lastCharEntered) > 2 && currentDate[0] == "1") {
                             return currentDate.substring(0, currentLength - 1);
-                        } else {
+                        } 
+                        else {
                             return currentDate + '/';
                         }
                     }
-                } else if (currentLength == 5) {
+                } 
+                else if (currentLength == 5) {
                     if (keyCode != 8) {
                         if (Number(currentDate[3]) == 3 && Number(lastCharEntered) > 1) {
                             return currentDate.substring(0, currentLength - 1);
-                        } else {
+                        } 
+                        else {
                             return currentDate + '/';
                         }
                     }
-                } else if (currentLength == 6) {
+                } 
+                else if (currentLength == 6) {
                     return currentDate.substring(0, 5) + "/" + lastCharEntered;
-                } else if (currentLength == 10 && Number(currentDate[3]) == 2 && Number(currentDate[4]) == 9 && currentMonth == 2) {
+                } 
+                else if (currentLength == 10 && Number(currentDate[3]) == 2 && Number(currentDate[4]) == 9 && currentMonth == 2) {
                     if (!isLeapYear(currentDate.substring(6))) {
                         return currentDate.replace("29","28");
                     }
@@ -78,29 +90,39 @@ namespace metron {
                 }
                 if (currentLength == 1 && Number(currentTime) > 1) {
                     return "0" + currentTime + ':';
-                } else if (currentLength == 3) {
+                } 
+                else if (currentLength == 3) {
                     if (Number(lastCharEntered) > 5) {
                         return currentTime.substring(0, 2) + ":0" + lastCharEntered + ' ';
-                    } else {
+                    } 
+                    else {
                         return currentTime.substring(0, 2) + ":" + lastCharEntered;
                     }
-                } else if (currentLength == 4 && Number(currentTime[3]) > 5) {
+                } 
+                else if (currentLength == 4 && Number(currentTime[3]) > 5) {
                     return currentTime.substring(0, 3) + "0" + currentTime[3] + ' ';
-                } else if (currentLength == 2) {
-                    return currentTime + ':';
-                } else if (currentLength == 5) {
+                } 
+                else if (currentLength == 2) {
+                    if (keyCode != 8) {
+                        return currentTime + ':';
+                    }
+                } 
+                else if (currentLength == 5) {
                     if (keyCode != 8) {
                         return currentTime + ' ';
                     }
-                } else if (currentLength == 6) {
+                } 
+                else if (currentLength == 6) {
                     if (lastCharEntered.toLowerCase() == "a")
                         return currentTime.substring(0, 5) + " AM";
                     if (lastCharEntered.toLowerCase() == "p")
                         return currentTime.substring(0, 5) + " PM";
-                } else if (currentLength == 6 || currentLength == 7) {
+                } 
+                else if (currentLength == 6 || currentLength == 7) {
                     if (keyCode == 8) {
                         return currentTime.substring(0, currentLength - 1);
-                    } else {
+                    } 
+                    else {
                         if (lastCharEntered.toLowerCase() == "a")
                             return currentTime.substring(0, 5) + " AM";
                         if (lastCharEntered.toLowerCase() == "p")
@@ -126,6 +148,7 @@ namespace metron {
                 return !(input.value === notADateValue);
             }
             if (!checkDateInputSupport() && typeof window.orientation === 'undefined') {
+                metron.globals.requiresDateTimePolyfill = true;
                 document.selectAll("input[type=date]").each((idx: number, elem: HTMLInputElement) => {
                     elem.placeholder = "mm/dd/yyyy";
                     elem.addEventListener("keyup", (e) => {
@@ -135,7 +158,7 @@ namespace metron {
                 document.selectAll("input[type=time]").each((idx: number, elem: HTMLInputElement) => {
                     elem.placeholder = "--:-- --";
                     elem.addEventListener("keyup", (e) => {
-                        elem.val(fillTimeInput(elem.val(), e.keyCode));
+                        elem.value = fillTimeInput(elem.val(), e.keyCode); // don't set elem.value with val extender here. elem.val(fillTimeInput(elem.val(), e.keyCode));
                     });
                 });
             }
