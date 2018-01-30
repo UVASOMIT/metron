@@ -8,6 +8,7 @@ namespace metron {
         , handlers: {}
         , hashLoadedFromApplication: false
         , firstLoad: false
+        , requiresDateTimePolyfill: false
     };
     export function onready(callback: Function, appName?: string) {
         document.addEventListener("DOMContentLoaded", function (e) {

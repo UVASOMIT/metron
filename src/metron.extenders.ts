@@ -592,6 +592,41 @@ HTMLElement.prototype.val = function(val?: string): string {
                         }
                     });
                     break;
+                case "date":
+                    let date: string = val;
+                    if (date.contains("T")) {
+                        date = date.slice(0, date.indexOf("T"));
+                    }
+                    if (metron.globals.requiresDateTimePolyfill && /\d{4}-\d{2}-\d{2}/g.test(val)) {
+                        this.value = `${date.slice(5, 7)}/${date.slice(8, 10)}/${date.slice(0, 4)}`;
+                    }
+                    else {
+                        this.value = date;
+                    }
+                    break;
+                case "time":
+                    let time: string = val;
+                    if (metron.globals.requiresDateTimePolyfill) {
+                        if (/\d{2}:\d{2}:\d{2}/g.test(time)) {
+                            let hour: number = Number(time.slice(0, 2));
+                            let period: string = hour > 11 ? "PM" : "AM";
+                            hour = hour > 12 ? hour - 12 : hour;
+                            let hourStr: string = hour > 9 ? hour.toString() : "0" + hour.toString();
+                            this.value = `${hourStr}:${time.slice(3, 5)} ${period}`;
+                        }
+                        else {
+                            this.value = time;
+                        }
+                    }
+                    else {
+                        if (/\d{2}:\d{2}:\d{2}/g.test(time)) {
+                            this.value = time.slice(0, 5);
+                        }
+                        else {
+                            this.value = time;
+                        }
+                    }
+                    break;
                 default:
                     this.value = val;
                     break;
@@ -627,6 +662,16 @@ HTMLElement.prototype.val = function(val?: string): string {
                 case "radio":
                     let name: string = this.attribute("name");
                     return (<HTMLInputElement>document.selectOne(`input[type='radio'][name='${name}']:checked`)).value;
+                case "time":
+                    if (metron.globals.requiresDateTimePolyfill && /\d{2}:\d{2} \S{2}/g.test(this.value)) {
+                        let period: string = this.value.slice(6, 8);
+                        let hour: number = Number(this.value.slice(0, 2));
+                        let hourStr: string = (period == "PM" && hour < 12) ? (hour + 12).toString() : hour.toString();
+                        return `${hourStr}:${this.value.slice(3, 5)}:00`;
+                    }
+                    else {
+                        return this.value;
+                    }
                 default:
                     return this.value;
             }
