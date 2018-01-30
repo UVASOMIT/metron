@@ -41,6 +41,8 @@ namespace metron {
                         return metron.tools.formatBoolean(<string><any>val);
                     case "datetime":
                         return metron.tools.formatDateTime(<string><any>val);
+                    case "date":
+                        return metron.tools.formatDate(<string><any>val);
                     case "time":
                         return metron.tools.formatTime(<Date><any>val);
                     case "formatmessage":
