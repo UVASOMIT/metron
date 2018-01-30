@@ -166,8 +166,14 @@ namespace metron {
             return num.toFixed(2);
         }
         export function formatDate(datetime: string): string {
-            if (datetime != null && datetime.indexOf("T") != -1) {
-                return datetime.split("T")[0];
+            if (!String.isNullOrEmpty(datetime)) {
+                let d = new Date(datetime);
+                let m = d.getMonth() + 1;
+                let mm = m < 10 ? "0" + m : m;
+                let dd = d.getDate();
+                let ddd = dd < 10 ? "0" + dd : dd;
+                let y = d.getFullYear();
+                return `${mm}-${ddd}-${y}`;
             }
             return "";
         }
