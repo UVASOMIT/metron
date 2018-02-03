@@ -264,7 +264,9 @@ namespace metron {
                     isValid = false;
                     result += `<p>[${elem.attribute("name")}] is a required field.</p>`;
                     elem.addClass("error");
-                    f.selectOne(`label[for='${elem.attribute("id")}']`).addClass("label-error");
+                    if (f.selectOne(`label[for='${elem.attribute("id")}']`) != null) {
+                        f.selectOne(`label[for='${elem.attribute("id")}']`).addClass("label-error");
+                    }
                 }
             });
             if (!isValid) {
