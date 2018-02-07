@@ -185,14 +185,22 @@ namespace metron {
                 let dd = d.getDate();
                 let ddd = dd < 10 ? "0" + dd : dd;
                 let y = d.getFullYear();
-                let time = formatTime(d);
+                let time = formatTime(d, true);
                 return `${mm}-${ddd}-${y} ${time}`;
             }
             return "";
         }
-        export function formatTime(datetime: Date): string {
-            var h = datetime.getHours();
-            var m = datetime.getMinutes();
+        export function formatTime(datetime: string | Date, isFullDate = false): string {
+            var d: Date;
+            if (isFullDate) {
+                d = <Date><any>datetime;
+            }
+            else {
+                let c: Array<string> = (<string><any>datetime).split(":");
+                d = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), parseInt(c[0], 10), parseInt(c[1], 10), parseInt(c[2], 10))
+            }
+            var h = d.getHours();
+            var m = d.getMinutes();
             var ampm = h >= 12 ? "pm" : "am";
             h = h % 12;
             h = h ? h : 12;
