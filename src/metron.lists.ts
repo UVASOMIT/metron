@@ -68,7 +68,10 @@ namespace metron {
                                             (el.attribute("data-m-pivot") != null) ? self.pivot.exact(<any>el.attribute("data-m-pivot")) : self.pivot.next();
                                         }
                                         if(metron.globals["forms"][self.model] != null) {
-                                            metron.globals["forms"][self.model].loadForm();
+                                            try {
+                                                metron.globals["forms"][self.model].loadForm();
+                                            }
+                                            catch(e) { }
                                         }
                                         if ((<any>self).new_m_inject != null) {
                                             (<any>self).new_m_inject();
@@ -184,7 +187,7 @@ namespace metron {
             document.selectAll(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='edit']`).each(function (idx: number, elem: Element) {
                 elem.removeEvent("click").addEvent("click", function (e) {
                     e.preventDefault();
-                    if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${elem.attribute("data-m-action").lower()}`] != null) { //Refactor getting the action overrides
+                    if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${elem.attribute("data-m-action").lower()}`] != null) {
                         metron.globals.actions[`${self.model}_${elem.attribute("data-m-action").lower()}`](elem);
                     }
                     else {
@@ -193,7 +196,10 @@ namespace metron {
                             (elem.attribute("data-m-pivot") != null) ? self.pivot.exact(<any>elem.attribute("data-m-pivot")) : self.pivot.next();
                         }
                         if(metron.globals["forms"][self.model] != null) {
-                            metron.globals["forms"][self.model].loadForm(parameters);
+                            try {
+                                metron.globals["forms"][self.model].loadForm(parameters);
+                            }
+                            catch(e) { }
                         }
                         if ((<any>self).edit_m_inject != null) {
                             (<any>self).edit_m_inject();
@@ -204,7 +210,7 @@ namespace metron {
             document.selectAll(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='delete']`).each(function (idx: number, elem: Element) {
                 elem.removeEvent("click").addEvent("click", function (e) {
                     e.preventDefault();
-                    if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${elem.attribute("data-m-action").lower()}`] != null) { //Refactor getting the action overrides
+                    if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${elem.attribute("data-m-action").lower()}`] != null) {
                         metron.globals.actions[`${self.model}_${elem.attribute("data-m-action").lower()}`](elem);
                     }
                     else {
