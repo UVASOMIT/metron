@@ -152,7 +152,10 @@ namespace metron {
                 (pivotPosition != null) ? self.pivot.exact(pivotPosition) : self.pivot.previous();
             }
             if (metron.globals["lists"][self.model] != null) {
-                metron.globals["lists"][self.model].callListing();
+                try {
+                    metron.globals["lists"][self.model].callListing();
+                }
+                catch(e) { }
             }
             if ((<any>self).save_m_inject != null) {
                 (<any>self).save_m_inject();

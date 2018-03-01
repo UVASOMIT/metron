@@ -33,6 +33,7 @@ namespace metron {
         public totalCount: number = 0;
         public sortOrder: string = (metron.config["config.options.sortOrder"] != null) ? metron.config["config.options.sortOrder"] : "DateCreated";
         public sortDirection: string = (metron.config["config.options.sortDirection"] != null) ? metron.config["config.options.sortDirection"] : "DESC";
+        private _defaults: any = (metron.config["config.lists.defaults"] != null) ? metron.config["config.lists.defaults"] : { };
         public fetchURL: string;
         constructor(public model: string, public listType: string = LIST) {
             super(model, listType);
@@ -67,7 +68,10 @@ namespace metron {
                                             (el.attribute("data-m-pivot") != null) ? self.pivot.exact(<any>el.attribute("data-m-pivot")) : self.pivot.next();
                                         }
                                         if(metron.globals["forms"][self.model] != null) {
-                                            metron.globals["forms"][self.model].loadForm();
+                                            try {
+                                                metron.globals["forms"][self.model].loadForm();
+                                            }
+                                            catch(e) { }
                                         }
                                         if ((<any>self).new_m_inject != null) {
                                             (<any>self).new_m_inject();
@@ -133,7 +137,7 @@ namespace metron {
                     let nText: string = el.attribute("data-m-text");
                     let options: any = (el.attribute("data-m-options") != null) ? metron.tools.formatOptions(el.attribute("data-m-options")) : {};
                     let ajx = new RSVP.Promise((resolve, reject) => {
-                        metron.web.get(`${metron.fw.getAPIURL(binding)}${metron.web.querystringify(options)}`, {}, null, "json", function (data: Array<T>) {
+                        metron.web.get(`${metron.fw.getAPIURL(binding)}${self.withDefaults(options)}`, {}, null, "json", function (data: Array<T>) {
                             data.each((i: number, item: any) => {
                                 if(self._filters[key] != null && self._filters[key] == item[key]) {
                                     el.append(`<option value="${item[key]}" selected="selected">${item[nText]}</option>`);
@@ -183,7 +187,7 @@ namespace metron {
             document.selectAll(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='edit']`).each(function (idx: number, elem: Element) {
                 elem.removeEvent("click").addEvent("click", function (e) {
                     e.preventDefault();
-                    if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${elem.attribute("data-m-action").lower()}`] != null) { //Refactor getting the action overrides
+                    if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${elem.attribute("data-m-action").lower()}`] != null) {
                         metron.globals.actions[`${self.model}_${elem.attribute("data-m-action").lower()}`](elem);
                     }
                     else {
@@ -192,7 +196,10 @@ namespace metron {
                             (elem.attribute("data-m-pivot") != null) ? self.pivot.exact(<any>elem.attribute("data-m-pivot")) : self.pivot.next();
                         }
                         if(metron.globals["forms"][self.model] != null) {
-                            metron.globals["forms"][self.model].loadForm(parameters);
+                            try {
+                                metron.globals["forms"][self.model].loadForm(parameters);
+                            }
+                            catch(e) { }
                         }
                         if ((<any>self).edit_m_inject != null) {
                             (<any>self).edit_m_inject();
@@ -203,7 +210,7 @@ namespace metron {
             document.selectAll(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='delete']`).each(function (idx: number, elem: Element) {
                 elem.removeEvent("click").addEvent("click", function (e) {
                     e.preventDefault();
-                    if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${elem.attribute("data-m-action").lower()}`] != null) { //Refactor getting the action overrides
+                    if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${elem.attribute("data-m-action").lower()}`] != null) {
                         metron.globals.actions[`${self.model}_${elem.attribute("data-m-action").lower()}`](elem);
                     }
                     else {
@@ -257,6 +264,20 @@ namespace metron {
                 (<any>self).applyViewEvents_m_inject();
             }
         }
+        private withDefaults(parameters: any): string {
+            var self = this;
+            if (Object.keys(self._defaults).length) {
+                let local = {};
+                for (let k in self._defaults) {
+                    if (self._defaults.hasOwnProperty(k)) {
+                        local[k] = self._defaults[k];
+                    }
+                }
+                let withDefaults: any = Object.extend(parameters, local);
+                return metron.web.querystringify(metron.tools.normalizeModelData(withDefaults));
+            }
+            return metron.web.querystringify(metron.tools.normalizeModelData(parameters));
+        }
         public populateListing(): void {
             var self = this;
             self.clearTable(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='list']`);
@@ -289,11 +310,10 @@ namespace metron {
             self.clearAlerts();
             var parameters: any = Object.extend({ PageIndex: self.currentPageIndex, PageSize: self.pageSize, _SortOrder: self.sortOrder, _SortDirection: self.sortDirection }, self._filters);
             var url = (self.fetchURL != null) ? self.fetchURL : self.model;
-            var wsqs = metron.web.querystringify(metron.tools.normalizeModelData(parameters));
-            if(!self._elem.isHidden()) { //This might not be needed anymore since we check the app name against the hash in setRouteUrl()
-                metron.routing.setRouteUrl(self._name, wsqs);
+            if(!self._elem.isHidden()) {
+                metron.routing.setRouteUrl(self._name, metron.web.querystringify(metron.tools.normalizeModelData(parameters)));
             }
-            metron.web.get(`${metron.fw.getAPIURL(url)}${wsqs}`, {}, null, "json", function (data: Array<T>) {
+            metron.web.get(`${metron.fw.getAPIURL(url)}${self.withDefaults(parameters)}`, {}, null, "json", function (data: Array<T>) {
                 self._items = data;
                 self.populateListing();
                 if ((<any>self).callListing_m_inject != null) {
