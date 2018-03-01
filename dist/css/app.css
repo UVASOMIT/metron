@@ -33,6 +33,19 @@
   border-color: inherit;
   color: #606c76;
 }
+[disabled].button:focus
+, [disabled].button:hover
+, button[disabled]:focus
+, button[disabled]:hover
+, input[type='button'][disabled]:focus
+, input[type='button'][disabled]:hover
+, input[type='reset'][disabled]:focus
+, input[type='reset'][disabled]:hover
+, input[type='submit'][disabled]:focus
+, input[type='submit'][disabled]:hover {
+        background-color: #ff942b;
+        border-color: #ff942b;
+    }
 .button.button-clear[disabled]:focus
 ,.button.button-clear[disabled]:hover
 ,button.button-clear[disabled]:focus
