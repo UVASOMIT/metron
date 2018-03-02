@@ -265,10 +265,12 @@ namespace metron {
             required.each(function (idx: number, elem: Element) {
                 if ((<HTMLElement>elem).val() == null || (<HTMLElement>elem).val().trim() === "") {
                     isValid = false;
-                    result += `<p>[${elem.attribute("name")}] is a required field.</p>`;
                     elem.addClass("error");
                     if (f.selectOne(`label[for='${elem.attribute("id")}']`) != null) {
                         f.selectOne(`label[for='${elem.attribute("id")}']`).addClass("label-error");
+                        result += `<p>${(<HTMLElement>f.selectOne(`label[for='${elem.attribute("id")}']`)).innerText} is a required field.</p>`;
+                    } else {
+                        result += `<p>[${elem.attribute("name")}] is a required field.</p>`;
                     }
                 }
             });
