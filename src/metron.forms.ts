@@ -158,7 +158,7 @@ namespace metron {
                 catch(e) { }
             }
             if ((<any>self).save_m_inject != null) {
-                (<any>self).save_m_inject();
+                (<any>self).save_m_inject(data);
             }
         }
         public loadForm(parameters?: any, defaults?: any): void {
@@ -265,10 +265,14 @@ namespace metron {
             required.each(function (idx: number, elem: Element) {
                 if ((<HTMLElement>elem).val() == null || (<HTMLElement>elem).val().trim() === "") {
                     isValid = false;
-                    result += `<p>[${elem.attribute("name")}] is a required field.</p>`;
                     elem.addClass("error");
                     if (f.selectOne(`label[for='${elem.attribute("id")}']`) != null) {
                         f.selectOne(`label[for='${elem.attribute("id")}']`).addClass("label-error");
+                    }
+                    if  (f.selectOne(`label[for='${elem.attribute("id")}']`) != null && (<HTMLElement>f.selectOne(`label[for='${elem.attribute("id")}']`)).innerText != "") {
+                        result += `<p>${(<HTMLElement>f.selectOne(`label[for='${elem.attribute("id")}']`)).innerText} is a required field.</p>`;
+                    } else {
+                        result += `<p>[${elem.attribute("name")}] is a required field.</p>`;
                     }
                 }
             });
