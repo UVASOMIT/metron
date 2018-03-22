@@ -158,7 +158,7 @@ namespace metron {
                 catch(e) { }
             }
             if ((<any>self).save_m_inject != null) {
-                (<any>self).save_m_inject();
+                (<any>self).save_m_inject(data);
             }
         }
         public loadForm(parameters?: any, defaults?: any): void {
