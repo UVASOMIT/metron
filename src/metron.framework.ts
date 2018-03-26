@@ -7,6 +7,7 @@ namespace metron {
         , pivots: {}
         , handlers: {}
         , hashLoadedFromApplication: false
+        , firstLoad: false
         , requiresDateTimePolyfill: false
     };
     export function onready(callback: Function, appName?: string) {
@@ -46,6 +47,7 @@ namespace metron {
                     }).then((result) => {
                         if (result != null) {
                             metron.config = JSON.parse(<string><any>result);
+                            metron.globals.firstLoad = true;
                             if (callback != null) {
                                 callback(e);
                             }
@@ -68,6 +70,7 @@ namespace metron {
                                     });
                                 });
                             }).then(() => {
+                                metron.globals.firstLoad = true;
                                 if (callback != null) {
                                     callback(e);
                                 }
