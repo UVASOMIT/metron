@@ -119,7 +119,7 @@ namespace metron {
                 });
             }
             export function merge(template: string): void {
-                function _copyAttributes(src: Node, elemName: string) {
+                function _copyAttributes(src: Element, elemName: string) {
                     for (let i = 0; i < src.attributes.length; i++) {
                         document.documentElement.querySelector(elemName).attribute(src.attributes[i].name, src.attributes[i].value);
                     }
