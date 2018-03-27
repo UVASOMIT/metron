@@ -63,7 +63,7 @@ namespace metron {
                         defaults = metron.tools.formatOptions(qs, metron.OptionTypes.QUERYSTRING);
                     }
                     if (metron.globals.firstLoad) {
-                        parameters = metron.routing.getRouteUrl();
+                        parameters = metron.routing.getRouteUrl({"PageSize": 1, "PageIndex": 1, "_SortOrder": 1, "_SortDirection": 1}); ///This should send null values or by removed by default.
                     }
                     self.loadForm(parameters, defaults);
                 });
