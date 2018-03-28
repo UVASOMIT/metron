@@ -200,7 +200,7 @@ namespace metron {
                     let nm: string = el.attribute("name");
                     let nText: string = el.attribute("data-m-text");
                     let options: any = (el.attribute("data-m-options") != null) ? metron.tools.formatOptions(el.attribute("data-m-options")) : { };
-                    let ajx = new RSVP.Promise(function (resolve, reject) {
+                    let ajx = new Promise(function (resolve, reject) {
                         metron.web.get(`${metron.fw.getAPIURL(binding)}${metron.web.querystringify(options)}`, {}, null, "json", function (data: Array<T>) {
                             data.each(function (i: number, item: any) {
                                 (<HTMLElement>self._elem.selectOne(`#${self.model}_${nm}`)).append(`<option value="${item[key]}">${item[nText]}</option>`);
@@ -211,7 +211,7 @@ namespace metron {
                     promises.push(ajx);
                 }
             });
-            RSVP.all(promises).then(function () {
+            Promise.all(promises).then(function () {
                 if (callback != null) {
                     callback();
                 }

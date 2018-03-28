@@ -16,7 +16,7 @@ namespace metron {
         }
         public init(): any {
             var self = this;
-            var p = new RSVP.Promise(function(resolve, reject) {
+            var p = new Promise(function(resolve, reject) {
                 try {
                     (<any>window).indexedDB = (<any>window).indexedDB || (<any>window).mozIndexedDB || (<any>window).webkitIndexedDB || (<any>window).msIndexedDB;
                     (<any>window).IDBTransaction = (<any>window).IDBTransaction || (<any>window).webkitIDBTransaction || (<any>window).msIDBTransaction || { READ_WRITE: "readwrite" }; 
@@ -65,7 +65,7 @@ namespace metron {
         }
         public getItem(s: string, val?: string): any {
             var self = this;
-            var p = new RSVP.Promise(function(resolve, reject) {
+            var p = new Promise(function(resolve, reject) {
                 try {
                     if(window.indexedDB != null) {
                         let objectStore = self.getObjectStore();
@@ -92,7 +92,7 @@ namespace metron {
         }
         public setItem(s: string, a: any): any {
             var self = this;
-            var p = new RSVP.Promise(function(resolve, reject) {
+            var p = new Promise(function(resolve, reject) {
                 try {
                     if(window.indexedDB != null) {
                         let objectStore = self.getObjectStore();
@@ -127,7 +127,7 @@ namespace metron {
         }
         public removeItem(s: string): any {
             var self = this;
-            var p = new RSVP.Promise(function(resolve, reject) {
+            var p = new Promise(function(resolve, reject) {
                 try {
                     if(window.indexedDB != null) {
                         var request = self.getObjectStore().delete(s);

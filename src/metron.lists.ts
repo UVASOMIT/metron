@@ -136,7 +136,7 @@ namespace metron {
                     let nm: string = el.attribute("name");
                     let nText: string = el.attribute("data-m-text");
                     let options: any = (el.attribute("data-m-options") != null) ? metron.tools.formatOptions(el.attribute("data-m-options")) : {};
-                    let ajx = new RSVP.Promise((resolve, reject) => {
+                    let ajx = new Promise((resolve, reject) => {
                         metron.web.get(`${metron.fw.getAPIURL(binding)}${self.withDefaults(options)}`, {}, null, "json", function (data: Array<T>) {
                             data.each((i: number, item: any) => {
                                 if(self._filters[key] != null && self._filters[key] == item[key]) {
@@ -174,7 +174,7 @@ namespace metron {
                     });
                 }
             });
-            RSVP.all(promises).then(() => {
+            Promise.all(promises).then(() => {
                 if ((<any>self).loadFilters_m_inject != null) {
                     (<any>self).loadFilters_m_inject();
                 }

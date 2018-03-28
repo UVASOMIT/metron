@@ -6,7 +6,11 @@
                 "outFile": "dist/gen/metron.js",
                 "sourceMap": true,
                 "declaration": true,
-                "removeComments": true
+                "removeComments": true,
+                "lib": ["dom"
+                    , "es2015.promise"
+                    , "es5"
+                ]
             },
     "files": [
         "src/metron.extenders.ts",

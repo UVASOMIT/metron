@@ -26,7 +26,7 @@ namespace metron {
                     });
                     proms.push(prom);
                 });
-                RSVP.all(proms).then(() => {
+                Promise.all(proms).then(() => {
                     document.selectAll("[data-m-type='markdown']").each((idx: number, elem: Element) => {
                         if (elem.attribute("data-m-include") == null) {
                             (<HTMLElement>elem).innerHTML = metron.templates.markdown.toHTML((<HTMLElement>elem).innerHTML);
@@ -53,7 +53,7 @@ namespace metron {
                             }
                         }
                         else {
-                            new RSVP.Promise((resolve, reject) => {
+                            new Promise((resolve, reject) => {
                                 metron.tools.loadJSON(`${root}/metron.json`, (configData: JSON) => {
                                     for (let obj in configData) {
                                         if (metron.config[obj] == null) {
