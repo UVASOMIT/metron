@@ -13,18 +13,18 @@
                 ]
             },
     "files": [
-        "src/metron.extenders.ts",
-        "src/metron.types.ts",
+        "src/extenders.ts",
+        "src/types.ts",
         "src/metron.ts",
-        "src/metron.controls.ts",
-        "src/metron.storage.ts",
-        "src/metron.tools.ts",
-        "src/metron.base.ts",
-        "src/metron.routing.ts",
-        "src/metron.framework.ts",
-        "src/metron.lists.ts",
-        "src/metron.forms.ts",
-        "src/metron.views.ts",
-        "src/metron.templates.ts"
+        "src/controls.ts",
+        "src/storage.ts",
+        "src/tools.ts",
+        "src/base.ts",
+        "src/routing.ts",
+        "src/framework.ts",
+        "src/lists.ts",
+        "src/forms.ts",
+        "src/views.ts",
+        "src/templates.ts"
     ]
 }

@@ -5,8 +5,8 @@ interface String {
     rtrim: () => string;
     //trim: () => string;
     normalize: () => string;
-    startsWith: (part: string) => boolean;
-    endsWith: (part: string) => boolean;
+    startsWith: (part: string, pos?: number) => boolean;
+    endsWith: (part: string, pos?: number) => boolean;
     capFirst: () => string;
     capWords: () => string;
     truncateWords: (number: number) => string;
@@ -111,11 +111,11 @@ String.prototype.normalize = function (): string {
     return this.replace(/^\s*|\s(?=\s)|\s*$/g, "");
 };
 
-String.prototype.startsWith = function (part: string): boolean {
+String.prototype.startsWith = function (part: string, pos?: number): boolean {
     return this.slice(0, part.length) == part;
 };
 
-String.prototype.endsWith = function (part: string): boolean {
+String.prototype.endsWith = function (part: string, pos?: number): boolean {
     return this.slice(part.length) == part;
 };
 

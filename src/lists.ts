@@ -1,4 +1,4 @@
-/// <reference path="metron.types.ts" />
+/// <reference path="types.ts" />
 
 namespace metron {
     export class lists {
