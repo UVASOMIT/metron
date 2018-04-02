@@ -48,7 +48,7 @@ namespace metron {
                 if (filters != null) {
                     for (let h in result) {
                         if (result.hasOwnProperty(h)) {
-                            if (filters[h] != null) {
+                            if (filters[h] != null) { //This should be checking for undefined.
                                 delete result[h];
                             }
                         }

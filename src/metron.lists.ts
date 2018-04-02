@@ -450,6 +450,7 @@ namespace metron {
             }
             let hash = metron.routing.getRouteUrl(self._filters);
             if (hash != null) {
+                /* If getRouteUrl() has the filters set, then the below items should never be in the hash. Might be able to delete this. */
                 self.pageSize = (hash["PageSize"] != null) ? hash["PageSize"] : self.pageSize;
                 self.currentPageIndex = (hash["PageIndex"] != null) ? hash["PageIndex"] : self.currentPageIndex;
                 self.sortOrder = (hash["_SortOrder"] != null) ? hash["_SortOrder"] : self.sortOrder;
