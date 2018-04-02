@@ -179,7 +179,7 @@ namespace metron {
         }
         export function formatDateTime(datetime: string): string {
             if (!String.isNullOrEmpty(datetime)) {
-                let d = new Date(datetime);
+                let d: Date = convertDateStringToDate(datetime);
                 let m = d.getMonth() + 1;
                 let mm = m < 10 ? "0" + m : m;
                 let dd = d.getDate();
@@ -193,7 +193,11 @@ namespace metron {
         export function formatTime(datetime: string | Date, isFullDate = false): string {
             var d: Date;
             if (isFullDate) {
-                d = <Date><any>datetime;
+                if ((<string>datetime).length) {
+                    d = convertDateStringToDate(<string>datetime);
+                } else {
+                    d = <Date><any>datetime;
+                }
             }
             else {
                 let c: Array<string> = (<string><any>datetime).split(":");
@@ -213,6 +217,13 @@ namespace metron {
                 return "yes";
             }
             return "no";
+        }
+        export function convertDateStringToDate(datetime: string): Date {
+            let dateString: string = datetime.substring(0, datetime.indexOf("T"));
+            let dateArray: Array<string> = dateString.split("-");
+            let timeString: string = datetime.substring(datetime.indexOf("T") + 1, datetime.length);
+            let timeArray: Array<string> = timeString.split(":");
+            return new Date(parseInt(dateArray[0]), parseInt(dateArray[1]) - 1, parseInt(dateArray[2]), parseInt(timeArray[0], 10), parseInt(timeArray[1], 10), parseInt(timeArray[2], 10), 0);
         }
     }
 }
