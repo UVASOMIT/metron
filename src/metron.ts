@@ -250,14 +250,14 @@ namespace metron {
         export function post(url: string, params: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
             return ajax(url, params, "POST", true, (contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, success, failure, always);
         }
-        export function postAll(url: string, params: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
-            return ajax(url, JSON.stringify({ params }), "POST", true, (contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, success, failure, always);
+        export function postAll(url: string, params: any = {}, contentType: string = "application/json;charset=utf-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
+            return ajax(url, JSON.stringify({ "data": params }), "POST", true, (contentType != null) ? contentType : "application/json;charset=utf-8", dataType, success, failure, always);
         }
         export function put(url: string, params: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
             return ajax(url, params, "PUT", true, (contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, success, failure, always);
         }
-        export function putAll(url: string, params: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
-            return ajax(url, JSON.stringify({ params }), "PUT", true, (contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, success, failure, always);
+        export function putAll(url: string, params: any = {}, contentType: string = "application/json;charset=utf-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
+            return ajax(url, JSON.stringify({ "data": params }), "PUT", true, (contentType != null) ? contentType : "application/json;charset=utf-8", dataType, success, failure, always);
         }
         export function remove(url: string, params: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
             return ajax(url, params, "DELETE", true, (contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, function (data) {
