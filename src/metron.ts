@@ -220,7 +220,7 @@ namespace metron {
                 request.send(data);
             }
             let request: XMLHttpRequest = new XMLHttpRequest();
-            let requestData = metron.web.querystringify(data, true);
+            let requestData = (typeof(data) !== "string") ? metron.web.querystringify(data, true) : data;
             if (requestData.startsWith("?")) {
                 requestData = requestData.substr(1);
             }
