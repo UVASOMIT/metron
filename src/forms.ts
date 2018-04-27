@@ -190,6 +190,7 @@ namespace metron {
                 });
             }
         }
+        /*
         public loadSelects(selects: NodeListOf<Element>, callback?: Function): void {
             var self = this;
             var promises: Array<any> = [];
@@ -222,6 +223,7 @@ namespace metron {
                 console.log("Error: Promise execution failed!");
             });
         }
+        */
         public clearForm(selector?: string, callback?: Function): void {
             var self = this;
             var f = (self._elem != null) ? self._elem : document.selectOne(selector);

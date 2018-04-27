@@ -1,11 +1,16 @@
 namespace metron {
-    export var config: any = {};
+    export var config: any = { };
     export var globals: any = {
         actions: {}
         , forms: {}
         , lists: {}
         , pivots: {}
         , handlers: {}
+        , pager: {
+            pages: []
+            , mode: null
+            , root: "/"
+        }
         , hashLoadedFromApplication: false
         , firstLoad: false
         , requiresDateTimePolyfill: false
@@ -87,6 +92,7 @@ namespace metron {
             });
         });
     }
+    /*
     export function load(segment: string, model: string, func: Function, name?: string) {
         if (name == null) {
             if (document.selectOne(`[data-m-type="${segment}"][data-m-model="${model}"]`) != null) {
@@ -98,6 +104,10 @@ namespace metron {
                 func();
             }
         }
+    }
+    */
+    export function load(re: RegExp, func: Function) {
+        metron.paging.add(re, func);
     }
     export function ifQuerystring(callback: Function): void {
         let qs: string = <string><any>metron.web.querystring();
@@ -188,6 +198,7 @@ namespace metron {
             }
         }
     }
+    /*
     window.onhashchange = function () {
         if (!metron.globals.hashLoadedFromApplication) {
             let hasPivoted = false;
@@ -206,6 +217,7 @@ namespace metron {
         }
         metron.globals.hashLoadedFromApplication = false;
     }
+    */
     metron.onready((e: Event) => {
         function recursePivot(elem: Element): void {
             if (elem != null) {
@@ -240,6 +252,7 @@ namespace metron {
                 metron.lists.bindAll(() => {
                     metron.forms.bindAll(() => {
                         metron.controls.polyfill();
+                        metron.component.loadSelects(document.selectAll("select[data-m-binding]"));
                     });
                 });
             }
