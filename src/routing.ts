@@ -115,17 +115,22 @@ namespace metron {
                         console.log(`Error: Failed to get routing. ${e}`);
                     }
                 }
-                let result = metron.tools.formatOptions(hash, metron.OptionTypes.QUERYSTRING);
-                if (filters != null) {
-                    for (let h in result) {
-                        if (result.hasOwnProperty(h)) {
-                            if (filters[h] != null) { //This should be checking for undefined.
-                                delete result[h];
+                try {
+                    let result = metron.tools.formatOptions(hash, metron.OptionTypes.QUERYSTRING);
+                    if (filters != null) {
+                        for (let h in result) {
+                            if (result.hasOwnProperty(h)) {
+                                if (filters[h] != null) { //This should be checking for undefined.
+                                    delete result[h];
+                                }
                             }
                         }
                     }
+                    return result;
                 }
-                return result;
+                catch(e) {
+                    console.log(`Error formatting options in getRouteUrl(): ${e}`);
+                }
             }
             return null;
         }
