@@ -114,7 +114,7 @@ namespace metron {
                                     }
                                     else {
                                         self.clearForm();
-                                        if(self.pivot != null) {
+                                        if(self.pivot != null) { //Might want to use the history here and just go back. Pivoting this way is causing an entry in the history object.
                                             (el.attribute("data-m-pivot") != null) ? self.pivot.exact(<any>el.attribute("data-m-pivot")) : self.pivot.previous();
                                         }
                                         if (metron.globals["lists"][self.model] != null) {

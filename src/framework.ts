@@ -198,8 +198,7 @@ namespace metron {
             }
         }
     }
-    /*
-    window.onhashchange = function () {
+    window.onhashchange = function () { //Is this still needed with the new paging/routing implementation?
         if (!metron.globals.hashLoadedFromApplication) {
             let hasPivoted = false;
             let section = document.selectOne("[data-m-type='pivot']");
@@ -217,7 +216,6 @@ namespace metron {
         }
         metron.globals.hashLoadedFromApplication = false;
     }
-    */
     metron.onready((e: Event) => {
         function recursePivot(elem: Element): void {
             if (elem != null) {
