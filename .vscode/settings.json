@@ -1,5 +1,6 @@
 // Place your settings in this file to overwrite default and user settings.
 {
     "vsicons.presets.angular": false,
-    "editor.minimap.enabled": false
+    "editor.minimap.enabled": false,
+    "typescript.tsdk": "node_modules\\typescript\\lib"
 }

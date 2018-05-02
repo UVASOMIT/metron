@@ -1,4 +1,4 @@
-/// <reference path="metron.types.ts" />
+/// <reference path="types.ts" />
 
 namespace metron {
     export class forms {
@@ -114,7 +114,7 @@ namespace metron {
                                     }
                                     else {
                                         self.clearForm();
-                                        if(self.pivot != null) {
+                                        if(self.pivot != null) { //Might want to use the history here and just go back. Pivoting this way is causing an entry in the history object.
                                             (el.attribute("data-m-pivot") != null) ? self.pivot.exact(<any>el.attribute("data-m-pivot")) : self.pivot.previous();
                                         }
                                         if (metron.globals["lists"][self.model] != null) {
@@ -190,6 +190,7 @@ namespace metron {
                 });
             }
         }
+        /*
         public loadSelects(selects: NodeListOf<Element>, callback?: Function): void {
             var self = this;
             var promises: Array<any> = [];
@@ -200,7 +201,7 @@ namespace metron {
                     let nm: string = el.attribute("name");
                     let nText: string = el.attribute("data-m-text");
                     let options: any = (el.attribute("data-m-options") != null) ? metron.tools.formatOptions(el.attribute("data-m-options")) : { };
-                    let ajx = new RSVP.Promise(function (resolve, reject) {
+                    let ajx = new Promise(function (resolve, reject) {
                         metron.web.get(`${metron.fw.getAPIURL(binding)}${metron.web.querystringify(options)}`, {}, null, "json", function (data: Array<T>) {
                             data.each(function (i: number, item: any) {
                                 (<HTMLElement>self._elem.selectOne(`#${self.model}_${nm}`)).append(`<option value="${item[key]}">${item[nText]}</option>`);
@@ -211,7 +212,7 @@ namespace metron {
                     promises.push(ajx);
                 }
             });
-            RSVP.all(promises).then(function () {
+            Promise.all(promises).then(function () {
                 if (callback != null) {
                     callback();
                 }
@@ -222,6 +223,7 @@ namespace metron {
                 console.log("Error: Promise execution failed!");
             });
         }
+        */
         public clearForm(selector?: string, callback?: Function): void {
             var self = this;
             var f = (self._elem != null) ? self._elem : document.selectOne(selector);

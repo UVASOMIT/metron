@@ -1,11 +1,16 @@
 namespace metron {
-    export var config: any = {};
+    export var config: any = { };
     export var globals: any = {
         actions: {}
         , forms: {}
         , lists: {}
         , pivots: {}
         , handlers: {}
+        , pager: {
+            pages: []
+            , mode: null
+            , root: "/"
+        }
         , hashLoadedFromApplication: false
         , firstLoad: false
         , requiresDateTimePolyfill: false
@@ -26,7 +31,7 @@ namespace metron {
                     });
                     proms.push(prom);
                 });
-                RSVP.all(proms).then(() => {
+                Promise.all(proms).then(() => {
                     document.selectAll("[data-m-type='markdown']").each((idx: number, elem: Element) => {
                         if (elem.attribute("data-m-include") == null) {
                             (<HTMLElement>elem).innerHTML = metron.templates.markdown.toHTML((<HTMLElement>elem).innerHTML);
@@ -53,7 +58,7 @@ namespace metron {
                             }
                         }
                         else {
-                            new RSVP.Promise((resolve, reject) => {
+                            new Promise((resolve, reject) => {
                                 metron.tools.loadJSON(`${root}/metron.json`, (configData: JSON) => {
                                     for (let obj in configData) {
                                         if (metron.config[obj] == null) {
@@ -87,6 +92,7 @@ namespace metron {
             });
         });
     }
+    /*
     export function load(segment: string, model: string, func: Function, name?: string) {
         if (name == null) {
             if (document.selectOne(`[data-m-type="${segment}"][data-m-model="${model}"]`) != null) {
@@ -98,6 +104,10 @@ namespace metron {
                 func();
             }
         }
+    }
+    */
+    export function load(re: RegExp, func: Function) {
+        metron.paging.add(re, func);
     }
     export function ifQuerystring(callback: Function): void {
         let qs: string = <string><any>metron.web.querystring();
@@ -188,7 +198,7 @@ namespace metron {
             }
         }
     }
-    window.onhashchange = function () {
+    window.onhashchange = function () { //Is this still needed with the new paging/routing implementation?
         if (!metron.globals.hashLoadedFromApplication) {
             let hasPivoted = false;
             let section = document.selectOne("[data-m-type='pivot']");
@@ -240,6 +250,7 @@ namespace metron {
                 metron.lists.bindAll(() => {
                     metron.forms.bindAll(() => {
                         metron.controls.polyfill();
+                        metron.component.loadSelects(document.selectAll("select[data-m-binding]"));
                     });
                 });
             }
