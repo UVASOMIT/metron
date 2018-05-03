@@ -227,8 +227,7 @@ namespace metron {
                             if (idx == self.displayIndex) {
                                 self.init(elem);
                                 elem.show();
-                                //metron.paging.navigate(`/${elem.attribute("data-m-page")}`);
-                                history.replaceState(null, null, `#/${elem.attribute("data-m-page")}/`);
+                                metron.routing.navigate(`/${elem.attribute("data-m-page")}`, true);
                             }
                             else {
                                 elem.hide();

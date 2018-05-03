@@ -61,7 +61,8 @@ namespace metron {
     }
     export class component extends base {
         public static action(action: string, prefix: string, func: Function) {
-            metron.globals.actions[`${prefix}_${action}`] = func;
+            var actionName = (prefix != null) ? `${prefix}_${action}` : action;
+            metron.globals.actions[actionName] = func;
         }
         public static loadSelects(selects: NodeListOf<Element>, callback?: Function): void {
             var promises: Array<any> = [];
@@ -94,6 +95,20 @@ namespace metron {
             }).catch(function (reason) {
                 console.log("Error: Promise execution failed!");
             });
+        }
+        public static loadActions(actions: NodeListOf<Element>): void {
+            actions.each(function (indx: number, el: Element) {
+                let a = el.attribute("data-m-action");
+                if(el.up("[data-m-type='list']") == null && el.up("[data-m-type='form']") == null && el.up("[data-m-type='view']") == null) {
+                    el.addEvent("click", function (e) {
+                        e.preventDefault();
+                        metron.globals.actions[a.lower()]();
+                    }, true);
+                }
+            });
+        }
+        public static bindActions(): void {
+            metron.component.loadActions(document.selectAll("[data-m-action]"));
         }
     }
 }

@@ -1,22 +1,15 @@
 namespace metron {
-    export namespace paging {
-        export function config(options): void {
-            metron.globals.pager.mode = options && options.mode && options.mode == "history"  && !!(history.pushState) ? "history" : "hash";
+    export namespace routing {
+        /* */
+        export function config(options: any): void {
             metron.globals.pager.root = options && options.root ? '/' + clearSlashes(options.root) + '/' : '/';
         }
         export function getFragment(): string {
-            var fragment = "";
-            if(metron.globals.pager.mode === "history") {
-                fragment = clearSlashes(decodeURI(location.pathname + location.search));
-                fragment = fragment.replace(/\?(.*)$/, "");
-                fragment = metron.globals.pager.root != "/" ? fragment.replace(metron.globals.pager.root, "") : fragment;
-            } else {
-                let match = window.location.href.match(/#(.*)$/);
-                fragment = match ? match[1] : "";
-            }
+            let match = window.location.href.match(/#(.*)$/);
+            let fragment = match ? match[1] : "";
             return clearSlashes(fragment);
         }
-        export function clearSlashes(path): string {
+        export function clearSlashes(path: string): string {
             return path.toString().replace(/\/$/, "").replace(/^\//, "");
         }
         export function add(re, handler): void {
@@ -26,7 +19,7 @@ namespace metron {
             }
             metron.globals.pager.pages.push({ re: re, handler: handler});
         }
-        export function remove(param): void {
+        export function remove(param: any): void {
             for(let i = 0, r; i < metron.globals.pager.pages.length, r = metron.globals.pager.pages[i]; i++) {
                 if(r.handler === param || r.re.toString() === param.toString()) {
                     metron.globals.pager.pages.splice(i, 1); 
@@ -35,10 +28,9 @@ namespace metron {
         }
         export function flush(): void {
             metron.globals.pager.pages = [];
-            metron.globals.pager.mode = null;
             metron.globals.pager.root = "/";
         }
-        export function check(f): any {
+        export function check(f?: string): any {
             var fragment = f || getFragment();
             for(var i = 0; i < metron.globals.pager.pages.length; i++) {
                 var match = fragment.match(metron.globals.pager.pages[i].re);
@@ -61,16 +53,16 @@ namespace metron {
             clearInterval(metron.globals.pager.interval);
             metron.globals.pager.interval = setInterval(fn, 50);
         }
-        export function navigate(path): void {
+        export function navigate(path: string, replace: boolean = false): void {
             path = path ? path : '';
-            //if(metron.globals.pager.mode === "history") {
-                history.pushState(null, null, `${metron.globals.pager.root}${clearSlashes(path)}`);
-            //} else {
-            //    window.location.href = `${window.location.href.replace(/#(.*)$/, '')}#${path}`;
-            //}
+            if(replace) {
+                history.replaceState(null, null, `#/${path}/`);
+            }
+            else {
+                history.pushState(null, null, `#/${path}/`);
+            }
         }
-    }
-    export namespace routing {
+        /* */
         export function setRouteUrl(name: string, wsqs: string, wantsReplaceHash: boolean = false): void {
             var hash = (wsqs.length > 1) ? wsqs.substr(1) : "";
             if (hash != "" && document.location.search != null) {
