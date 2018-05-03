@@ -8,7 +8,6 @@ namespace metron {
         , handlers: {}
         , pager: {
             pages: []
-            , mode: null
             , root: "/"
         }
         , hashLoadedFromApplication: false
@@ -107,7 +106,7 @@ namespace metron {
     }
     */
     export function load(re: RegExp, func: Function) {
-        metron.paging.add(re, func);
+        metron.routing.add(re, func);
     }
     export function ifQuerystring(callback: Function): void {
         let qs: string = <string><any>metron.web.querystring();
@@ -251,6 +250,7 @@ namespace metron {
                     metron.forms.bindAll(() => {
                         metron.controls.polyfill();
                         metron.component.loadSelects(document.selectAll("select[data-m-binding]"));
+                        metron.component.loadActions(document.selectAll("[data-m-action]"));
                     });
                 });
             }
