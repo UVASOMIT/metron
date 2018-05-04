@@ -48,11 +48,7 @@ namespace metron {
         }
         public showAlerts(className: string, txt: string, jsn?: any, xml?: XMLDocument): void {
             var self = this;
-            var elem = <HTMLElement>document.selectOne(`[data-m-type='${self.baseType}'][data-m-model='${self.model}'] [data-m-segment='alert']`);
-            elem.innerHTML = txt;
-            elem.addClass(className);
-            elem.attribute("data-m-state", "show");
-            elem.show();
+            metron.component.showAlerts(`[data-m-type='${self.baseType}'][data-m-model='${self.model}'] [data-m-segment='alert']`, className, txt, jsn, xml);
         }
         public loadSelects(selects: NodeListOf<Element>, callback?: Function): void {
             var self = this;
@@ -109,6 +105,13 @@ namespace metron {
         }
         public static bindActions(): void {
             metron.component.loadActions(document.selectAll("[data-m-action]"));
+        }
+        public static showAlerts(selector: string, className: string, txt: string, jsn?: any, xml?: XMLDocument): void {
+            var elem = <HTMLElement>document.selectOne(selector);
+            elem.innerHTML = txt;
+            elem.addClass(className);
+            elem.attribute("data-m-state", "show");
+            elem.show();
         }
     }
 }

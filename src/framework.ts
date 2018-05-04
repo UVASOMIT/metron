@@ -105,8 +105,22 @@ namespace metron {
         }
     }
     */
-    export function load(re: RegExp, func: Function) {
-        metron.routing.add(re, func);
+    export function load(re: RegExp, func: Function | { n: string, func: Function }): void {
+        let n, f;
+        if(typeof func == "object") {
+            n = func.n;
+            f = func.func;
+        }
+        let h = () => {
+            if(n !== undefined) {
+                let p = document.selectOne("[data-m-type='pivot']");
+                if(p !== undefined) {
+                    metron.controls.getPivot(p.attribute("data-m-page")).exact(n);
+                }
+            }
+            f();
+        };
+        metron.routing.add(re, h);
     }
     export function ifQuerystring(callback: Function): void {
         let qs: string = <string><any>metron.web.querystring();
