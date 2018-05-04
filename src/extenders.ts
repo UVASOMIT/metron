@@ -75,6 +75,7 @@ interface Element {
     hasMatches: (selector: string) => boolean;
     up: (selector: string) => Element;
     isHidden: () => Boolean;
+    val: (val?: string) => string;
 }
 
 interface HTMLElement {
@@ -86,6 +87,133 @@ interface XMLHttpRequest {
     responseJSON: () => JSON;
 }
 
+function getElementValue(_self: any, val?: string): string {
+    if(val != null) {
+        if(_self.nodeName.lower() == "textarea") {
+            _self.innerHTML = val;
+            try {
+                _self.innerText = val;
+            }
+            catch (e) { }
+            try {
+                _self.value = val;
+            }
+            catch (e) { }
+        }
+        else if(_self.nodeName.lower() == "input") {
+            switch(_self.attribute("type").lower()) {
+                case "file":
+                    break;
+                case "checkbox":
+                    if (<boolean><any>val) {
+                        _self.checked = true;
+                    }
+                    else {
+                        _self.checked = false;
+                    }
+                    break;
+                case "radio":
+                    let name: string = _self.attribute("name");
+                    let radios: NodeListOf<Element> = document.selectAll(`input[type='radio'][name='${name}']`);
+                    radios.each(function(idx: number, elem: Element) {
+                        if(elem.attribute("value") == val) {
+                            (<HTMLInputElement>elem).checked = true;
+                        }
+                        else {
+                            (<HTMLInputElement>elem).checked = false;
+                        }
+                    });
+                    break;
+                case "date":
+                    let date: string = val;
+                    if (date.contains("T")) {
+                        date = date.slice(0, date.indexOf("T"));
+                    }
+                    if (metron.globals.requiresDateTimePolyfill && /\d{4}-\d{2}-\d{2}/g.test(val)) {
+                        _self.value = `${date.slice(5, 7)}/${date.slice(8, 10)}/${date.slice(0, 4)}`;
+                    }
+                    else {
+                        _self.value = date;
+                    }
+                    break;
+                case "time":
+                    let time: string = val;
+                    if (metron.globals.requiresDateTimePolyfill) {
+                        if (/\d{2}:\d{2}:\d{2}/g.test(time)) {
+                            let hour: number = Number(time.slice(0, 2));
+                            let period: string = hour > 11 ? "PM" : "AM";
+                            hour = hour > 12 ? hour - 12 : hour;
+                            let hourStr: string = hour > 9 ? hour.toString() : "0" + hour.toString();
+                            _self.value = `${hourStr}:${time.slice(3, 5)} ${period}`;
+                        }
+                        else {
+                            _self.value = time;
+                        }
+                    }
+                    else {
+                        if (/\d{2}:\d{2}:\d{2}/g.test(time)) {
+                            _self.value = time.slice(0, 5);
+                        }
+                        else {
+                            _self.value = time;
+                        }
+                    }
+                    break;
+                default:
+                _self.value = val;
+                    break;
+            }
+        }
+        else if(_self.nodeName.lower() == "select") {
+            for(let i = 0; i < (<any>self).options.length; i++) {
+                if((<any>self).options[i].value == val) {
+                    (<any>self).selectedIndex = i;
+                    break;
+                }
+            }
+        }
+    }
+    else {
+        if (_self.nodeName.lower() == "textarea") {
+            try {
+                return (<any>self).value;
+            }
+            catch (e) { }
+            if (_self.innerText != null && (<string>(<any>self).innerText).trim() != "") {
+                return _self.innerText;
+            }
+            else if (_self.innerHTML != null && _self.innerHTML.trim() != "") {
+                return _self.innerHTML;
+            }
+            return null;
+        }
+        else if(_self.nodeName.lower() == "input") {
+            switch(_self.attribute("type").lower()) {
+                case "checkbox":
+                    return _self.checked;
+                case "radio":
+                    let name: string = _self.attribute("name");
+                    return (<HTMLInputElement>document.selectOne(`input[type='radio'][name='${name}']:checked`)).value;
+                case "time":
+                    if (metron.globals.requiresDateTimePolyfill && /\d{2}:\d{2} \S{2}/g.test((<any>self).value)) {
+                        let period: string = _self.value.slice(6, 8);
+                        let hour: number = Number(_self.value.slice(0, 2));
+                        let hourStr: string = (period == "PM" && hour < 12) ? (hour + 12).toString() : hour.toString();
+                        return `${hourStr}:${_self.value.slice(3, 5)}:00`;
+                    }
+                    else {
+                        return (<any>self).value;
+                    }
+                default:
+                    return (<any>self).value;
+            }
+        }
+        else if(_self.nodeName.lower() == "select") {
+            return _self.options[_self.selectedIndex].value;
+        }
+    }
+    return val;
+}
 
 String.prototype.lower = function (): string {
     return this.toLowerCase();
@@ -397,11 +525,11 @@ NodeList.prototype.last = function (): Element {
     return this[this.length - 1];
 };
 
-Element.prototype.selectOne = function(selector: string): Element {
+Element.prototype.selectOne = function(selector: string): Element | HTMLElement {
     return this.querySelector(selector);
 };
 
-Element.prototype.selectAll = function(selector: string): NodeListOf<Element> {
+Element.prototype.selectAll = function(selector: string): NodeListOf<Element> | NodeListOf<HTMLElement> {
     return this.querySelectorAll(selector);
 };
 
@@ -522,6 +650,7 @@ Element.prototype.hide = function(): Element {
     }
     return this.attribute("style", `display:none;`);
 };
+
 Element.prototype.toggle = function(): Element {
     if (!(this.offsetWidth || this.offsetHeight || this.getClientRects().length)){
         return this.show();
@@ -550,137 +679,17 @@ Element.prototype.isHidden = function(): boolean {
     return (this.offsetParent === null);
 };
 
+Element.prototype.val = function(val?: string): string {
+    return getElementValue(this, val);
+}
+
 HTMLElement.prototype.clean = function(): HTMLElement {
     this.value = this.value.replace(/\r?\n/g, "\r\n");
     return this;
 };
 
 HTMLElement.prototype.val = function(val?: string): string {
-    if(val != null) {
-        if(this.nodeName.lower() == "textarea") {
-            this.innerHTML = val;
-            try {
-                this.innerText = val;
-            }
-            catch (e) { }
-            try {
-                this.value = val;
-            }
-            catch (e) { }
-        }
-        else if(this.nodeName.lower() == "input") {
-            switch(this.attribute("type").lower()) {
-                case "file":
-                    break;
-                case "checkbox":
-                    if (<boolean><any>val) {
-                        this.checked = true;
-                    }
-                    else {
-                        this.checked = false;
-                    }
-                    break;
-                case "radio":
-                    let name: string = this.attribute("name");
-                    let radios: NodeListOf<Element> = document.selectAll(`input[type='radio'][name='${name}']`);
-                    radios.each(function(idx: number, elem: Element) {
-                        if(elem.attribute("value") == val) {
-                            (<HTMLInputElement>elem).checked = true;
-                        }
-                        else {
-                            (<HTMLInputElement>elem).checked = false;
-                        }
-                    });
-                    break;
-                case "date":
-                    let date: string = val;
-                    if (date.contains("T")) {
-                        date = date.slice(0, date.indexOf("T"));
-                    }
-                    if (metron.globals.requiresDateTimePolyfill && /\d{4}-\d{2}-\d{2}/g.test(val)) {
-                        this.value = `${date.slice(5, 7)}/${date.slice(8, 10)}/${date.slice(0, 4)}`;
-                    }
-                    else {
-                        this.value = date;
-                    }
-                    break;
-                case "time":
-                    let time: string = val;
-                    if (metron.globals.requiresDateTimePolyfill) {
-                        if (/\d{2}:\d{2}:\d{2}/g.test(time)) {
-                            let hour: number = Number(time.slice(0, 2));
-                            let period: string = hour > 11 ? "PM" : "AM";
-                            hour = hour > 12 ? hour - 12 : hour;
-                            let hourStr: string = hour > 9 ? hour.toString() : "0" + hour.toString();
-                            this.value = `${hourStr}:${time.slice(3, 5)} ${period}`;
-                        }
-                        else {
-                            this.value = time;
-                        }
-                    }
-                    else {
-                        if (/\d{2}:\d{2}:\d{2}/g.test(time)) {
-                            this.value = time.slice(0, 5);
-                        }
-                        else {
-                            this.value = time;
-                        }
-                    }
-                    break;
-                default:
-                    this.value = val;
-                    break;
-            }
-        }
-        else if(this.nodeName.lower() == "select") {
-            for(let i = 0; i < this.options.length; i++) {
-                if(this.options[i].value == val) {
-                    this.selectedIndex = i;
-                    break;
-                }
-            }
-        }
-    }
-    else {
-        if (this.nodeName.lower() == "textarea") {
-            try {
-                return this.value;
-            }
-            catch (e) { }
-            if (this.innerText != null && (<string>this.innerText).trim() != "") {
-                return this.innerText;
-            }
-            else if (this.innerHTML != null && (<string>this.innerHTML).trim() != "") {
-                return this.innerHTML;
-            }
-            return null;
-        }
-        else if(this.nodeName.lower() == "input") {
-            switch(this.attribute("type").lower()) {
-                case "checkbox":
-                    return this.checked;
-                case "radio":
-                    let name: string = this.attribute("name");
-                    return (<HTMLInputElement>document.selectOne(`input[type='radio'][name='${name}']:checked`)).value;
-                case "time":
-                    if (metron.globals.requiresDateTimePolyfill && /\d{2}:\d{2} \S{2}/g.test(this.value)) {
-                        let period: string = this.value.slice(6, 8);
-                        let hour: number = Number(this.value.slice(0, 2));
-                        let hourStr: string = (period == "PM" && hour < 12) ? (hour + 12).toString() : hour.toString();
-                        return `${hourStr}:${this.value.slice(3, 5)}:00`;
-                    }
-                    else {
-                        return this.value;
-                    }
-                default:
-                    return this.value;
-            }
-        }
-        else if(this.nodeName.lower() == "select") {
-            return this.options[this.selectedIndex].value;
-        }
-    }
-    return val;
+    return getElementValue(this, val);
 };
 
 XMLHttpRequest.prototype.responseJSON = function(): JSON {
