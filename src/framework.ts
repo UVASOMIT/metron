@@ -111,6 +111,9 @@ namespace metron {
             n = func.n;
             f = func.func;
         }
+        else {
+            f = func;
+        }
         let h = () => {
             if(n !== undefined) {
                 let p = document.selectOne("[data-m-type='pivot']");

@@ -53,13 +53,16 @@ namespace metron {
             clearInterval(metron.globals.pager.interval);
             metron.globals.pager.interval = setInterval(fn, 50);
         }
-        export function navigate(path: string, replace: boolean = false): void {
+        export function navigate(path: string, replace: boolean = false, callback?: Function): void {
             path = path ? path : '';
             if(replace) {
                 history.replaceState(null, null, `#/${path}/`);
             }
             else {
                 history.pushState(null, null, `#/${path}/`);
+            }
+            if(callback !== undefined) {
+                callback();
             }
         }
         /* */
