@@ -71,7 +71,9 @@ namespace metron {
                                             try {
                                                 metron.globals["forms"][self.model].loadForm();
                                             }
-                                            catch(e) { }
+                                            catch(e) {
+                                                console.log(e);
+                                            }
                                         }
                                         if ((<any>self).new_m_inject != null) {
                                             (<any>self).new_m_inject();

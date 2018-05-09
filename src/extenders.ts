@@ -165,9 +165,9 @@ function getElementValue(_self: any, val?: string): string {
             }
         }
         else if(_self.nodeName.lower() == "select") {
-            for(let i = 0; i < (<any>self).options.length; i++) {
-                if((<any>self).options[i].value == val) {
-                    (<any>self).selectedIndex = i;
+            for(let i = 0; i < _self.options.length; i++) {
+                if(_self.options[i].value == val) {
+                    _self.selectedIndex = i;
                     break;
                 }
             }
