@@ -176,10 +176,10 @@ function getElementValue(_self: any, val?: string): string {
     else {
         if (_self.nodeName.lower() == "textarea") {
             try {
-                return (<any>self).value;
+                return _self.value;
             }
             catch (e) { }
-            if (_self.innerText != null && (<string>(<any>self).innerText).trim() != "") {
+            if (_self.innerText != null && (<string>_self.innerText).trim() != "") {
                 return _self.innerText;
             }
             else if (_self.innerHTML != null && _self.innerHTML.trim() != "") {
@@ -202,10 +202,10 @@ function getElementValue(_self: any, val?: string): string {
                         return `${hourStr}:${_self.value.slice(3, 5)}:00`;
                     }
                     else {
-                        return (<any>self).value;
+                        return _self.value;
                     }
                 default:
-                    return (<any>self).value;
+                    return _self.value;
             }
         }
         else if(_self.nodeName.lower() == "select") {

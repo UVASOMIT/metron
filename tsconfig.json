@@ -19,6 +19,7 @@
         "src/controls.ts",
         "src/storage.ts",
         "src/tools.ts",
+        "src/page.ts",
         "src/base.ts",
         "src/routing.ts",
         "src/framework.ts",

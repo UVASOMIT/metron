@@ -190,40 +190,6 @@ namespace metron {
                 });
             }
         }
-        /*
-        public loadSelects(selects: NodeListOf<Element>, callback?: Function): void {
-            var self = this;
-            var promises: Array<any> = [];
-            selects.each(function (indx: number, el: Element) {
-                if (el.attribute("data-m-binding") != null && el.selectAll("option").length <= 1) {
-                    let binding: string = el.attribute("data-m-binding");
-                    let key: string = (el.attribute("data-m-key")) != null ? el.attribute("data-m-key") : el.attribute("name");
-                    let nm: string = el.attribute("name");
-                    let nText: string = el.attribute("data-m-text");
-                    let options: any = (el.attribute("data-m-options") != null) ? metron.tools.formatOptions(el.attribute("data-m-options")) : { };
-                    let ajx = new Promise(function (resolve, reject) {
-                        metron.web.get(`${metron.fw.getAPIURL(binding)}${metron.web.querystringify(options)}`, {}, null, "json", function (data: Array<T>) {
-                            data.each(function (i: number, item: any) {
-                                (<HTMLElement>self._elem.selectOne(`#${self.model}_${nm}`)).append(`<option value="${item[key]}">${item[nText]}</option>`);
-                            });
-                            resolve(data);
-                        });
-                    });
-                    promises.push(ajx);
-                }
-            });
-            Promise.all(promises).then(function () {
-                if (callback != null) {
-                    callback();
-                }
-                if ((<any>self).loadSelects_m_inject != null) {
-                    (<any>self).loadSelects_m_inject();
-                }
-            }).catch(function (reason) {
-                console.log("Error: Promise execution failed!");
-            });
-        }
-        */
         public clearForm(selector?: string, callback?: Function): void {
             var self = this;
             var f = (self._elem != null) ? self._elem : document.selectOne(selector);
@@ -265,17 +231,23 @@ namespace metron {
             var isValid: boolean = true;
             var required: NodeListOf<Element> = f.selectAll("[required='required']");
             required.each(function (idx: number, elem: Element) {
-                if ((<HTMLElement>elem).val() == null || (<HTMLElement>elem).val().trim() === "") {
+                try {
+                    if ((<HTMLElement>elem).val() == null || (<HTMLElement>elem).val().trim() === "") {
+                        isValid = false;
+                        elem.addClass("error");
+                        if (f.selectOne(`label[for='${elem.attribute("id")}']`) != null) {
+                            f.selectOne(`label[for='${elem.attribute("id")}']`).addClass("label-error");
+                        }
+                        if  (f.selectOne(`label[for='${elem.attribute("id")}']`) != null && (<HTMLElement>f.selectOne(`label[for='${elem.attribute("id")}']`)).innerText != "") {
+                            result += `<p>${(<HTMLElement>f.selectOne(`label[for='${elem.attribute("id")}']`)).innerText} is a required field.</p>`;
+                        } else {
+                            result += `<p>[${elem.attribute("name")}] is a required field.</p>`;
+                        }
+                    }
+                }
+                catch(e) {
+                    console.log(`An error occurred while validating the form: ${e}`);
                     isValid = false;
-                    elem.addClass("error");
-                    if (f.selectOne(`label[for='${elem.attribute("id")}']`) != null) {
-                        f.selectOne(`label[for='${elem.attribute("id")}']`).addClass("label-error");
-                    }
-                    if  (f.selectOne(`label[for='${elem.attribute("id")}']`) != null && (<HTMLElement>f.selectOne(`label[for='${elem.attribute("id")}']`)).innerText != "") {
-                        result += `<p>${(<HTMLElement>f.selectOne(`label[for='${elem.attribute("id")}']`)).innerText} is a required field.</p>`;
-                    } else {
-                        result += `<p>[${elem.attribute("name")}] is a required field.</p>`;
-                    }
                 }
             });
             if (!isValid) {

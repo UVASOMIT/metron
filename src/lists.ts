@@ -135,6 +135,9 @@ namespace metron {
                 if (el.attribute("data-m-binding") != null) {
                     let binding: string = el.attribute("data-m-binding");
                     let key: string = (el.attribute("data-m-key")) != null ? el.attribute("data-m-key") : el.attribute("name");
+                    if(!self._filters.hasOwnProperty(key)) {
+                        console.log(`Warning: You have set the data-m-key to ${key}, which is not expected according to the <T> interface type of ${binding}.`);
+                    }
                     let nm: string = el.attribute("name");
                     let nText: string = el.attribute("data-m-text");
                     let options: any = (el.attribute("data-m-options") != null) ? metron.tools.formatOptions(el.attribute("data-m-options")) : {};

@@ -35,7 +35,7 @@ namespace metron {
         }
         public action(action: string, model: string, func: Function): base {
             var self = this;
-            component.action(action, model, func);
+            metron.page.action(action, model, func);
             return self;
         }
         public clearAlerts(): void {
@@ -48,70 +48,11 @@ namespace metron {
         }
         public showAlerts(className: string, txt: string, jsn?: any, xml?: XMLDocument): void {
             var self = this;
-            metron.component.showAlerts(`[data-m-type='${self.baseType}'][data-m-model='${self.model}'] [data-m-segment='alert']`, className, txt, jsn, xml);
+            metron.page.showAlerts(`[data-m-type='${self.baseType}'][data-m-model='${self.model}'] [data-m-segment='alert']`, className, txt, jsn, xml);
         }
-        public loadSelects(selects: NodeListOf<Element>, callback?: Function): void {
+        public loadSelects(selects: NodeListOf<Element>, callback?: Function, reload: boolean = false): void {
             var self = this;
-            component.loadSelects(selects, callback);
-        }
-    }
-    export class component extends base {
-        public static action(action: string, prefix: string, func: Function) {
-            var actionName = (prefix != null) ? `${prefix}_${action}` : action;
-            metron.globals.actions[actionName] = func;
-        }
-        public static loadSelects(selects: NodeListOf<Element>, callback?: Function): void {
-            var promises: Array<any> = [];
-            selects.each(function (indx: number, el: Element) {
-                if (el.attribute("data-m-binding") != null && el.selectAll("option").length <= 1) {
-                    let node: HTMLElement = <HTMLElement>el;
-                    let binding: string = el.attribute("data-m-binding");
-                    let key: string = (el.attribute("data-m-key")) != null ? el.attribute("data-m-key") : el.attribute("name");
-                    let nm: string = el.attribute("name");
-                    let nText: string = el.attribute("data-m-text");
-                    let options: any = (el.attribute("data-m-options") != null) ? metron.tools.formatOptions(el.attribute("data-m-options")) : { };
-                    let ajx = new Promise(function (resolve, reject) {
-                        metron.web.get(`${metron.fw.getAPIURL(binding)}${metron.web.querystringify(options)}`, {}, null, "json", function (data: Array<any>) {
-                            data.each(function (i: number, item: any) {
-                                node.append(`<option value="${item[key]}">${item[nText]}</option>`);
-                            });
-                            resolve(data);
-                        });
-                    });
-                    promises.push(ajx);
-                }
-            });
-            Promise.all(promises).then(function () {
-                if (callback != null) {
-                    callback();
-                }
-                if ((<any>self).loadSelects_m_inject != null) {
-                    (<any>self).loadSelects_m_inject();
-                }
-            }).catch(function (reason) {
-                console.log("Error: Promise execution failed!");
-            });
-        }
-        public static loadActions(actions: NodeListOf<Element>): void {
-            actions.each(function (indx: number, el: Element) {
-                let a = el.attribute("data-m-action");
-                if(el.up("[data-m-type='list']") == null && el.up("[data-m-type='form']") == null && el.up("[data-m-type='view']") == null) {
-                    el.addEvent("click", function (e) {
-                        e.preventDefault();
-                        metron.globals.actions[a.lower()]();
-                    }, true);
-                }
-            });
-        }
-        public static bindActions(): void {
-            metron.component.loadActions(document.selectAll("[data-m-action]"));
-        }
-        public static showAlerts(selector: string, className: string, txt: string, jsn?: any, xml?: XMLDocument): void {
-            var elem = <HTMLElement>document.selectOne(selector);
-            elem.innerHTML = txt;
-            elem.addClass(className);
-            elem.attribute("data-m-state", "show");
-            elem.show();
+            metron.page.loadSelects(selects, callback, reload);
         }
     }
 }
