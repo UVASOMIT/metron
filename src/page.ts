@@ -6,10 +6,8 @@ namespace metron {
             metron.globals.actions[actionName] = func;
         }
         public static loadSelects(selects: NodeListOf<Element>, callback?: Function, reload: boolean = false): void {
-            var promises: Array<any> = [];
-            selects.each(function (indx: number, el: Element) {
-                if (!reload && el.attribute("data-m-binding") != null && el.selectAll("option").length <= 1) {
-                    let node: HTMLElement = <HTMLElement>el;
+            function populateSelects(el: Element): void {
+                let node: HTMLElement = <HTMLElement>el;
                     let binding: string = el.attribute("data-m-binding");
                     let key: string = (el.attribute("data-m-key")) != null ? el.attribute("data-m-key") : el.attribute("name");
                     let nm: string = el.attribute("name");
@@ -24,6 +22,14 @@ namespace metron {
                         });
                     });
                     promises.push(ajx);
+            }
+            var promises: Array<any> = [];
+            selects.each(function (indx: number, el: Element) {
+                if(reload) {
+                    populateSelects(el);
+                }
+                else if (el.attribute("data-m-binding") != null && el.selectAll("option").length <= 1) {
+                    populateSelects(el);
                 }
             });
             Promise.all(promises).then(function () {
