@@ -285,13 +285,18 @@ namespace metron {
         }
         public populateListing(): void {
             var self = this;
-            self.clearTable(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='list']`);
-            self.populateTable(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='list']`);
-            self.totalCount = (self._items.length > 0) ? self._items[0]["TotalCount"] : 0;
-            self.createPaging(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='paging']`, self.totalCount);
-            self.applyViewEvents();
-            if ((<any>self).populateListing_m_inject != null) {
-                (<any>self).populateListing_m_inject();
+            try {
+                self.clearTable(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='list']`);
+                self.populateTable(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='list']`);
+                self.totalCount = (self._items.length > 0) ? self._items[0]["TotalCount"] : 0;
+                self.createPaging(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='paging']`, self.totalCount);
+                self.applyViewEvents();
+                if ((<any>self).populateListing_m_inject != null) {
+                    (<any>self).populateListing_m_inject();
+                }
+            }
+            catch(e) {
+                console.log(`Failed to populate listing: ${e}`);
             }
         }
         public undoLast(): void {
@@ -346,7 +351,12 @@ namespace metron {
         public clearTable(selector: string): void {
             var self = this;
             if (String.isNullOrEmpty(self._rowTemplate)) {
-                self._rowTemplate = (<HTMLElement>document.selectOne(`${selector} [data-m-type='table-body'] [data-m-action='repeat']`)).outerHTML;
+                try {
+                    self._rowTemplate = (<HTMLElement>document.selectOne(`${selector} [data-m-type='table-body'] [data-m-action='repeat']`)).outerHTML;
+                }
+                catch(e) {
+                    console.log(`DOM has no element that matches the selector "${selector} [data-m-type='table-body'] [data-m-action='repeat']": ${e}`);
+                }
             }
             document.selectOne(`${selector} [data-m-type='table-body']`).empty();
         }
