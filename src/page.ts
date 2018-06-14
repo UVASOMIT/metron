@@ -6,40 +6,40 @@ namespace metron {
             metron.globals.actions[actionName] = func;
         }
         public static loadSelects(selects: NodeListOf<Element>, callback?: Function, reload: boolean = false): void {
-            function populateSelects(el: Element): void {
+            function populateSelects(el: Element, rl: boolean): Promise<any> {
+                let rli: boolean = rl;
                 let node: HTMLElement = <HTMLElement>el;
-                    let binding: string = el.attribute("data-m-binding");
-                    let key: string = (el.attribute("data-m-key")) != null ? el.attribute("data-m-key") : el.attribute("name");
-                    let nm: string = el.attribute("name");
-                    let nText: string = el.attribute("data-m-text");
-                    let options: any = (el.attribute("data-m-options") != null) ? metron.tools.formatOptions(el.attribute("data-m-options")) : { };
-                    let ajx = new Promise(function (resolve, reject) {
+                let binding: string = el.attribute("data-m-binding");
+                let key: string = (el.attribute("data-m-key")) != null ? el.attribute("data-m-key") : el.attribute("name");
+                let nm: string = el.attribute("name");
+                let nText: string = el.attribute("data-m-text");
+                let options: any = (el.attribute("data-m-options") != null) ? metron.tools.formatOptions(el.attribute("data-m-options")) : { };
+                return new Promise((resolve, reject) => {
+                    if (rli || (binding != null && node.selectAll("option").length <= 1)) {
                         metron.web.get(`${metron.fw.getAPIURL(binding)}${metron.web.querystringify(options)}`, {}, null, "json", function (data: Array<any>) {
                             data.each(function (i: number, item: any) {
                                 node.append(`<option value="${item[key]}">${item[nText]}</option>`);
                             });
                             resolve(data);
                         });
-                    });
-                    promises.push(ajx);
+                    }
+                    else {
+                        resolve();
+                    }
+                });
             }
-            var promises: Array<any> = [];
+            var promises: Array<Promise<any>> = [];
             selects.each(function (indx: number, el: Element) {
-                if(reload) {
-                    populateSelects(el);
-                }
-                else if (el.attribute("data-m-binding") != null && el.selectAll("option").length <= 1) {
-                    populateSelects(el);
-                }
+                promises.push(populateSelects(el, reload));
             });
-            Promise.all(promises).then(function () {
+            Promise.all(promises).then(() => {
                 if (callback != null) {
                     callback();
                 }
                 if ((<any>self).loadSelects_m_inject != null) {
                     (<any>self).loadSelects_m_inject();
                 }
-            }).catch(function (reason) {
+            }).catch((reason) => {
                 console.log("Error: Promise execution failed!");
             });
         }
