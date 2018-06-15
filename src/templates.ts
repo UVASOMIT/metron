@@ -13,43 +13,41 @@ namespace metron {
                 });
             });
         }
-        export namespace list {
-            export function row<T>(template: string, item: T, isTable: boolean = true): string {
-                var result = template;
-                for (let k in item) {
-                    if (item.hasOwnProperty(k)) {
-                        let replacement = `{{${k}}}`;
-                        result = result.replace(new RegExp(replacement, "g"), (<string><any>item[k] != null && <string><any>item[k] != "null") ? <string><any>item[k] : "");
-                    }
+        export function merge<T>(template: string, item: T, isTable: boolean = true): string {
+            var result = template;
+            for (let k in item) {
+                if (item.hasOwnProperty(k)) {
+                    let replacement = `{{${k}}}`;
+                    result = result.replace(new RegExp(replacement, "g"), (<string><any>item[k] != null && <string><any>item[k] != "null") ? <string><any>item[k] : "");
                 }
-                var doc = document.createElement((isTable ? "tbody" : "div"));
-                doc.innerHTML = result;
-                doc.selectAll("[data-m-format]").each((idx: number, elem: HTMLElement) => {
-                    let options = (elem.attribute("data-m-options") != null) ? metron.tools.formatOptions(elem.attribute("data-m-options")) : null;
-                    if (elem.firstElementChild == null) {
-                        elem.innerText = format(elem.attribute("data-m-format"), elem.innerText, options);
-                    }
-                    else {
-                        format(elem.attribute("data-m-format"), elem, options);
-                    }
-                });
-                return doc.innerHTML;
             }
-            export function format(type: string, val: string | Element, options?: any): string {
-                switch (type.lower()) {
-                    case "yesno":
-                        return metron.tools.formatBoolean(<string><any>val);
-                    case "datetime":
-                        return metron.tools.formatDateTime(<string><any>val);
-                    case "date":
-                        return metron.tools.formatDate(<string><any>val);
-                    case "time":
-                        return metron.tools.formatTime(<Date><any>val);
-                    case "formatmessage":
-                        return metron.tools.formatMessage(<string><any>val, options["length"]);
-                    default:
-                        return metron.globals[type](<Element>val, options);
+            var doc = document.createElement((isTable ? "tbody" : "div"));
+            doc.innerHTML = result;
+            doc.selectAll("[data-m-format]").each((idx: number, elem: HTMLElement) => {
+                let options = (elem.attribute("data-m-options") != null) ? metron.tools.formatOptions(elem.attribute("data-m-options")) : null;
+                if (elem.firstElementChild == null) {
+                    elem.innerText = format(elem.attribute("data-m-format"), elem.innerText, options);
                 }
+                else {
+                    format(elem.attribute("data-m-format"), elem, options);
+                }
+            });
+            return doc.innerHTML;
+        }
+        export function format(type: string, val: string | Element, options?: any): string {
+            switch (type.lower()) {
+                case "yesno":
+                    return metron.tools.formatBoolean(<string><any>val);
+                case "datetime":
+                    return metron.tools.formatDateTime(<string><any>val);
+                case "date":
+                    return metron.tools.formatDate(<string><any>val);
+                case "time":
+                    return metron.tools.formatTime(<Date><any>val);
+                case "formatmessage":
+                    return metron.tools.formatMessage(<string><any>val, options["length"]);
+                default:
+                    return metron.globals[type](<Element>val, options);
             }
         }
         export namespace markdown {

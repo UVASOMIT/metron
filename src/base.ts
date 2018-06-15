@@ -1,6 +1,8 @@
 namespace metron {
-    export abstract class base {
+    export abstract class base<T> {
         protected _name: string;
+        protected _elem: Element;
+        protected _template: string;
         public pivot: metron.controls.pivot;
         constructor(public model: string, private baseType: string) {
         }
@@ -11,7 +13,7 @@ namespace metron {
             }
             return undefined;
         }
-        public inject(type: string, method: string, func: Function): base {
+        public inject(type: string, method: string, func: Function): base<T> {
             var self = this;
             if (func == null) {
                 throw new Error("Error: No function passed for injection!");
@@ -28,15 +30,20 @@ namespace metron {
             }
             return self;
         }
-        public on(method: metron.Event, func: Function, overwrite: boolean = false): base {
+        public on(method: metron.Event, func: Function, overwrite: boolean = false): base<T> {
             var self = this;
             self.inject((overwrite) ? "overwrite" : "append", metron.tools.eventEnumToString(method), func);
             return self;
         }
-        public action(action: string, model: string, func: Function): base {
+        public action(action: string, model: string, func: Function): base<T> {
             var self = this;
             metron.page.action(action, model, func);
             return self;
+        }
+        public formatData(item: T, isTable: boolean = true): string {
+            var self = this;
+            var t: string = (self._template != null) ? self._template : self._elem.innerHTML;
+            return metron.templates.merge<T>(self._template, item, isTable);
         }
         public clearAlerts(): void {
             var self = this;
