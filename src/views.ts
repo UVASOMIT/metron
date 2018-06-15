@@ -1,11 +1,19 @@
 namespace metron {
     export class views {
         public static bindAll(): void {
-
+            let sections: NodeListOf<Element> = document.selectAll("[data-m-type='view']");
+            for (let i = 0; i < sections.length; i++) {
+                let section: Element = <Element>sections[i];
+                if (section.attribute("data-m-autoload") == null || section.attribute("data-m-autoload") == "true") {
+                    let model: string = section.attribute("data-m-model");
+                    if (metron.globals["views"][model] == null) {
+                        let v: view<any> = new view(model).init();
+                    }
+                }
+            }
         }
     }
-    export class view<T> extends base {
-        private _elem: Element;
+    export class view<T> extends base<T> {
         private _form: string;
         constructor(public model: string) {
             super(model, VIEW);
@@ -29,6 +37,7 @@ namespace metron {
                 if(data instanceof Array) {
                     data = data[0];
                 }
+                self._elem.innerHTML = self.formatData(data, false);
                 for (let prop in data) {
                     if(data.hasOwnProperty(prop) && data[prop] != null && document.selectOne(`#View_${self.model}_${prop}`) != null) {
                         (<HTMLElement>document.selectOne(`#View_${self.model}_${prop}`)).innerText = <any>data[prop];

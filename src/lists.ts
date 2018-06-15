@@ -20,11 +20,9 @@ namespace metron {
             }
         }
     }
-    export class list<T> extends base {
-        private _elem: Element;
+    export class list<T> extends base<T> {
         private _filters: any = {};
         private _items: Array<T>;
-        private _rowTemplate: string;
         private _form: string;
         public recycleBin: Array<T> = [];
         public currentPageIndex: number = 1;
@@ -311,10 +309,6 @@ namespace metron {
                 (<any>self).undoLast_m_inject();
             }
         }
-        public formatData(item: T, isTable: boolean = true): string {
-            var self = this;
-            return metron.templates.list.row<T>(self._rowTemplate, item, isTable);
-        }
         public callListing(): void {
             var self = this;
             self.clearAlerts();
@@ -350,9 +344,9 @@ namespace metron {
         }
         public clearTable(selector: string): void {
             var self = this;
-            if (String.isNullOrEmpty(self._rowTemplate)) {
+            if (String.isNullOrEmpty(self._template)) {
                 try {
-                    self._rowTemplate = (<HTMLElement>document.selectOne(`${selector} [data-m-type='table-body'] [data-m-action='repeat']`)).outerHTML;
+                    self._template = (<HTMLElement>document.selectOne(`${selector} [data-m-type='table-body'] [data-m-action='repeat']`)).outerHTML;
                 }
                 catch(e) {
                     console.log(`DOM has no element that matches the selector "${selector} [data-m-type='table-body'] [data-m-action='repeat']": ${e}`);

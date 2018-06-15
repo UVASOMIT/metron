@@ -18,8 +18,7 @@ namespace metron {
             }
         }
     }
-    export class form<T> extends base {
-        private _elem: Element;
+    export class form<T> extends base<T> {
         private _fields: Array<string> = [];
         private _defaults: Array<any> = (metron.config["config.forms.defaults"] != null) ? metron.config["config.forms.defaults"] : [];
         public hasLoaded: boolean = false;
@@ -179,6 +178,7 @@ namespace metron {
                     if (data instanceof Array) {
                         data = data[0];
                     }
+                    self._elem.innerHTML = self.formatData(data, false);
                     for (let prop in data) {
                         if (data.hasOwnProperty(prop) && data[prop] != null && document.selectOne(`#${self.model}_${prop}`) != null) {
                             (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(<any>data[prop]);
