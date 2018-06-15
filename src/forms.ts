@@ -189,6 +189,9 @@ namespace metron {
                     }
                 });
             }
+            else if ((<any>self).loadForm_m_inject != null) {
+                (<any>self).loadForm_m_inject(null);
+            }
         }
         public clearForm(selector?: string, callback?: Function): void {
             var self = this;
