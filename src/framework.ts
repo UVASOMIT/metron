@@ -266,7 +266,7 @@ namespace metron {
                 metron.lists.bindAll(() => {
                     metron.forms.bindAll(() => {
                         metron.controls.polyfill();
-                        metron.page.loadSelects(document.selectAll("select[data-m-binding]"));
+                        //metron.page.loadSelects(document.selectAll("select[data-m-binding]"));
                         metron.page.loadActions(document.selectAll("[data-m-action]"));
                     });
                 });
