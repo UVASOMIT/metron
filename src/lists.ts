@@ -12,8 +12,6 @@ namespace metron {
                         let l: list<any> = new list(model).init();
                     }
                 }
-            
-
             }
             if (callback != null) {
                 callback();
