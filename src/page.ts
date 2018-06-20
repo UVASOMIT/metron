@@ -46,7 +46,7 @@ namespace metron {
         public static loadActions(actions: NodeListOf<Element>): void {
             actions.each(function (indx: number, el: Element) {
                 let a = el.attribute("data-m-action");
-                if(el.up("[data-m-type='list']") == null && el.up("[data-m-type='form']") == null && el.up("[data-m-type='view']") == null) {
+                if(el.up("[data-m-segment='controls']") == null && el.up("[data-m-type='row']") == null) {
                     let ev: string;
                     if(el.nodeName.lower() === "a" || el.nodeName.lower() === "button" || (el.nodeName.lower() === "input" && (el.attribute("type").lower() === "submit" || el.attribute("type").lower() === "button"))) {
                         ev = "click";
