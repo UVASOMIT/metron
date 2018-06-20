@@ -3,7 +3,7 @@ namespace metron {
         private _elem: Element;
         public static action(action: string, prefix: string, func: Function) {
             var actionName = (prefix != null) ? `${prefix}_${action}` : action;
-            metron.globals.actions[actionName] = func;
+            metron.globals.actions[actionName.lower()] = func;
         }
         public static loadSelects(selects: NodeListOf<Element>, callback?: Function, reload: boolean = false): void {
             function populateSelects(el: Element, rl: boolean): Promise<any> {
