@@ -74,8 +74,8 @@ namespace metron {
                             case "save":
                                 el.addEvent("click", function (e) {
                                     e.preventDefault();
-                                    if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`] != null) { //Refactor getting the action overrides
-                                        metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`]();
+                                    if (metron.globals.actions != null && metron.globals.actions[`${self.model.lower()}_${el.attribute("data-m-action").lower()}`] != null) { //Refactor getting the action overrides
+                                        metron.globals.actions[`${self.model.lower()}_${el.attribute("data-m-action").lower()}`]();
                                     }
                                     else {
                                         if (self.isValid()) {
@@ -108,8 +108,8 @@ namespace metron {
                             case "cancel":
                                 el.addEvent("click", function (e) {
                                     e.preventDefault();
-                                    if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`] != null) {
-                                        metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`]();
+                                    if (metron.globals.actions != null && metron.globals.actions[`${self.model.lower()}_${el.attribute("data-m-action").lower()}`] != null) {
+                                        metron.globals.actions[`${self.model.lower()}_${el.attribute("data-m-action").lower()}`]();
                                     }
                                     else {
                                         self.clearForm();
@@ -126,10 +126,10 @@ namespace metron {
                                 }, true);
                                 break;
                             default:
-                                if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`] != null) {
+                                if (metron.globals.actions != null && metron.globals.actions[`${self.model.lower()}_${el.attribute("data-m-action").lower()}`] != null) {
                                     el.addEvent("click", function (e) {
                                         e.preventDefault();
-                                        metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`]();
+                                        metron.globals.actions[`${self.model.lower()}_${el.attribute("data-m-action").lower()}`]();
                                     }, true);
                                 }
                                 break;
