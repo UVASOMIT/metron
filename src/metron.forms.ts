@@ -74,6 +74,7 @@ namespace metron {
                         switch (el.attribute("data-m-action").lower()) {
                             case "save":
                                 el.addEvent("click", function (e) {
+                                    el.attribute("disabled", "disabled");
                                     e.preventDefault();
                                     if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`] != null) { //Refactor getting the action overrides
                                         metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`]();
@@ -93,6 +94,7 @@ namespace metron {
                                                     self.save(data, <number><any>el.attribute("data-m-pivot"))
                                                 }, (txt, jsn, xml) => {
                                                     self.showAlerts(metron.DANGER, txt, jsn, xml);
+                                                    el.removeAttribute("disabled");
                                                 });
                                             }
                                             else {
@@ -100,8 +102,11 @@ namespace metron {
                                                     self.save(data, <number><any>el.attribute("data-m-pivot"));
                                                 }, (txt, jsn, xml) => {
                                                     self.showAlerts(metron.DANGER, txt, jsn, xml);
+                                                    el.removeAttribute("disabled");
                                                 });
                                             }
+                                        } else {
+                                            el.removeAttribute("disabled");
                                         }
                                     }
                                 }, true);
