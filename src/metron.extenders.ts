@@ -41,7 +41,6 @@ interface Array<T> {
 }
 
 interface Object {
-    getName: () => string;
     extend: (dest: any, src: any) => any;
 }
 
@@ -65,7 +64,7 @@ interface Element {
     drop: () => Element;
     removeEvent: (event: string) => Element;
     addEvent: (event: string, callback: Function, overwrite?: boolean) => Element;
-    show: (t?: string) => Element;
+    show: (t?: string) => Element | void;
     hide: () => Element;
     toggle:()=> Element;
     addClass: (className: string) => Element;
@@ -365,12 +364,6 @@ Array.prototype.toObjectArray = function (objName: string): Array<any> {
     }
 };
 
-Object.prototype.getName = function (): string {
-    let regex: RegExp = /function (.{1,})\(/;
-    let results: RegExpExecArray = regex.exec((this).constructor.toString());
-    return (results && results.length > 1) ? results[1] : "";
-};
-
 (<any>Object).extend = function(dest: any, src: any) {
     for (let prop in src) {
         if(src.hasOwnProperty(prop)) {
@@ -481,31 +474,40 @@ Element.prototype.drop = function(): Element {
 };
 
 Element.prototype.removeEvent = function (event: string): Element {
-    let evt = this[`on${event}`] || this[`${event}`];
-    try {
-        this.removeEventListener(event, evt);
+    if (this.id == "")
+        return this;
+
+    if (metron.globals.handlers[this.id])
+    {
+        if (metron.globals.handlers[this.id][event])
+        {
+            for (var i = 0; i < metron.globals.handlers[this.id][event].length; i++)
+                this.removeEventListener(event, metron.globals.handlers[this.id][event][i]);
+            metron.globals.handlers[this.id][event].empty();
+        }
     }
-    catch (e) { }
-    try {
-        this.detachEvent(`on${event}`, evt);
-    }
-    catch (e) { }
-    this[`on${event}`] = null;
-    this[`${event}`] = null;
     return this;
 };
 
 Element.prototype.addEvent = function (event: string, callback: Function, overwrite: boolean = false): Element {
     if (overwrite) {
-        this[`on${event}`] = callback;
+        this.removeEvent(event);
     }
-    else {
-        this.addEventListener(event, callback);
+    this.addEventListener(event, callback);
+    if (this.id == "") {
+        this.id = metron.guid.newGuid();
     }
+    if (!metron.globals.handlers[this.id]) {
+        metron.globals.handlers[this.id] = {};
+    }
+    if (!metron.globals.handlers[this.id][event]) {
+        metron.globals.handlers[this.id][event] = [];
+    }
+    metron.globals.handlers[this.id][event].push(callback);
     return this;
 };
 
-Element.prototype.show = function(t: string = "block"): Element {
+Element.prototype.show = function(t: string = "block"): Element | void {
     let styles = this.attribute("style");
     if(styles != null && styles != "") {
         return this.attribute("style", styles.setValueByKey("display", t));
@@ -590,6 +592,41 @@ HTMLElement.prototype.val = function(val?: string): string {
                         }
                     });
                     break;
+                case "date":
+                    let date: string = val;
+                    if (date.contains("T")) {
+                        date = date.slice(0, date.indexOf("T"));
+                    }
+                    if (metron.globals.requiresDateTimePolyfill && /\d{4}-\d{2}-\d{2}/g.test(val)) {
+                        this.value = `${date.slice(5, 7)}/${date.slice(8, 10)}/${date.slice(0, 4)}`;
+                    }
+                    else {
+                        this.value = date;
+                    }
+                    break;
+                case "time":
+                    let time: string = val;
+                    if (metron.globals.requiresDateTimePolyfill) {
+                        if (/\d{2}:\d{2}:\d{2}/g.test(time)) {
+                            let hour: number = Number(time.slice(0, 2));
+                            let period: string = hour > 11 ? "PM" : "AM";
+                            hour = hour > 12 ? hour - 12 : hour;
+                            let hourStr: string = hour > 9 ? hour.toString() : "0" + hour.toString();
+                            this.value = `${hourStr}:${time.slice(3, 5)} ${period}`;
+                        }
+                        else {
+                            this.value = time;
+                        }
+                    }
+                    else {
+                        if (/\d{2}:\d{2}:\d{2}/g.test(time)) {
+                            this.value = time.slice(0, 5);
+                        }
+                        else {
+                            this.value = time;
+                        }
+                    }
+                    break;
                 default:
                     this.value = val;
                     break;
@@ -625,6 +662,16 @@ HTMLElement.prototype.val = function(val?: string): string {
                 case "radio":
                     let name: string = this.attribute("name");
                     return (<HTMLInputElement>document.selectOne(`input[type='radio'][name='${name}']:checked`)).value;
+                case "time":
+                    if (metron.globals.requiresDateTimePolyfill && /\d{2}:\d{2} \S{2}/g.test(this.value)) {
+                        let period: string = this.value.slice(6, 8);
+                        let hour: number = Number(this.value.slice(0, 2));
+                        let hourStr: string = (period == "PM" && hour < 12) ? (hour + 12).toString() : hour.toString();
+                        return `${hourStr}:${this.value.slice(3, 5)}:00`;
+                    }
+                    else {
+                        return this.value;
+                    }
                 default:
                     return this.value;
             }

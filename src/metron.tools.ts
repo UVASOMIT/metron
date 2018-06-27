@@ -146,6 +146,18 @@ namespace metron {
                     return "loadSelects";
                 case metron.Event.CLEAR_FORM:
                     return "clearForm";
+                case metron.Event.NEW:
+                    return "new";
+                case metron.Event.UNDO:
+                    return "undo";
+                case metron.Event.DOWNLOAD:
+                    return "download";
+                case metron.Event.EDIT:
+                    return "edit";
+                case metron.Event.DELETE:
+                    return "delete";
+                case metron.Event.CANCEL:
+                    return "cancel";
                 default:
                     throw new Error("Error: Invalid enum.");
             }
@@ -154,27 +166,45 @@ namespace metron {
             return num.toFixed(2);
         }
         export function formatDate(datetime: string): string {
-            if (datetime != null && datetime.indexOf("T") != -1) {
-                return datetime.split("T")[0];
-            }
-            return "";
-        }
-        export function formatDateTime(datetime: string): string {
             if (!String.isNullOrEmpty(datetime)) {
-                let d = new Date(datetime);
+                let d: Date = convertDateStringToDate(datetime);
                 let m = d.getMonth() + 1;
                 let mm = m < 10 ? "0" + m : m;
                 let dd = d.getDate();
                 let ddd = dd < 10 ? "0" + dd : dd;
                 let y = d.getFullYear();
-                let time = formatTime(d);
+                return `${mm}-${ddd}-${y}`;
+            }
+            return "";
+        }
+        export function formatDateTime(datetime: string): string {
+            if (!String.isNullOrEmpty(datetime)) {
+                let d: Date = convertDateStringToDate(datetime);
+                let m = d.getMonth() + 1;
+                let mm = m < 10 ? "0" + m : m;
+                let dd = d.getDate();
+                let ddd = dd < 10 ? "0" + dd : dd;
+                let y = d.getFullYear();
+                let time = formatTime(d, true);
                 return `${mm}-${ddd}-${y} ${time}`;
             }
             return "";
         }
-        export function formatTime(datetime: Date): string {
-            var h = datetime.getHours();
-            var m = datetime.getMinutes();
+        export function formatTime(datetime: string | Date, isFullDate = false): string {
+            var d: Date;
+            if (isFullDate) {
+                if ((<string>datetime).length) {
+                    d = convertDateStringToDate(<string>datetime);
+                } else {
+                    d = <Date><any>datetime;
+                }
+            }
+            else {
+                let c: Array<string> = (<string><any>datetime).split(":");
+                d = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), parseInt(c[0], 10), parseInt(c[1], 10), parseInt(c[2], 10))
+            }
+            var h = d.getHours();
+            var m = d.getMinutes();
             var ampm = h >= 12 ? "pm" : "am";
             h = h % 12;
             h = h ? h : 12;
@@ -187,6 +217,13 @@ namespace metron {
                 return "yes";
             }
             return "no";
+        }
+        export function convertDateStringToDate(datetime: string): Date {
+            let dateString: string = datetime.substring(0, datetime.indexOf("T"));
+            let dateArray: Array<string> = dateString.split("-");
+            let timeString: string = datetime.substring(datetime.indexOf("T") + 1, datetime.length);
+            let timeArray: Array<string> = timeString.split(":");
+            return new Date(parseInt(dateArray[0]), parseInt(dateArray[1]) - 1, parseInt(dateArray[2]), parseInt(timeArray[0], 10), parseInt(timeArray[1], 10), parseInt(timeArray[2], 10), 0);
         }
     }
 }

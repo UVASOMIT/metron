@@ -1,5 +1,7 @@
 /// <reference types="rsvp" />
 
+declare var RSVP;
+
 namespace metron {
     export namespace dictionary {
         (function () {
@@ -71,7 +73,7 @@ namespace metron {
         })();
     }
     export namespace web {
-        function parseUrl(url: string, obj: any): string {
+        function parseUrl(url: string, obj: any, encode: boolean = false): string {
             let paramPairs: Array<string> = [];
             if (url.contains('?')) {
                 let parts: Array<string> = url.split('?');
@@ -80,10 +82,12 @@ namespace metron {
             }
             for (let prop in obj) {
                 if (obj.hasOwnProperty(prop) && !paramPairs.contains(prop, true)) {
-                    paramPairs.push(prop + '=' + obj[prop]);
+                    let item = (encode) ? encodeURIComponent(obj[prop]) : obj[prop];
+                    paramPairs.push(prop + '=' + item);
                 }
                 else if (obj.hasOwnProperty(prop) && paramPairs.contains(prop, true)) {
-                    paramPairs[paramPairs.indexOfPartial(prop)] = prop + '=' + obj[prop];
+                    let item = (encode) ? encodeURIComponent(obj[prop]) : obj[prop];
+                    paramPairs[paramPairs.indexOfPartial(prop)] = prop + '=' +item;
                 }
             }
             return url + '?' + paramPairs.join('&');
@@ -113,8 +117,8 @@ namespace metron {
                 throw 'Error: No document object found. Environment may not contain a DOM.';
             }
         }
-        export function querystringify(obj: any): string {
-            return parseUrl("", obj);
+        export function querystringify(obj: any, encode = false): string {
+            return parseUrl("", obj, encode);
         }
         export namespace cookie {
             export function get(name: string): string {
@@ -216,7 +220,7 @@ namespace metron {
                 request.send(data);
             }
             let request: XMLHttpRequest = new XMLHttpRequest();
-            let requestData = metron.web.querystringify(data);
+            let requestData = (typeof(data) !== "string") ? metron.web.querystringify(data, true) : data;
             if (requestData.startsWith("?")) {
                 requestData = requestData.substr(1);
             }
@@ -246,14 +250,14 @@ namespace metron {
         export function post(url: string, params: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
             return ajax(url, params, "POST", true, (contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, success, failure, always);
         }
-        export function postAll(url: string, params: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
-            return ajax(url, JSON.stringify({ params }), "POST", true, (contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, success, failure, always);
+        export function postAll(url: string, params: any = {}, contentType: string = "application/json;charset=utf-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
+            return ajax(url, JSON.stringify({ "data": params }), "POST", true, (contentType != null) ? contentType : "application/json;charset=utf-8", dataType, success, failure, always);
         }
         export function put(url: string, params: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
             return ajax(url, params, "PUT", true, (contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, success, failure, always);
         }
-        export function putAll(url: string, params: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
-            return ajax(url, JSON.stringify({ params }), "PUT", true, (contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, success, failure, always);
+        export function putAll(url: string, params: any = {}, contentType: string = "application/json;charset=utf-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
+            return ajax(url, JSON.stringify({ "data": params }), "PUT", true, (contentType != null) ? contentType : "application/json;charset=utf-8", dataType, success, failure, always);
         }
         export function remove(url: string, params: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
             return ajax(url, params, "DELETE", true, (contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, function (data) {
@@ -312,18 +316,14 @@ namespace metron {
         })();
     }
     export namespace guid {
-        (function () {
-            function generateGUIDPart(): string {
-                return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-            }
-            return {
-                //Note that JavaScript doesn't actually have GUID or UUID functionality.
-                //This is as best as it gets.
-                newGuid: function (): string {
-                    return (generateGUIDPart() + generateGUIDPart() + "-" + generateGUIDPart() + "-" + generateGUIDPart() + "-" + generateGUIDPart() + "-" + generateGUIDPart() + generateGUIDPart() + generateGUIDPart());
-                }
-            };
-        })();
+        function generateGUIDPart(): string {
+            return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+        }
+        //Note that JavaScript doesn't actually have GUID or UUID functionality.
+        //This is as best as it gets.
+        export function newGuid(): string {
+            return (generateGUIDPart() + generateGUIDPart() + "-" + generateGUIDPart() + "-" + generateGUIDPart() + "-" + generateGUIDPart() + "-" + generateGUIDPart() + generateGUIDPart() + generateGUIDPart());
+        }
     }
 }
 

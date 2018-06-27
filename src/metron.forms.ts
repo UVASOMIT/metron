@@ -2,7 +2,7 @@
 
 namespace metron {
     export class forms {
-        public static bindAll(): void {
+        public static bindAll(callback: Function): void {
             let sections: NodeListOf<Element> = document.selectAll("[data-m-type='form']");
             for (let i = 0; i < sections.length; i++) {
                 let section: Element = <Element>sections[i];
@@ -13,11 +13,15 @@ namespace metron {
                     }
                 }
             }
+            if (callback != null) {
+                callback();
+            }
         }
     }
     export class form<T> extends base {
         private _elem: Element;
         private _fields: Array<string> = [];
+        private _defaults: Array<any> = (metron.config["config.forms.defaults"] != null) ? metron.config["config.forms.defaults"] : [];
         public hasLoaded: boolean = false;
         constructor(public model: string) {
             super(model, FORM);
@@ -25,19 +29,43 @@ namespace metron {
             metron.globals["forms"][model] = self;
             self._elem = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
         }
+        private loadDefaults(): void {
+            var self = this;
+            if (self._defaults != null && self._defaults.length > 0) {
+                for (let i = 0; i < self._defaults.length; i++) {
+                    let pair: any = self._defaults[i];
+                    for (let k in pair) {
+                        if (pair.hasOwnProperty(k)) {
+                            let v = pair[k];
+                            if ((<string>k).contains(`${self.model}_`) && document.selectOne(`#${k}`) != null) {
+                                (<HTMLElement>document.selectOne(`#${k}`)).val(v);
+                            }
+                            else if (!(<string>k).contains("_") && document.selectOne(`#${self.model}_${k}`) != null) {
+                                (<HTMLElement>document.selectOne(`#${self.model}_${k}`)).val(v);
+                            }
+                        }
+                    }
+                }
+            }
+        }
         public init(toggle: boolean = false): form<T> {
             var self = this;
             self.hasLoaded = true;
             if (self._elem != null) {
-                self._pivot = self.attachPivot(self._elem);
+                self.pivot = self.attachPivot(self._elem);
                 self._name = self._elem.attribute("data-m-page");
                 let selects = self._elem.selectAll("select");
                 self.loadSelects(selects, () => {
-                    var qs: string = <string><any>metron.web.querystring();
+                    let parameters: any;
+                    let defaults: any;
+                    let qs: string = <string><any>metron.web.querystring();
                     if (qs != "") {
-                        let parameters = metron.tools.formatOptions(qs, metron.OptionTypes.QUERYSTRING);
-                        self.loadForm(parameters);
+                        defaults = metron.tools.formatOptions(qs, metron.OptionTypes.QUERYSTRING);
                     }
+                    if (metron.globals.firstLoad) {
+                        parameters = metron.routing.getRouteUrl({"PageSize": 1, "PageIndex": 1, "_SortOrder": 1, "_SortDirection": 1}); ///This should send null values or by removed by default.
+                    }
+                    self.loadForm(parameters, defaults);
                 });
                 let controlBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='controls']");
                 controlBlocks.each((idx: number, elem: Element) => {
@@ -46,6 +74,7 @@ namespace metron {
                         switch (el.attribute("data-m-action").lower()) {
                             case "save":
                                 el.addEvent("click", function (e) {
+                                    el.attribute("disabled", "disabled");
                                     e.preventDefault();
                                     if (metron.globals.actions != null && metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`] != null) { //Refactor getting the action overrides
                                         metron.globals.actions[`${self.model}_${el.attribute("data-m-action").lower()}`]();
@@ -61,15 +90,23 @@ namespace metron {
                                                 }
                                             });
                                             if (!hasPrimary) {
-                                                metron.web.post(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
+                                                metron.web.post(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", (data: T) => {
                                                     self.save(data, <number><any>el.attribute("data-m-pivot"))
+                                                }, (txt, jsn, xml) => {
+                                                    self.showAlerts(metron.DANGER, txt, jsn, xml);
+                                                    el.removeAttribute("disabled");
                                                 });
                                             }
                                             else {
-                                                metron.web.put(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", function (data: T) {
+                                                metron.web.put(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", (data: T) => {
                                                     self.save(data, <number><any>el.attribute("data-m-pivot"));
+                                                }, (txt, jsn, xml) => {
+                                                    self.showAlerts(metron.DANGER, txt, jsn, xml);
+                                                    el.removeAttribute("disabled");
                                                 });
                                             }
+                                        } else {
+                                            el.removeAttribute("disabled");
                                         }
                                     }
                                 }, true);
@@ -82,11 +119,14 @@ namespace metron {
                                     }
                                     else {
                                         self.clearForm();
-                                        if(self._pivot != null) {
-                                            (el.attribute("data-m-pivot") != null) ? self._pivot.exact(<any>el.attribute("data-m-pivot")) : self._pivot.previous();
+                                        if(self.pivot != null) {
+                                            (el.attribute("data-m-pivot") != null) ? self.pivot.exact(<any>el.attribute("data-m-pivot")) : self.pivot.previous();
                                         }
-                                        if(metron.globals["lists"][self.model] != null) {
+                                        if (metron.globals["lists"][self.model] != null) {
                                             metron.globals["lists"][self.model].callListing();
+                                        }
+                                        if ((<any>self).cancel_m_inject != null) {
+                                            (<any>self).cancel_m_inject();
                                         }
                                     }
                                 }, true);
@@ -113,21 +153,33 @@ namespace metron {
             self.elem.selectAll("[data-m-primary]").each((idx: number, elem: Element) => {
                 (<HTMLElement>elem).val(<string><any>data[<string><any>elem.attribute("name")]);
             });
-            if(self._pivot != null) {
-                (pivotPosition != null) ? self._pivot.exact(pivotPosition) : self._pivot.previous();
+            if(self.pivot != null) {
+                (pivotPosition != null) ? self.pivot.exact(pivotPosition) : self.pivot.previous();
             }
-            if(metron.globals["lists"][self.model] != null) {
-                metron.globals["lists"][self.model].callListing();
+            if (metron.globals["lists"][self.model] != null) {
+                try {
+                    metron.globals["lists"][self.model].callListing();
+                }
+                catch(e) { }
             }
             if ((<any>self).save_m_inject != null) {
-                (<any>self).save_m_inject();
+                (<any>self).save_m_inject(data);
             }
         }
-        public loadForm(parameters?: any): void {
+        public loadForm(parameters?: any, defaults?: any): void {
             var self = this;
             self.clearForm();
-            metron.routing.setRouteUrl(self._name, metron.web.querystringify(parameters), true);
-            if(parameters != null) {
+            if (!self._elem.isHidden()) {
+                metron.routing.setRouteUrl(self._name, metron.web.querystringify(parameters), true);
+            }
+            if (defaults != null) {
+                for (let prop in defaults) {
+                    if (defaults.hasOwnProperty(prop) && defaults[prop] != null && document.selectOne(`#${self.model}_${prop}`) != null) {
+                        (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(<any>defaults[prop]);
+                    }
+                }
+            }
+            if (parameters != null && Object.keys(parameters).length > 0) {
                 metron.web.get(`${metron.fw.getAPIURL(self.model)}${metron.web.querystringify(parameters)}`, parameters, null, "json", function (data: T) {
                     if (data instanceof Array) {
                         data = data[0];
@@ -194,6 +246,7 @@ namespace metron {
                 (<HTMLElement>elem).val("");
             });
             self.clearAlerts();
+            self.loadDefaults();
             if (callback != null) {
                 callback();
             }
@@ -217,9 +270,15 @@ namespace metron {
             required.each(function (idx: number, elem: Element) {
                 if ((<HTMLElement>elem).val() == null || (<HTMLElement>elem).val().trim() === "") {
                     isValid = false;
-                    result += `<p>[${elem.attribute("name")}] is a required field.</p>`;
                     elem.addClass("error");
-                    f.selectOne(`label[for='${elem.attribute("id")}']`).addClass("label-error");
+                    if (f.selectOne(`label[for='${elem.attribute("id")}']`) != null) {
+                        f.selectOne(`label[for='${elem.attribute("id")}']`).addClass("label-error");
+                    }
+                    if  (f.selectOne(`label[for='${elem.attribute("id")}']`) != null && (<HTMLElement>f.selectOne(`label[for='${elem.attribute("id")}']`)).innerText != "") {
+                        result += `<p>${(<HTMLElement>f.selectOne(`label[for='${elem.attribute("id")}']`)).innerText} is a required field.</p>`;
+                    } else {
+                        result += `<p>[${elem.attribute("name")}] is a required field.</p>`;
+                    }
                 }
             });
             if (!isValid) {

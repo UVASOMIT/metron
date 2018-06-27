@@ -1,7 +1,7 @@
 namespace metron {
     export abstract class base {
         protected _name: string;
-        protected _pivot: metron.controls.pivot;
+        public pivot: metron.controls.pivot;
         constructor(public model: string, private baseType: string) {
         }
         protected attachPivot(elem: Element): metron.controls.pivot {
@@ -15,9 +15,6 @@ namespace metron {
             var self = this;
             if (func == null) {
                 throw new Error("Error: No function passed for injection!");
-            }
-            if ((<any>self)[method] == null) {
-                throw new Error(`Error: [${method}] does not exist!`);
             }
             switch (type.lower()) {
                 case "append":
@@ -38,7 +35,7 @@ namespace metron {
         }
         public action(action: string, model: string, func: Function): base {
             var self = this;
-            metron.globals.actions[`${model}_${action}`] = func;
+            component.action(action, model, func);
             return self;
         }
         public clearAlerts(): void {
@@ -56,6 +53,11 @@ namespace metron {
             elem.addClass(className);
             elem.attribute("data-m-state", "show");
             elem.show();
+        }
+    }
+    export class component extends base {
+        public static action(action: string, prefix: string, func: Function) {
+            metron.globals.actions[`${prefix}_${action}`] = func;
         }
     }
 }
