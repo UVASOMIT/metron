@@ -369,7 +369,8 @@ namespace metron {
         }
         public createPaging(selector: string, totalCount, filters?: any): void {
             var self = this;
-            if (self.currentPageIndex != null && self.pageSize != null) {
+            if (document.selectOne(`${selector}`) == null){return;}
+            if (self.currentPageIndex != null && self.pageSize != null ) {
                 self.totalPageSize = self.calculateTotalPageSize(totalCount);
                 var startPage: number = ((parseInt(this.currentPageIndex.toString(), 10) - 5) < 1) ? 1 : (parseInt(this.currentPageIndex.toString(), 10) - 5);
                 var endPage: number = ((parseInt(this.currentPageIndex.toString(), 10) + 5) > this.totalPageSize) ? this.totalPageSize : (parseInt(this.currentPageIndex.toString(), 10) + 5);
