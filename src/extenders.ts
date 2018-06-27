@@ -193,7 +193,7 @@ function getElementValue(_self: any, val?: string): string {
                     return _self.checked;
                 case "radio":
                     let name: string = _self.attribute("name");
-                    return (<HTMLInputElement>document.selectOne(`input[type='radio'][name='${name}']:checked`)).value;
+                    return (<HTMLInputElement>document.selectOne(`input[type='radio'][name='${name}']:checked`) != null) ? (<HTMLInputElement>document.selectOne(`input[type='radio'][name='${name}']:checked`)).value : null;
                 case "time":
                     if (metron.globals.requiresDateTimePolyfill && /\d{2}:\d{2} \S{2}/g.test((<any>self).value)) {
                         let period: string = _self.value.slice(6, 8);
