@@ -91,7 +91,7 @@ namespace metron {
                                             });
                                             if (!hasPrimary) {
                                                 metron.web.post(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", (data: T) => {
-                                                    self.save(data, <number><any>el.attribute("data-m-pivot"))
+                                                    self.save(data, <number><any>el.attribute("data-m-pivot"), el)
                                                 }, (txt, jsn, xml) => {
                                                     self.showAlerts(metron.DANGER, txt, jsn, xml);
                                                     el.removeAttribute("disabled");
@@ -99,7 +99,7 @@ namespace metron {
                                             }
                                             else {
                                                 metron.web.put(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", (data: T) => {
-                                                    self.save(data, <number><any>el.attribute("data-m-pivot"));
+                                                    self.save(data, <number><any>el.attribute("data-m-pivot"), el);
                                                 }, (txt, jsn, xml) => {
                                                     self.showAlerts(metron.DANGER, txt, jsn, xml);
                                                     el.removeAttribute("disabled");
@@ -148,7 +148,7 @@ namespace metron {
             }
             return self;
         }
-        public save(data: T, pivotPosition: number): void {
+        public save(data: T, pivotPosition: number, saveElement: Element): void {
             var self = this;
             self.elem.selectAll("[data-m-primary]").each((idx: number, elem: Element) => {
                 (<HTMLElement>elem).val(<string><any>data[<string><any>elem.attribute("name")]);
@@ -162,6 +162,7 @@ namespace metron {
                 }
                 catch(e) { }
             }
+            saveElement.removeAttribute("disabled");
             if ((<any>self).save_m_inject != null) {
                 (<any>self).save_m_inject(data);
             }
