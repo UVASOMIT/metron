@@ -40,9 +40,11 @@ namespace metron {
         public sortDirection: string = (metron.config["config.options.sortDirection"] != null) ? metron.config["config.options.sortDirection"] : "DESC";
         private _defaults: any = (metron.config["config.lists.defaults"] != null) ? metron.config["config.lists.defaults"] : { };
         public fetchURL: string;
-        constructor(public model: string, public listType: string = LIST) {
-            super(model, listType);
+        constructor(public model: string, public mID?: string) {
+            super(model, LIST);
             var self = this;
+            self.id = mID;
+            self.gTypeName = (mID != null) ? `${mID}_${model}` : model;
             metron.globals["lists"][self.gTypeName] = self;
             self.setFilters();
         }
