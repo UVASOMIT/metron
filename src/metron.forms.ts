@@ -8,8 +8,13 @@ namespace metron {
                 let section: Element = <Element>sections[i];
                 if (section.attribute("data-m-autoload") == null || section.attribute("data-m-autoload") == "true") {
                     let model: string = section.attribute("data-m-model");
-                    if (metron.globals["forms"][model] == null) {
-                        let f: form<any> = new form(model).init();
+                    let mID: string = section.attribute("id");
+                    let gTypeName: string = (mID != null) ? `${mID}_${model}` : model;
+                    if (metron.globals["forms"][gTypeName] == null) {
+                        let f: form<any> = new form(model);
+                        f.id = mID;
+                        f.gTypeName = gTypeName;
+                        f.init();
                     }
                 }
             }
@@ -22,12 +27,14 @@ namespace metron {
         private _elem: Element;
         private _fields: Array<string> = [];
         private _defaults: Array<any> = (metron.config["config.forms.defaults"] != null) ? metron.config["config.forms.defaults"] : [];
+        public id: string;
+        public gTypeName: string;
         public hasLoaded: boolean = false;
         constructor(public model: string) {
             super(model, FORM);
             var self = this;
-            metron.globals["forms"][model] = self;
-            self._elem = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
+            metron.globals["forms"][self.gTypeName] = self;
+            self._elem = (self.id != null) ? document.selectOne(`#${self.id}`) : document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
         }
         private loadDefaults(): void {
             var self = this;
@@ -91,7 +98,7 @@ namespace metron {
                                             });
                                             if (!hasPrimary) {
                                                 metron.web.post(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", (data: T) => {
-                                                    self.save(data, <number><any>el.attribute("data-m-pivot"))
+                                                    self.save(data, <number><any>el.attribute("data-m-pivot"), el)
                                                 }, (txt, jsn, xml) => {
                                                     self.showAlerts(metron.DANGER, txt, jsn, xml);
                                                     el.removeAttribute("disabled");
@@ -99,7 +106,7 @@ namespace metron {
                                             }
                                             else {
                                                 metron.web.put(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", (data: T) => {
-                                                    self.save(data, <number><any>el.attribute("data-m-pivot"));
+                                                    self.save(data, <number><any>el.attribute("data-m-pivot"), el);
                                                 }, (txt, jsn, xml) => {
                                                     self.showAlerts(metron.DANGER, txt, jsn, xml);
                                                     el.removeAttribute("disabled");
@@ -148,7 +155,7 @@ namespace metron {
             }
             return self;
         }
-        public save(data: T, pivotPosition: number): void {
+        public save(data: T, pivotPosition: number, saveElement: Element): void {
             var self = this;
             self.elem.selectAll("[data-m-primary]").each((idx: number, elem: Element) => {
                 (<HTMLElement>elem).val(<string><any>data[<string><any>elem.attribute("name")]);
@@ -162,6 +169,7 @@ namespace metron {
                 }
                 catch(e) { }
             }
+            saveElement.removeAttribute("disabled");
             if ((<any>self).save_m_inject != null) {
                 (<any>self).save_m_inject(data);
             }
