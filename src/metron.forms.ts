@@ -8,8 +8,13 @@ namespace metron {
                 let section: Element = <Element>sections[i];
                 if (section.attribute("data-m-autoload") == null || section.attribute("data-m-autoload") == "true") {
                     let model: string = section.attribute("data-m-model");
-                    if (metron.globals["forms"][model] == null) {
-                        let f: form<any> = new form(model).init();
+                    let mID: string = section.attribute("id");
+                    let gTypeName: string = (mID != null) ? `${mID}_${model}` : model;
+                    if (metron.globals["forms"][gTypeName] == null) {
+                        let f: form<any> = new form(model);
+                        f.id = mID;
+                        f.gTypeName = gTypeName;
+                        f.init();
                     }
                 }
             }
@@ -22,12 +27,14 @@ namespace metron {
         private _elem: Element;
         private _fields: Array<string> = [];
         private _defaults: Array<any> = (metron.config["config.forms.defaults"] != null) ? metron.config["config.forms.defaults"] : [];
+        public id: string;
+        public gTypeName: string;
         public hasLoaded: boolean = false;
         constructor(public model: string) {
             super(model, FORM);
             var self = this;
-            metron.globals["forms"][model] = self;
-            self._elem = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
+            metron.globals["forms"][self.gTypeName] = self;
+            self._elem = (self.id != null) ? document.selectOne(`#${self.id}`) : document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
         }
         private loadDefaults(): void {
             var self = this;
