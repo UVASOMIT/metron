@@ -219,11 +219,20 @@ namespace metron {
             return "no";
         }
         export function convertDateStringToDate(datetime: string): Date {
-            let dateString: string = datetime.substring(0, datetime.indexOf("T"));
-            let dateArray: Array<string> = dateString.split("-");
-            let timeString: string = datetime.substring(datetime.indexOf("T") + 1, datetime.length);
-            let timeArray: Array<string> = timeString.split(":");
-            return new Date(parseInt(dateArray[0]), parseInt(dateArray[1]) - 1, parseInt(dateArray[2]), parseInt(timeArray[0], 10), parseInt(timeArray[1], 10), parseInt(timeArray[2], 10), 0);
+            if (datetime.indexOf("T") > 0 && datetime.indexOf("-") > 0) {
+                let dateString: string = datetime.substring(0, datetime.indexOf("T"));
+                let dateArray: Array<string> = dateString.split("-");
+                let timeString: string = datetime.substring(datetime.indexOf("T") + 1, datetime.length);
+                let timeArray: Array<string> = timeString.split(":");
+                return new Date(parseInt(dateArray[0]), parseInt(dateArray[1]) - 1, parseInt(dateArray[2]), parseInt(timeArray[0], 10), parseInt(timeArray[1], 10), parseInt(timeArray[2], 10), 0);
+            } else if (datetime.indexOf(" ") > 0 && datetime.indexOf("/") > 0) {
+                let dateString: string = datetime.substring(0, datetime.indexOf(" "));
+                let dateArray: Array<string> = dateString.split("/");
+                let timeString: string = datetime.substring(datetime.indexOf(" ") + 1, datetime.length);
+                let timeArray: Array<string> = timeString.split(":");
+                return new Date(parseInt(dateArray[2]), parseInt(dateArray[0]) - 1, parseInt(dateArray[1]), parseInt(timeArray[0], 10), parseInt(timeArray[1], 10), parseInt(timeArray[2], 10), 0);
+            }
+            return new Date(datetime);
         }
     }
 }
