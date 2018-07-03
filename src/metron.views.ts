@@ -7,13 +7,15 @@ namespace metron {
     export class view<T> extends base {
         private _elem: Element;
         private _form: string;
+        public id: string;
+        public gTypeName: string;
         constructor(public model: string) {
             super(model, VIEW);
             var self = this;
         }
         public init(): view<T> {
             var self = this;
-            self._elem = document.selectOne(`[data-m-type='view'][data-m-model='${self.model}']`);
+            self._elem = (self.id != null) ? document.selectOne(`#${self.id}`) : document.selectOne(`[data-m-type='view'][data-m-model='${self.model}']`);
             if(self._elem != null) {
                 self.pivot = self.attachPivot(self._elem);
                 self._name = self._elem.attribute("[data-m-page]");
