@@ -378,13 +378,13 @@ namespace metron {
         }
         public createPaging(selector: Element, totalCount, filters?: any): void {
             var self = this;
-            if (document.selectOne(`${selector}`) == null){return;}
+            if (selector == null){return;}
             if (self.currentPageIndex != null && self.pageSize != null ) {
                 self.totalPageSize = self.calculateTotalPageSize(totalCount);
                 var startPage: number = ((parseInt(this.currentPageIndex.toString(), 10) - 5) < 1) ? 1 : (parseInt(this.currentPageIndex.toString(), 10) - 5);
                 var endPage: number = ((parseInt(this.currentPageIndex.toString(), 10) + 5) > this.totalPageSize) ? this.totalPageSize : (parseInt(this.currentPageIndex.toString(), 10) + 5);
                 self.setupPagingEvents(selector, filters);
-                document.selectAll(`${selector} > li`).each(function (idx: number, elem: Element) {
+                selector.selectAll("li").each(function (idx: number, elem: Element) {
                     if (elem.first("a").attribute("title") != "Previous" && elem.first("a").attribute("title") != "Next" && elem.first("a").attribute("title") != "First" && elem.first("a").attribute("title") != "Last") {
                         elem.drop();
                     }
@@ -403,7 +403,7 @@ namespace metron {
                     selector.insertBefore(li, selector.selectOne("li > a[title='Next']").parent());
                 }
                 if (self.totalPageSize > 0) {
-                    selector.selectOne("li > a[title='${self.currentPageIndex}']").removeClass("button-outline").addClass("button-clear");
+                    selector.selectOne(`li > a[title='${self.currentPageIndex}']`).removeClass("button-outline").addClass("button-clear");
                 }
                 if (selector.selectAll("li").length <= 5) {
                     selector.hide();
