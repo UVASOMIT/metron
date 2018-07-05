@@ -178,7 +178,8 @@ namespace metron {
                     if (data instanceof Array) {
                         data = data[0];
                     }
-                    self._elem.innerHTML = self.formatData(data, false);
+                    //Need to do the below a different way...
+                    //self._elem.innerHTML = self.formatData(data, false);
                     for (let prop in data) {
                         if (data.hasOwnProperty(prop) && data[prop] != null && document.selectOne(`#${self.model}_${prop}`) != null) {
                             (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(<any>data[prop]);
