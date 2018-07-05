@@ -350,7 +350,7 @@ namespace metron {
                     console.log(`DOM has no element that matches the selector "${selector} [data-m-type='table-body'] [data-m-action='repeat']": ${e}`);
                 }
             }
-            document.selectOne(`${selector} [data-m-type='table-body']`).removeAttribute("data-m-action");
+            document.selectOne(`${selector} [data-m-type='table-body'] [data-m-action='repeat']`).removeAttribute("data-m-action");
             document.selectOne(`${selector} [data-m-type='table-body']`).empty();
         }
         public getRows(selector: string): number {
