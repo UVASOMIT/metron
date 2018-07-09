@@ -568,7 +568,7 @@ HTMLElement.prototype.val = function(val?: string): string {
             }
             catch (e) { }
         }
-        else if(this.nodeName.lower() == "input") {
+        else if(this.nodeName.lower() == "input" && this.attribute("type") != null) {
             switch(this.attribute("type").lower()) {
                 case "file":
                     break;
@@ -655,7 +655,7 @@ HTMLElement.prototype.val = function(val?: string): string {
             }
             return null;
         }
-        else if(this.nodeName.lower() == "input") {
+        else if(this.nodeName.lower() == "input" && this.attribute("type") != null) {
             switch(this.attribute("type").lower()) {
                 case "checkbox":
                     return this.checked;
