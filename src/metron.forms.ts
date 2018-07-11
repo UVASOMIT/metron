@@ -246,13 +246,13 @@ namespace metron {
             document.selectAll(".label-error").each(function (idx, elem) {
                 (<HTMLElement>elem).removeClass("label-error");
             });
-            f.selectAll("input, select").each(function (idx: number, elem: Element) {
+            f.selectAll("input:not([data-m-ignore='true']), select:not([data-m-ignore='true'])").each(function (idx: number, elem: Element) {
                 (<HTMLElement>elem).val("");
             });
-            f.selectAll("textarea").each(function (idx: number, elem: Element) {
+            f.selectAll("textarea:not([data-m-ignore='true'])").each(function (idx: number, elem: Element) {
                 (<HTMLElement>elem).val("");
             });
-            f.selectAll("input[type='checkbox']").each(function (idx: number, elem: Element) {
+            f.selectAll("input[type='checkbox']:not([data-m-ignore='true'])").each(function (idx: number, elem: Element) {
                 (<HTMLElement>elem).val("");
             });
             self.clearAlerts();
