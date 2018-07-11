@@ -1,6 +1,7 @@
 namespace metron {
     export abstract class base {
         protected _name: string;
+        public id: string;
         public pivot: metron.controls.pivot;
         constructor(public model: string, private baseType: string) {
         }
