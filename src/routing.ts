@@ -1,12 +1,14 @@
 namespace metron {
     export namespace routing {
-        /* */
         export function config(options: any): void {
             metron.globals.pager.root = options && options.root ? '/' + clearSlashes(options.root) + '/' : '/';
         }
         export function getFragment(): string {
             let match = window.location.href.match(/#(.*)$/);
             let fragment = match ? match[1] : "";
+            if(fragment.lastIndexOf("/") != -1) {
+                fragment = fragment.substring(0, fragment.lastIndexOf("/"));
+            }
             return clearSlashes(fragment);
         }
         export function clearSlashes(path: string): string {
@@ -65,7 +67,6 @@ namespace metron {
                 callback();
             }
         }
-        /* */
         export function setRouteUrl(name: string, wsqs: string, wantsReplaceHash: boolean = false): void {
             var hash = (wsqs.length > 1) ? wsqs.substr(1) : "";
             if (hash != "" && document.location.search != null) {
