@@ -45,7 +45,7 @@ namespace metron {
                 case "time":
                     return metron.tools.formatTime(<Date><any>val);
                 case "formatmessage":
-                    return metron.tools.formatMessage(<string><any>val, options["length"]);
+                    return metron.tools.formatMessage(<string><any>val, options["length"], options["closetags"]);
                 default:
                     return metron.globals[type](<Element>val, options);
             }

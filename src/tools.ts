@@ -113,11 +113,17 @@ namespace metron {
         export function getDataPrimary(key: string, values: string): any {
             return values.getValueByKey(key);
         }
-        export function formatMessage(message: string, length?: number): string {
+        export function formatMessage(message: string, length?: number, closetags?: boolean): string {
             try {
                 let len = (length != null && length > 0) ? length : 15;
+                if(closetags && typeof(message) !== "string") {
+                    let result = `${(<Element>message).innerHTML.truncateWordsWithHtml(len)}...`;
+                    (<Element>message).innerHTML = result;
+                    return result;
+                }
                 if (message.split(" ").length > len) {
-                    return message.truncateWords(len) + "...";
+                    
+                    return `${message.truncateWords(len)}...`;
                 }
             }
             catch (e) {
