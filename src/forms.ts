@@ -181,8 +181,13 @@ namespace metron {
                     //Need to do the below a different way...
                     //self._elem.innerHTML = self.formatData(data, false);
                     for (let prop in data) {
-                        if (data.hasOwnProperty(prop) && data[prop] != null && document.selectOne(`#${self.model}_${prop}`) != null) {
-                            (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(<any>data[prop]);
+                        if (data.hasOwnProperty(prop) && data[prop] != null && (document.selectOne(`#${self.model}_${prop}`) != null || document.selectOne(`[name='${prop}']`) != null)) {
+                            if(document.selectOne(`#${self.model}_${prop}`) == null && document.selectOne(`[name='${prop}']`) != null) {
+                                (<HTMLInputElement>document.selectOne(`[name='${prop}'][value='${data[prop]}']`)).checked = true;
+                            }
+                            else {
+                                (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(<any>data[prop]);
+                            }
                         }
                     }
                     if ((<any>self).loadForm_m_inject != null) {
