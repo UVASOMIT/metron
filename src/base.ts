@@ -47,11 +47,7 @@ namespace metron {
         }
         public clearAlerts(): void {
             var self = this;
-            var elem = <HTMLElement>document.selectOne(`[data-m-type='${self.baseType}'][data-m-model='${self.model}'] [data-m-segment='alert']`);
-            elem.innerHTML = "";
-            elem.removeClass("info").removeClass("warning").removeClass("danger").removeClass("success"); //Create a removeClasses() method
-            elem.attribute("data-m-state", "hide");
-            elem.hide();
+            metron.page.clearAlerts(`[data-m-type='${self.baseType}'][data-m-model='${self.model}'] [data-m-segment='alert']`);
         }
         public showAlerts(className: string, txt: string, jsn?: any, xml?: XMLDocument): void {
             var self = this;
@@ -60,6 +56,10 @@ namespace metron {
         public loadSelects(selects: NodeListOf<Element>, callback?: Function, reload: boolean = false): void {
             var self = this;
             metron.page.loadSelects(selects, callback, reload);
+        }
+        public clearFilters(selector: Element): void {
+            var self = this;
+            metron.page.clearFilters(selector);
         }
     }
 }
