@@ -106,6 +106,22 @@ namespace metron {
                                     }
                                 }, true);
                                 break;
+                            case "clear":
+                                el.addEvent("click", function (e) {
+                                    e.preventDefault();
+                                    if (metron.globals.actions != null && metron.globals.actions[`${self.model.lower()}_${el.attribute("data-m-action").lower()}`] != null) {
+                                        metron.globals.actions[`${self.model.lower()}_${el.attribute("data-m-action").lower()}`]();
+                                    }
+                                    else {
+                                        self._elem.selectAll("[data-m-segment='filters']").each((idx: number, elem: Element) => {
+                                            self.clearFilters(elem);
+                                        });
+                                    }
+                                    if ((<any>self).clear_m_inject != null) {
+                                        (<any>self).clear_m_inject();
+                                    }
+                                }, true);
+                                break;
                             default:
                                 if (metron.globals.actions != null && metron.globals.actions[`${self.model.lower()}_${el.attribute("data-m-action").lower()}`] != null) {
                                     el.addEvent("click", function (e) {

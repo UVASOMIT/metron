@@ -64,12 +64,29 @@ namespace metron {
         public static bindActions(): void {
             page.loadActions(document.selectAll("[data-m-action]"));
         }
+        public static clearAlerts(selector: string) {
+            var elem = <HTMLElement>document.selectOne(selector);
+            elem.innerHTML = "";
+            elem.removeClass("info").removeClass("warning").removeClass("danger").removeClass("success"); //Create a removeClasses() method
+            elem.attribute("data-m-state", "hide");
+            elem.hide();
+        }
         public static showAlerts(selector: string, className: string, txt: string, jsn?: any, xml?: XMLDocument): void {
             var elem = <HTMLElement>document.selectOne(selector);
             elem.innerHTML = txt;
             elem.addClass(className);
             elem.attribute("data-m-state", "show");
             elem.show();
+        }
+        public static clearFilters(selector: Element): void {
+            selector.selectAll("[data-m-action='filter']").each((idx: number, elem: Element) => {
+                try {
+                    elem.val("");
+                }
+                catch(e) {
+                    console.log(`Could not clear value for ${(elem != null) ? elem.outerHTML : idx}: ${e}`);
+                }
+            });
         }
         public get elem(): Element {
             if(this._elem == null) {
