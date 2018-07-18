@@ -271,7 +271,7 @@ namespace metron {
             let callback: Function;
             let frequency: number;
             let isExecuting: boolean = false;
-            var timer: number;
+            var timer;
             function setupInterval(pe: any) {
                 timer = setInterval(
                     function () {
