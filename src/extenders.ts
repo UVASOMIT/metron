@@ -693,5 +693,10 @@ HTMLElement.prototype.val = function(val?: string): string {
 };
 
 XMLHttpRequest.prototype.responseJSON = function(): JSON {
-    return JSON.parse(this.responseText);
+    try {
+        return JSON.parse(this.responseText);
+    }
+    catch(e) {
+        return JSON.parse(`{ "data": "${this.responseText}" }`);
+    }
 };
