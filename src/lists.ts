@@ -115,6 +115,7 @@ namespace metron {
                                     else {
                                         self._elem.selectAll("[data-m-segment='filters']").each((idx: number, elem: Element) => {
                                             self.clearFilters(elem);
+                                            self.callListing();
                                         });
                                     }
                                     if ((<any>self).clear_m_inject != null) {
