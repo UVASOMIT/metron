@@ -219,7 +219,7 @@ namespace metron {
             return "no";
         }
         export function convertDateStringToDate(datetime: string): Date {
-            if (datetime.indexOf("T") > 0 && datetime.indexOf("-") > 0) {
+            if (datetime.indexOf("T") > 0 && datetime.indexOf("-") > 0 && datetime.toLowerCase().indexOf("gmt") == -1) {
                 let dateString: string = datetime.substring(0, datetime.indexOf("T"));
                 let dateArray: Array<string> = dateString.split("-");
                 let timeString: string = datetime.substring(datetime.indexOf("T") + 1, datetime.length);
