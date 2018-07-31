@@ -600,7 +600,11 @@ HTMLElement.prototype.val = function(val?: string): string {
                     if (metron.globals.requiresDateTimePolyfill && /\d{4}-\d{2}-\d{2}/g.test(val)) {
                         this.value = `${date.slice(5, 7)}/${date.slice(8, 10)}/${date.slice(0, 4)}`;
                     }
-                    else {
+                    else if (metron.globals.requiresDateTimePolyfill && /\d{2}\/\d{2}\/\d{4}/g.test(val)) {
+                        this.value = date;
+                    } else if (/\d{2}\/\d{2}\/\d{4}/g.test(val)) {
+                        this.value = `${date.slice(6, 10)}-${date.slice(0, 2)}-${date.slice(3, 5)}`;
+                    } else {
                         this.value = date;
                     }
                     break;
