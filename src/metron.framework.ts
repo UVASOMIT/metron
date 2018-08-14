@@ -33,7 +33,6 @@ namespace metron {
                             (<HTMLElement>elem).show();
                         }
                     });
-                    metron.fw.loadOptionalFunctionality();
 
                     let root: string = metron.fw.getApplicationRoot(document.documentElement.outerHTML);
                     appName = (appName != null) ? appName : metron.fw.getApplicationName(document.documentElement.outerHTML);
@@ -160,30 +159,28 @@ namespace metron {
                     metron.globals.autolists = {};
                 }
                 document.selectAll("[data-m-autocomplete]").each((idx: number, elem: Element) => {
+                    let datalist: string[] = [];
                     let endpoint = elem.attribute("data-m-autocomplete");
-                    let label: string = elem.attribute("data-m-label");
-                    let val: string = elem.attribute("data-m-value");
-                    let target = elem.attribute("data-m-target");
-                    let auto = new Awesomplete(elem, { minChars: 1 });
-                    elem.addEvent("keydown", (e) => {
-                        let elemVal = (<HTMLInputElement>elem).value;
-                        if (elemVal != "" && elemVal.trim().length > 1) {
-                            metron.web.get(`${metron.fw.getAPIURL(endpoint)}?${target}=${elemVal}`, {}, null, "json", (result) => {
-                                auto.list = result;
-                                metron.globals.autolists[(<HTMLInputElement>elem).attribute("id")] = result;
-                                auto.data = function (item, input) {
-                                    return { value: item[val], label: `(${item[val]}) ${item[label]}` };
-                                };
-                            });
+                    let url: string = (endpoint.toLowerCase().startsWith("http")) ? endpoint : metron.fw.getAPIURL(endpoint);
+                    metron.web.get(`${url}${metron.web.querystringify({ IsActive: true, _SortOrder: elem.attribute("data-m-search-text"), _SortDirection: "ASC" })}`, null, null, "json", (result) => {
+                        if (result != null) {
+                            for (var a in result) {
+                                if (result.hasOwnProperty(a)) {
+                                    if (result[a][elem.attribute("data-m-search-text")] != null) {
+                                        datalist.push(result[a][elem.attribute("data-m-search-text")]);
+                                        if (!metron.globals.autolists[(<HTMLInputElement>elem).attribute("id")]) {
+                                            metron.globals.autolists[(<HTMLInputElement>elem).attribute("id")] = {};
+                                        }
+                                        if (!metron.globals.autolists[(<HTMLInputElement>elem).attribute("id")][result[a][elem.attribute("data-m-search-text")]]) {
+                                            metron.globals.autolists[(<HTMLInputElement>elem).attribute("id")][result[a][elem.attribute("data-m-search-text")]] = {};
+                                        }
+                                        metron.globals.autolists[(<HTMLInputElement>elem).attribute("id")][result[a][elem.attribute("data-m-search-text")]] = result[a][elem.attribute("data-m-val")];
+                                    }
+                                }
+                            }
                         }
-                    });
-                    window.addEventListener("awesomplete-selectcomplete", (e) => {
-                        let elem = document.selectOne(`#${e.srcElement.id}`);
-                        let action = elem.attribute("data-m-format");
-                        if (action != null) {
-                            metron.globals[action]((<HTMLElement>elem).val(), e);
-                        }
-                    }, false);
+                        let auto = new Awesomplete(elem, { minChars: 0, list: datalist, sort: false, maxItems: 20 });
+                    })
                 });
             }
         }
@@ -236,6 +233,7 @@ namespace metron {
                 let page = document.selectOne(`[data-m-segment='pivot-item'][data-m-page="${route}"]`);
                 recursePivot(page);
             }
+            metron.fw.loadOptionalFunctionality();
             if (wantsAutoload) {
                 metron.lists.bindAll(() => {
                     metron.forms.bindAll(() => {
