@@ -93,7 +93,11 @@ namespace metron {
                                             let parameters: any = {};
                                             let hasPrimary: boolean = false;
                                             self.elem.selectAll("input, select, textarea").each(function (idx: number, elem: Element) {
-                                                parameters[<string>elem.attribute("name")] = (<HTMLElement>elem).val();
+                                                if (elem.attribute("data-m-autocomplete") != null && (<HTMLElement>elem).val() != "") {
+                                                    parameters[<string>elem.attribute("name")] = metron.globals.autolists[(<HTMLInputElement>elem).attribute("id")][(<HTMLElement>elem).val()];
+                                                } else {
+                                                    parameters[<string>elem.attribute("name")] = (<HTMLElement>elem).val();
+                                                }
                                                 if (elem.attribute("data-m-primary") != null && elem.attribute("data-m-primary").toBool() && (<HTMLElement>elem).val() != "") {
                                                     hasPrimary = true;
                                                 }
@@ -185,7 +189,11 @@ namespace metron {
             if (defaults != null) {
                 for (let prop in defaults) {
                     if (defaults.hasOwnProperty(prop) && defaults[prop] != null && document.selectOne(`#${self.model}_${prop}`) != null) {
-                        (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(<any>defaults[prop]);
+                        if ((<Element>document.selectOne(`#${self.model}_${prop}`)).attribute("data-m-autocomplete") != null) {
+                            (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(<any>defaults[(<Element>document.selectOne(`#${self.model}_${prop}`)).attribute("data-m-display-text")]);
+                        } else {
+                            (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(<any>defaults[prop]);
+                        }
                     }
                 }
             }
