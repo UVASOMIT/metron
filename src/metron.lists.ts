@@ -326,7 +326,7 @@ namespace metron {
                 self._items = data;
                 self.populateListing();
                 if ((<any>self).callListing_m_inject != null) {
-                    (<any>self).callListing_m_inject();
+                    (<any>self).callListing_m_inject(data);
                 }
             }, (txt: string, jsn: any, xml: XMLDocument) => {
                 self.showAlerts(DANGER, txt, jsn, xml);
@@ -410,6 +410,9 @@ namespace metron {
                 }
                 else {
                     selector.show();
+                }
+                if (self._elem.selectOne(`[data-m-segment='recordcount']`) != null) {
+                    (<Element>self._elem.selectOne(`[data-m-segment='recordcount']`)).innerHTML = `<label class="record-count">of ${this.totalPageSize} Pages (${totalCount} Total Records)</label>`;
                 }
             }
             else {
