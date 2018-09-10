@@ -33,7 +33,7 @@ namespace metron {
         constructor(public model: string, public options?: metron.FormOptions) {
             super(model, FORM);
             var self = this;
-            self.id = options.mID;
+            self.id = (options != null) ? options.mID : null;
             self.gTypeName = (options.mID != null) ? `${options.mID}_${model}` : model;
             metron.globals["forms"][self.gTypeName] = self;
             self._elem = (self.id != null) ? document.selectOne(`#${self.id}`) : document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);

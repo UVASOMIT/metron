@@ -43,7 +43,7 @@ namespace metron {
         constructor(public model: string, public options?: metron.ListOptions) {
             super(model, LIST);
             var self = this;
-            self.id = options.mID;
+            self.id = (options != null) ? options.mID : null;
             self.gTypeName = (options.mID != null) ? `${options.mID}_${model}` : model;
             metron.globals["lists"][self.gTypeName] = self;
             self.setFilters();
