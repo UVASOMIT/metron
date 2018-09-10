@@ -1,10 +1,13 @@
 {
   "name": "metron",
-  "version": "2.9.1",
+  "version": "2.9.2",
   "description": "A lightweight library and front-end framework utilizing data attributes",
   "main": "dist/gen/metron.js",
   "authors": [
-    "Michael Szul <michael@szul.us>"
+    "Michael Szul <michael@szul.us>",
+    "Bill Ahern <william.ahern@gmail.com>",
+    "Tom Lynch <TomJLynch@gmail.com>",
+    "Ashish Pathak <ashish@ashish.codes>"
   ],
   "license": "MIT",
   "keywords": [

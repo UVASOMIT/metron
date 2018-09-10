@@ -55,6 +55,12 @@ namespace metron {
             elem.attribute("data-m-state", "show");
             elem.show();
         }
+        public shouldRoute(options: any): boolean {
+            if(options == null || options.hasRouting == null || options.hasRouting) {
+                return true;
+            }
+            return false;
+        }
     }
     export class component extends base {
         public static action(action: string, prefix: string, func: Function) {

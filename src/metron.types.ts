@@ -30,6 +30,14 @@ namespace metron {
         , next: Element
         , previous: Element
     }
+    export interface ListOptions {
+        mID?: string
+        , hasRouting?: boolean
+    }
+    export interface FormOptions {
+        mID?: string
+        , hasRouting?: boolean
+    }
     export enum OptionTypes {
           QUERYSTRING = 1
         , KEYVALUE = 2

@@ -40,11 +40,11 @@ namespace metron {
         public sortDirection: string = (metron.config["config.options.sortDirection"] != null) ? metron.config["config.options.sortDirection"] : "DESC";
         private _defaults: any = (metron.config["config.lists.defaults"] != null) ? metron.config["config.lists.defaults"] : { };
         public fetchURL: string;
-        constructor(public model: string, public mID?: string) {
+        constructor(public model: string, public options?: metron.ListOptions) {
             super(model, LIST);
             var self = this;
-            self.id = mID;
-            self.gTypeName = (mID != null) ? `${mID}_${model}` : model;
+            self.id = options.mID;
+            self.gTypeName = (options.mID != null) ? `${options.mID}_${model}` : model;
             metron.globals["lists"][self.gTypeName] = self;
             self.setFilters();
         }
@@ -319,7 +319,7 @@ namespace metron {
             self.clearAlerts();
             var parameters: any = Object.extend({ PageIndex: self.currentPageIndex, PageSize: self.pageSize, _SortOrder: self.sortOrder, _SortDirection: self.sortDirection }, self._filters);
             var url = (self.fetchURL != null) ? self.fetchURL : self.model;
-            if(!self._elem.isHidden()) {
+            if(!self._elem.isHidden() && self.shouldRoute(self.options)) {
                 metron.routing.setRouteUrl(self._name, metron.web.querystringify(metron.tools.normalizeModelData(parameters)));
             }
             metron.web.get(`${metron.fw.getAPIURL(url)}${self.withDefaults(parameters)}`, {}, null, "json", function (data: Array<T>) {
