@@ -203,8 +203,14 @@ namespace metron {
                         data = data[0];
                     }
                     for (let prop in data) {
-                        if (data.hasOwnProperty(prop) && data[prop] != null && document.selectOne(`#${self.model}_${prop}`) != null) {
-                            (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(<any>data[prop]);
+                        if (self.id == null) {
+                            if (data.hasOwnProperty(prop) && data[prop] != null && document.selectOne(`#${self.model}_${prop}`) != null) {
+                                (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(<any>data[prop]);
+                            }
+                        } else {
+                            if (data.hasOwnProperty(prop) && data[prop] != null && document.selectOne(`#${self.id} > fieldset > #${self.model}_${prop}`) != null) {
+                                (<HTMLElement>document.selectOne(`#${self.id} > fieldset > #${self.model}_${prop}`)).val(<any>data[prop]);
+                            }
                         }
                     }
                     if ((<any>self).loadForm_m_inject != null) {
