@@ -44,7 +44,7 @@ namespace metron {
             super(model, LIST);
             var self = this;
             self.id = (options != null) ? options.mID : null;
-            self.gTypeName = (options.mID != null) ? `${options.mID}_${model}` : model;
+            self.gTypeName = (options != null && options.mID != null) ? `${options.mID}_${model}` : model;
             metron.globals["lists"][self.gTypeName] = self;
             self.setFilters();
         }
