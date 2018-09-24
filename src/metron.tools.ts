@@ -163,7 +163,8 @@ namespace metron {
             }
         }
         export function formatDecimal(num: number): string {
-            return num.toFixed(2);
+            let dec = parseFloat(num.toString());
+            return dec.toFixed(2);
         }
         export function formatDate(datetime: string): string {
             if (!String.isNullOrEmpty(datetime)) {
