@@ -84,7 +84,7 @@ interface HTMLElement {
 }
 
 interface XMLHttpRequest {
-    responseJSON: () => JSON;
+    responseJSON?: () => JSON;
 }
 
 function getElementValue(_self: any, val?: string): string {
@@ -100,7 +100,7 @@ function getElementValue(_self: any, val?: string): string {
             }
             catch (e) { }
         }
-        else if(_self.nodeName.lower() == "input") {
+        else if(_self.nodeName.lower() == "input" && _self.attribute("type") != null) {
             switch(_self.attribute("type").lower()) {
                 case "file":
                     break;
@@ -124,16 +124,20 @@ function getElementValue(_self: any, val?: string): string {
                         }
                     });
                     break;
-                case "date":
+                    case "date":
                     let date: string = val;
                     if (date.contains("T")) {
                         date = date.slice(0, date.indexOf("T"));
                     }
                     if (metron.globals.requiresDateTimePolyfill && /\d{4}-\d{2}-\d{2}/g.test(val)) {
-                        _self.value = `${date.slice(5, 7)}/${date.slice(8, 10)}/${date.slice(0, 4)}`;
+                        this.value = `${date.slice(5, 7)}/${date.slice(8, 10)}/${date.slice(0, 4)}`;
                     }
-                    else {
-                        _self.value = date;
+                    else if (metron.globals.requiresDateTimePolyfill && /\d{2}\/\d{2}\/\d{4}/g.test(val)) {
+                        this.value = date;
+                    } else if (/\d{2}\/\d{2}\/\d{4}/g.test(val)) {
+                        this.value = `${date.slice(6, 10)}-${date.slice(0, 2)}-${date.slice(3, 5)}`;
+                    } else {
+                        this.value = date;
                     }
                     break;
                 case "time":
@@ -144,18 +148,18 @@ function getElementValue(_self: any, val?: string): string {
                             let period: string = hour > 11 ? "PM" : "AM";
                             hour = hour > 12 ? hour - 12 : hour;
                             let hourStr: string = hour > 9 ? hour.toString() : "0" + hour.toString();
-                            _self.value = `${hourStr}:${time.slice(3, 5)} ${period}`;
+                            this.value = `${hourStr}:${time.slice(3, 5)} ${period}`;
                         }
                         else {
-                            _self.value = time;
+                            this.value = time;
                         }
                     }
                     else {
                         if (/\d{2}:\d{2}:\d{2}/g.test(time)) {
-                            _self.value = time.slice(0, 5);
+                            this.value = time.slice(0, 5);
                         }
                         else {
-                            _self.value = time;
+                            this.value = time;
                         }
                     }
                     break;
@@ -187,7 +191,7 @@ function getElementValue(_self: any, val?: string): string {
             }
             return null;
         }
-        else if(_self.nodeName.lower() == "input") {
+        else if(_self.nodeName.lower() == "input" && _self.attribute("type") != null) {
             switch(_self.attribute("type").lower()) {
                 case "checkbox":
                     return _self.checked;

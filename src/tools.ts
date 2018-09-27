@@ -169,11 +169,12 @@ namespace metron {
             }
         }
         export function formatDecimal(num: number): string {
-            return num.toFixed(2);
+            let dec = parseFloat(num.toString());
+            return dec.toFixed(2);
         }
         export function formatDate(datetime: string): string {
             if (!String.isNullOrEmpty(datetime)) {
-                let d = new Date(datetime);
+                let d: Date = convertDateStringToDate(datetime);
                 let m = d.getMonth() + 1;
                 let mm = m < 10 ? "0" + m : m;
                 let dd = d.getDate();
@@ -185,7 +186,7 @@ namespace metron {
         }
         export function formatDateTime(datetime: string): string {
             if (!String.isNullOrEmpty(datetime)) {
-                let d = new Date(datetime);
+                let d: Date = convertDateStringToDate(datetime);
                 let m = d.getMonth() + 1;
                 let mm = m < 10 ? "0" + m : m;
                 let dd = d.getDate();
@@ -199,7 +200,11 @@ namespace metron {
         export function formatTime(datetime: string | Date, isFullDate = false): string {
             var d: Date;
             if (isFullDate) {
-                d = <Date><any>datetime;
+                if ((<string>datetime).length) {
+                    d = convertDateStringToDate(<string>datetime);
+                } else {
+                    d = <Date><any>datetime;
+                }
             }
             else {
                 let c: Array<string> = (<string><any>datetime).split(":");
@@ -213,6 +218,22 @@ namespace metron {
             var mm = m < 10 ? "0" + m : m;
             var result = `${h}:${mm} ${ampm}`;
             return result;
+        }
+        export function convertDateStringToDate(datetime: string): Date {
+            if (datetime.indexOf("T") > 0 && datetime.indexOf("-") > 0 && datetime.toLowerCase().indexOf("gmt") == -1) {
+                let dateString: string = datetime.substring(0, datetime.indexOf("T"));
+                let dateArray: Array<string> = dateString.split("-");
+                let timeString: string = datetime.substring(datetime.indexOf("T") + 1, datetime.length);
+                let timeArray: Array<string> = timeString.split(":");
+                return new Date(parseInt(dateArray[0]), parseInt(dateArray[1]) - 1, parseInt(dateArray[2]), parseInt(timeArray[0], 10), parseInt(timeArray[1], 10), parseInt(timeArray[2], 10), 0);
+            } else if (datetime.indexOf(" ") > 0 && datetime.indexOf("/") > 0) {
+                let dateString: string = datetime.substring(0, datetime.indexOf(" "));
+                let dateArray: Array<string> = dateString.split("/");
+                let timeString: string = datetime.substring(datetime.indexOf(" ") + 1, datetime.length);
+                let timeArray: Array<string> = timeString.split(":");
+                return new Date(parseInt(dateArray[2]), parseInt(dateArray[0]) - 1, parseInt(dateArray[1]), parseInt(timeArray[0], 10), parseInt(timeArray[1], 10), parseInt(timeArray[2], 10), 0);
+            }
+            return new Date(datetime);
         }
         export function formatBoolean(b: string): string {
             if (b.toBool()) {

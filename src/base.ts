@@ -61,5 +61,11 @@ namespace metron {
             var self = this;
             metron.page.clearFilters(selector);
         }
+        public shouldRoute(options: any): boolean {
+            if(options == null || options.hasRouting == null || options.hasRouting) {
+                return true;
+            }
+            return false;
+        }
     }
 }
