@@ -8,8 +8,13 @@ namespace metron {
                 let section: Element = <Element>sections[i];
                 if (section.attribute("data-m-autoload") == null || section.attribute("data-m-autoload") == "true") {
                     let model: string = section.attribute("data-m-model");
-                    if (metron.globals["lists"][model] == null) {
-                        let l: list<any> = new list(model).init();
+                    let mID: string = section.attribute("id");
+                    let gTypeName: string = (mID != null) ? `${mID}_${model}` : model;
+                    if (metron.globals["lists"][gTypeName] == null) {
+                        let l: list<any> = new list(model);
+                        l.id = mID;
+                        l.gTypeName = gTypeName;
+                        l.init();
                     }
                 }
             }
@@ -22,6 +27,8 @@ namespace metron {
         private _filters: any = {};
         private _items: Array<T>;
         private _form: string;
+        public id: string;
+        public gTypeName: string;
         public recycleBin: Array<T> = [];
         public currentPageIndex: number = 1;
         public pageSize: number = (!isNaN(<number><any>metron.config["config.options.pageSize"])) ? <number><any>metron.config["config.options.pageSize"] : 10;
@@ -31,15 +38,17 @@ namespace metron {
         public sortDirection: string = (metron.config["config.options.sortDirection"] != null) ? metron.config["config.options.sortDirection"] : "DESC";
         private _defaults: any = (metron.config["config.lists.defaults"] != null) ? metron.config["config.lists.defaults"] : { };
         public fetchURL: string;
-        constructor(public model: string, public listType: string = LIST) {
-            super(model, listType);
+        constructor(public model: string, public options?: metron.ListOptions) {
+            super(model, LIST);
             var self = this;
-            metron.globals["lists"][model] = self;
+            self.id = (options != null) ? options.id : null;
+            self.gTypeName = (options != null && options.id != null) ? `${options.id}_${model}` : model;
+            metron.globals["lists"][self.gTypeName] = self;
             self.setFilters();
         }
         public init(): list<T> {
             var self = this;
-            self._elem = document.selectOne(`[data-m-type='list'][data-m-model='${self.model}']`);
+            self._elem = (self.id != null) ? document.selectOne(`#${self.id}`) : document.selectOne(`[data-m-type='list'][data-m-model='${self.model}']`);
             if (self._elem != null) {
                 self.pivot = self.attachPivot(self._elem);
                 self._name = self._elem.attribute("data-m-page");
@@ -202,7 +211,7 @@ namespace metron {
         }
         private applyViewEvents(): void {
             var self = this;
-            document.selectAll(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='edit']`).each(function (idx: number, elem: Element) {
+            self._elem.selectAll(`[data-m-action='edit']`).each(function (idx: number, elem: Element) {
                 elem.removeEvent("click").addEvent("click", function (e) {
                     e.preventDefault();
                     if (metron.globals.actions != null && metron.globals.actions[`${self.model.lower()}_${elem.attribute("data-m-action").lower()}`] != null) {
@@ -225,7 +234,7 @@ namespace metron {
                     }
                 }, true);
             });
-            document.selectAll(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='delete']`).each(function (idx: number, elem: Element) {
+            self._elem.selectAll(`[data-m-action='delete']`).each(function (idx: number, elem: Element) {
                 elem.removeEvent("click").addEvent("click", function (e) {
                     e.preventDefault();
                     if (metron.globals.actions != null && metron.globals.actions[`${self.model.lower()}_${elem.attribute("data-m-action").lower()}`] != null) {
@@ -246,7 +255,7 @@ namespace metron {
                                 else {
                                     current.up(".row").drop();
                                 }
-                                document.selectOne(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='undo']`).show();
+                                self._elem.selectOne(`[data-m-action='undo']`).show();
                                 if ((<any>self).delete_m_inject != null) {
                                     (<any>self).delete_m_inject();
                                 }
@@ -255,7 +264,7 @@ namespace metron {
                     }
                 }, true);
             });
-            document.selectAll(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='sort']`).each(function (idx: number, elem: Element) {
+            self._elem.selectAll(`[data-m-action='sort']`).each(function (idx: number, elem: Element) {
                 elem.removeClass("pointer").addClass("pointer");
                 elem.removeEvent("click").addEvent("click", function (e) {
                     self.sortOrder = elem.attribute("data-m-col");
@@ -268,7 +277,7 @@ namespace metron {
                     self.callListing();
                 }, true);
             });
-            document.selectAll(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action]`).each(function (idx: number, elem: Element) {
+            self._elem.selectAll(`[data-m-action]`).each(function (idx: number, elem: Element) {
                 if (elem.attribute("data-m-action") != "edit" && elem.attribute("data-m-action") != "delete" && elem.attribute("data-m-action") != "sort" && elem.attribute("data-m-action") != "filter") { //Use an in/keys here
                     if (metron.globals.actions != null && metron.globals.actions[`${self.model.lower()}_${elem.attribute("data-m-action").lower()}`] != null) {
                         elem.removeEvent("click").addEvent("click", function (e) {
@@ -299,10 +308,10 @@ namespace metron {
         public populateListing(): void {
             var self = this;
             try {
-                self.clearTable(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='list']`);
-                self.populateTable(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='list']`);
+                self.clearTable(self._elem.selectOne(`[data-m-segment='list']`));
+                self.populateTable(self._elem.selectOne(`[data-m-segment='list']`));
                 self.totalCount = (self._items.length > 0) ? self._items[0]["TotalCount"] : 0;
-                self.createPaging(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-segment='paging']`, self.totalCount);
+                self.createPaging(self._elem.selectOne(`[data-m-segment='paging']`), self.totalCount);
                 self.applyViewEvents();
                 if ((<any>self).populateListing_m_inject != null) {
                     (<any>self).populateListing_m_inject();
@@ -318,7 +327,7 @@ namespace metron {
                 self.callListing();
             });
             if (self.recycleBin.length == 0) {
-                document.selectOne(`[data-m-type='list'][data-m-model='${self.model}'] [data-m-action='undo']`).hide();
+                self._elem.selectOne(`[data-m-action='undo']`).hide();
             }
             if ((<any>self).undoLast_m_inject != null) {
                 (<any>self).undoLast_m_inject();
@@ -329,25 +338,25 @@ namespace metron {
             self.clearAlerts();
             var parameters: any = Object.extend({ PageIndex: self.currentPageIndex, PageSize: self.pageSize, _SortOrder: self.sortOrder, _SortDirection: self.sortDirection }, self._filters);
             var url = (self.fetchURL != null) ? self.fetchURL : self.model;
-            if(!self._elem.isHidden()) {
+            if(!self._elem.isHidden() && self.shouldRoute(self.options)) {
                 metron.routing.setRouteUrl(self._name, metron.web.querystringify(metron.tools.normalizeModelData(parameters)));
             }
             metron.web.get(`${metron.fw.getAPIURL(url)}${self.withDefaults(parameters)}`, {}, null, "json", function (data: Array<T>) {
                 self._items = data;
                 self.populateListing();
                 if ((<any>self).callListing_m_inject != null) {
-                    (<any>self).callListing_m_inject();
+                    (<any>self).callListing_m_inject(data);
                 }
             }, (txt: string, jsn: any, xml: XMLDocument) => {
                 self.showAlerts(DANGER, txt, jsn, xml);
             });
         }
-        public populateTable(selector: string): void {
+        public populateTable(selector: Element): void {
             var self = this;
-            var tbody = document.selectOne(`${selector} [data-m-type='table-body']`);
+            var tbody = selector.selectOne("[data-m-type='table-body']");
             var isTable: boolean = (tbody.nodeName.lower() == "tbody") ? true : false;
             self._items.each(function (idx, item) {
-                document.selectOne(`${selector} [data-m-type='table-body']`).append(self.formatData(item, isTable));
+                selector.selectOne("[data-m-type='table-body']").append(self.formatData(item, isTable));
             });
             tbody.attribute("data-m-state", "show");
             if (isTable) {
@@ -357,48 +366,51 @@ namespace metron {
                 tbody.show();
             }
         }
-        public clearTable(selector: string): void {
+        public clearTable(selector: Element): void {
             var self = this;
             if (String.isNullOrEmpty(self._template)) {
                 try {
-                    self._template = (<HTMLElement>document.selectOne(`${selector} [data-m-type='table-body'] [data-m-action='repeat']`)).outerHTML;
+                    self._template = (<HTMLElement>selector.selectOne("[data-m-type='table-body'] [data-m-action='repeat']")).outerHTML;
                 }
                 catch(e) {
                     console.log(`DOM has no element that matches the selector "${selector} [data-m-type='table-body'] [data-m-action='repeat']": ${e}`);
                 }
             }
-            document.selectOne(`${selector} [data-m-type='table-body']`).empty();
+            selector.selectOne("[data-m-type='table-body']").empty();
         }
         public getRows(selector: string): number {
             return document.selectAll(`${selector} [data-m-type='table-body'] [data-m-type='row']`).length;
         }
-        public setupPagingEvents(selector: string, filters?: any): void {
+        public setupPagingEvents(selector: Element, filters?: any): void {
             var self = this;
-            document.selectOne(`${selector} > li > a[title='Previous']`).removeEvent("click").addEvent("click", function (e) {
+            selector.selectOne("li > a[title='Previous']").removeEvent("click").addEvent("click", function (e) {
                 e.preventDefault();
                 self.pageListing(self.getPreviousPage(), filters);
             }, true);
-            document.selectOne(`${selector} > li > a[title='Next']`).removeEvent("click").addEvent("click", function (e) {
+            selector.selectOne("li > a[title='Next']").removeEvent("click").addEvent("click", function (e) {
                 e.preventDefault();
                 self.pageListing(self.getNextPage(), filters);
             }, true);
-            document.selectOne(`${selector} > li > a[title='First']`).removeEvent("click").addEvent("click", function (e) {
+            selector.selectOne("li > a[title='First']").removeEvent("click").addEvent("click", function (e) {
                 e.preventDefault();
                 self.pageListing(1, filters);
             }, true);
-            document.selectOne(`${selector} > li > a[title='Last']`).removeEvent("click").addEvent("click", function (e) {
+            selector.selectOne("li > a[title='Last']").removeEvent("click").addEvent("click", function (e) {
                 e.preventDefault();
                 self.pageListing(self.totalPageSize, filters);
             }, true);
         }
-        public createPaging(selector: string, totalCount, filters?: any): void {
+        public createPaging(selector: Element, totalCount, filters?: any): void {
             var self = this;
+            if (document.selectOne(`${selector}`) == null){
+                return;
+            }
             if (self.currentPageIndex != null && self.pageSize != null) {
                 self.totalPageSize = self.calculateTotalPageSize(totalCount);
                 var startPage: number = ((parseInt(this.currentPageIndex.toString(), 10) - 5) < 1) ? 1 : (parseInt(this.currentPageIndex.toString(), 10) - 5);
                 var endPage: number = ((parseInt(this.currentPageIndex.toString(), 10) + 5) > this.totalPageSize) ? this.totalPageSize : (parseInt(this.currentPageIndex.toString(), 10) + 5);
                 self.setupPagingEvents(selector, filters);
-                document.selectAll(`${selector} > li`).each(function (idx: number, elem: Element) {
+                selector.selectAll("li").each(function (idx: number, elem: Element) {
                     if (elem.first("a").attribute("title") != "Previous" && elem.first("a").attribute("title") != "Next" && elem.first("a").attribute("title") != "First" && elem.first("a").attribute("title") != "Last") {
                         elem.drop();
                     }
@@ -414,24 +426,27 @@ namespace metron {
                         self.pageListing(<number><any>this.attribute("title"), filters);
                     });
                     li.appendChild(link);
-                    document.selectOne(`${selector}`).insertBefore(li, document.selectOne(`${selector} > li > a[title='Next']`).parent());
+                    selector.insertBefore(li, selector.selectOne("li > a[title='Next']").parent());
                 }
                 if (self.totalPageSize > 0) {
-                    document.selectOne(`${selector} > li > a[title='${self.currentPageIndex}']`).removeClass("button-outline").addClass("button-clear");
+                    selector.selectOne(`li > a[title='${self.currentPageIndex}']`).removeClass("button-outline").addClass("button-clear");
                 }
-                if (document.selectAll(`${selector} > li`).length <= 5) {
-                    document.selectOne(`${selector}`).hide();
+                if (selector.selectAll("li").length <= 5) {
+                    selector.hide();
                 }
                 else {
-                    document.selectOne(`${selector}`).show();
+                    selector.show();
+                }
+                if (self._elem.selectOne(`[data-m-segment='recordcount']`) != null) {
+                    (<Element>self._elem.selectOne(`[data-m-segment='recordcount']`)).innerHTML = `<label class="record-count">of ${this.totalPageSize} Pages (${totalCount} Total Records)</label>`;
                 }
             }
             else {
-                document.selectOne(`${selector}`).hide();
+                selector.hide();
             }
             self.applyPageSizeEvents(selector);
         }
-        private applyPageSizeEvents(selector: string): void {
+        private applyPageSizeEvents(selector: Element): void {
             var self = this;
             var parent = document.selectOne(`${selector}`).parent();
             var control = parent.selectOne("[data-m-segment='controls'] [data-m-segment='paging']");
@@ -465,7 +480,7 @@ namespace metron {
         }
         private setFilters(): void {
             var self = this;
-            var elem = (self._elem != null) ? self._elem : document.selectOne(`[data-m-type='list'][data-m-model='${self.model}']`);
+            var elem = (self._elem != null) ? self._elem : document.selectOne(`[data-m-type='list'][data-m-model='${self.model}']`); //Do we need this?
             var page = (elem != null) ? elem.attribute("data-m-page") : null;
             var routeName = metron.routing.getRouteName();
             var qs: string = <string><any>metron.web.querystring();

@@ -30,6 +30,14 @@ namespace metron {
         , next: Element
         , previous: Element
     }
+    export interface IBaseOptions {
+        id?: string
+        , hasRouting?: boolean
+    }
+    export interface ListOptions extends IBaseOptions {
+    }
+    export interface FormOptions extends IBaseOptions {
+    }
     export enum OptionTypes {
           QUERYSTRING = 1
         , KEYVALUE = 2

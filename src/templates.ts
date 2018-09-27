@@ -46,6 +46,8 @@ namespace metron {
                     return metron.tools.formatTime(<Date><any>val);
                 case "formatmessage":
                     return metron.tools.formatMessage(<string><any>val, options["length"], options["closetags"]);
+                case "decimal":
+                    return metron.tools.formatDecimal(<number><any>val);
                 default:
                     return metron.globals[type](<Element>val, options);
             }

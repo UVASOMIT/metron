@@ -8,8 +8,13 @@ namespace metron {
                 let section: Element = <Element>sections[i];
                 if (section.attribute("data-m-autoload") == null || section.attribute("data-m-autoload") == "true") {
                     let model: string = section.attribute("data-m-model");
-                    if (metron.globals["forms"][model] == null) {
-                        let f: form<any> = new form(model).init();
+                    let mID: string = section.attribute("id");
+                    let gTypeName: string = (mID != null) ? `${mID}_${model}` : model;
+                    if (metron.globals["forms"][gTypeName] == null) {
+                        let f: form<any> = new form(model);
+                        f.id = mID;
+                        f.gTypeName = gTypeName;
+                        f.init();
                     }
                 }
             }
@@ -21,12 +26,16 @@ namespace metron {
     export class form<T> extends base<T> {
         private _fields: Array<string> = [];
         private _defaults: Array<any> = (metron.config["config.forms.defaults"] != null) ? metron.config["config.forms.defaults"] : [];
+        public id: string;
+        public gTypeName: string;
         public hasLoaded: boolean = false;
-        constructor(public model: string) {
+        constructor(public model: string, public options?: metron.FormOptions) {
             super(model, FORM);
             var self = this;
-            metron.globals["forms"][model] = self;
-            self._elem = document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
+            self.id = (options != null) ? options.id : null;
+            self.gTypeName = (options != null && options.id != null) ? `${options.id}_${model}` : model;
+            metron.globals["forms"][self.gTypeName] = self;
+            self._elem = (self.id != null) ? document.selectOne(`#${self.id}`) : document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
         }
         private loadDefaults(): void {
             var self = this;
@@ -74,6 +83,7 @@ namespace metron {
                             case "save":
                                 el.addEvent("click", function (e) {
                                     e.preventDefault();
+                                    el.attribute("disabled", "disabled");
                                     if (metron.globals.actions != null && metron.globals.actions[`${self.model.lower()}_${el.attribute("data-m-action").lower()}`] != null) { //Refactor getting the action overrides
                                         metron.globals.actions[`${self.model.lower()}_${el.attribute("data-m-action").lower()}`]();
                                     }
@@ -83,24 +93,34 @@ namespace metron {
                                             let hasPrimary: boolean = false;
                                             self.elem.selectAll("input, select, textarea").each(function (idx: number, elem: Element) {
                                                 parameters[<string>elem.attribute("name")] = (<HTMLElement>elem).val();
+                                                if (elem.attribute("data-m-autocomplete") != null && (<HTMLElement>elem).val() != "") {
+                                                    parameters[<string>elem.attribute("name")] = metron.globals.autolists[(<HTMLInputElement>elem).attribute("id")][(<HTMLElement>elem).val()];
+                                                } else {
+                                                    parameters[<string>elem.attribute("name")] = (<HTMLElement>elem).val();
+                                                }
                                                 if (elem.attribute("data-m-primary") != null && elem.attribute("data-m-primary").toBool() && (<HTMLElement>elem).val() != "") {
                                                     hasPrimary = true;
                                                 }
                                             });
                                             if (!hasPrimary) {
                                                 metron.web.post(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", (data: T) => {
-                                                    self.save(data, <number><any>el.attribute("data-m-pivot"))
+                                                    self.save(data, <number><any>el.attribute("data-m-pivot"), el)
                                                 }, (txt, jsn, xml) => {
                                                     self.showAlerts(metron.DANGER, txt, jsn, xml);
+                                                    el.removeAttribute("disabled");
                                                 });
                                             }
                                             else {
                                                 metron.web.put(`${metron.fw.getAPIURL(self.model)}`, parameters, null, "json", (data: T) => {
-                                                    self.save(data, <number><any>el.attribute("data-m-pivot"));
+                                                    self.save(data, <number><any>el.attribute("data-m-pivot"), el);
                                                 }, (txt, jsn, xml) => {
                                                     self.showAlerts(metron.DANGER, txt, jsn, xml);
+                                                    el.removeAttribute("disabled");
                                                 });
                                             }
+                                        }
+                                        else {
+                                            el.removeAttribute("disabled");
                                         }
                                     }
                                 }, true);
@@ -142,7 +162,7 @@ namespace metron {
             }
             return self;
         }
-        public save(data: T, pivotPosition: number): void {
+        public save(data: T, pivotPosition: number, saveElement: Element): void {
             var self = this;
             self.elem.selectAll("[data-m-primary]").each((idx: number, elem: Element) => {
                 (<HTMLElement>elem).val(<string><any>data[<string><any>elem.attribute("name")]);
@@ -156,6 +176,7 @@ namespace metron {
                 }
                 catch(e) { }
             }
+            saveElement.removeAttribute("disabled");
             if ((<any>self).save_m_inject != null) {
                 (<any>self).save_m_inject(data);
             }
@@ -163,13 +184,17 @@ namespace metron {
         public loadForm(parameters?: any, defaults?: any): void {
             var self = this;
             self.clearForm();
-            if (!self._elem.isHidden()) {
+            if (!self._elem.isHidden() && self.shouldRoute(self.options)) {
                 metron.routing.setRouteUrl(self._name, metron.web.querystringify(parameters), true);
             }
             if (defaults != null) {
                 for (let prop in defaults) {
                     if (defaults.hasOwnProperty(prop) && defaults[prop] != null && document.selectOne(`#${self.model}_${prop}`) != null) {
-                        (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(<any>defaults[prop]);
+                        if ((<Element>document.selectOne(`#${self.model}_${prop}`)).attribute("data-m-autocomplete") != null) {
+                            (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(<any>defaults[(<Element>document.selectOne(`#${self.model}_${prop}`)).attribute("data-m-display-text")]);
+                        } else {
+                            (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(<any>defaults[prop]);
+                        }
                     }
                 }
             }
@@ -181,12 +206,13 @@ namespace metron {
                     //Need to do the below a different way...
                     //self._elem.innerHTML = self.formatData(data, false);
                     for (let prop in data) {
-                        if (data.hasOwnProperty(prop) && data[prop] != null && (document.selectOne(`#${self.model}_${prop}`) != null || document.selectOne(`[name='${prop}']`) != null)) {
-                            if(document.selectOne(`#${self.model}_${prop}`) == null && document.selectOne(`[name='${prop}']`) != null) {
-                                (<HTMLInputElement>document.selectOne(`[name='${prop}'][value='${data[prop]}']`)).checked = true;
-                            }
-                            else {
+                        if (self.id == null) {
+                            if (data.hasOwnProperty(prop) && data[prop] != null && document.selectOne(`#${self.model}_${prop}`) != null) {
                                 (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(<any>data[prop]);
+                            }
+                        } else {
+                            if (data.hasOwnProperty(prop) && data[prop] != null && document.selectOne(`#${self.id} > fieldset > #${self.model}_${prop}`) != null) {
+                                (<HTMLElement>document.selectOne(`#${self.id} > fieldset > #${self.model}_${prop}`)).val(<any>data[prop]);
                             }
                         }
                     }
@@ -208,13 +234,13 @@ namespace metron {
             document.selectAll(".label-error").each(function (idx, elem) {
                 (<HTMLElement>elem).removeClass("label-error");
             });
-            f.selectAll("input, select").each(function (idx: number, elem: Element) {
+            f.selectAll("input:not([data-m-ignore='true']), select:not([data-m-ignore='true'])").each(function (idx: number, elem: Element) {
                 (<HTMLElement>elem).val("");
             });
-            f.selectAll("textarea").each(function (idx: number, elem: Element) {
+            f.selectAll("textarea:not([data-m-ignore='true'])").each(function (idx: number, elem: Element) {
                 (<HTMLElement>elem).val("");
             });
-            f.selectAll("input[type='checkbox']").each(function (idx: number, elem: Element) {
+            f.selectAll("input[type='checkbox']:not([data-m-ignore='true'])").each(function (idx: number, elem: Element) {
                 (<HTMLElement>elem).val("");
             });
             self.clearAlerts();

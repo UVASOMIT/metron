@@ -27,5 +27,9 @@
         "src/forms.ts",
         "src/views.ts",
         "src/templates.ts"
-    ]
+    ],
+    "exclude": [
+        "node_modules",
+        "typings"
+      ]
 }
