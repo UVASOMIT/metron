@@ -402,7 +402,7 @@ namespace metron {
         }
         public createPaging(selector: Element, totalCount, filters?: any): void {
             var self = this;
-            if (document.selectOne(`${selector}`) == null){
+            if (selector == null) {
                 return;
             }
             if (self.currentPageIndex != null && self.pageSize != null) {
