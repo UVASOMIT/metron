@@ -201,7 +201,7 @@ namespace metron {
                 }
             }
         }
-        export function ajax(url: string, data: any = {}, method: string = "POST", async: boolean = true, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType: string = "text", success?: Function, failure?: Function, always?: Function): Ajax {
+        export async function ajax(url: string, data: any = {}, method: string = "POST", async: boolean = true, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType: string = "text", success?: Function, failure?: Function): Promise<any> {
             function _parseResult(request: XMLHttpRequest): AjaxRequest {
                 switch (dataType.lower()) {
                     case "text":
@@ -214,35 +214,33 @@ namespace metron {
                         return request.responseText;
                 }
             }
-            function _send(request: XMLHttpRequest, data: any): void {
-                var ajx = this;
-                request.open(method, url, async, data);
-                request.onreadystatechange = function () {
-                    if (request.readyState === 4) {
-                        if (request.status === 200) {
-                            if (success !== undefined) {
-                                success(_parseResult(request));
+            async function _send(request: XMLHttpRequest, data: any): Promise<Ajax> {
+                return new Promise<Ajax>((resolve, reject) => {
+                    request.open(method, url, async, data);
+                    request.onreadystatechange = function () {
+                        if (request.readyState === 4) {
+                            if (request.status === 200) {
+                                if (success !== undefined) {
+                                    resolve(success(_parseResult(request)));
+                                }
+                            }
+                            if (request.status === 404 || request.status === 405 || request.status === 500) {
+                                if (failure !== undefined) {
+                                    reject(failure(request.responseText, request.responseJSON(), request.responseXML));
+                                }
+                                else {
+                                    (<HTMLElement>document.selectOne("[data-m-segment='alert']").addClass("danger")).innerHTML = `<p>${(request.responseText != null && request.responseText != "") ? request.responseText : "Error: A problem has occurred while attempting to complete the last operation!"}</p>`;
+                                    document.selectOne("[data-m-segment='alert']").show();
+                                }
                             }
                         }
-                        if (request.status === 404 || request.status === 405 || request.status === 500) {
-                            if (failure !== undefined) {
-                                failure(request.responseText, request.responseJSON(), request.responseXML);
-                            }
-                            else {
-                                (<HTMLElement>document.selectOne("[data-m-segment='alert']").addClass("danger")).innerHTML = `<p>${(request.responseText != null && request.responseText != "") ? request.responseText : "Error: A problem has occurred while attempting to complete the last operation!"}</p>`;
-                                document.selectOne("[data-m-segment='alert']").show();
-                            }
-                        }
-                        if (always !== undefined) {
-                            always(request);
-                        }
+                    };
+                    request.setRequestHeader("Content-Type", contentType);
+                    if (url.contains("localhost")) {
+                        request.setRequestHeader("Cache-Control", "max-age=0");
                     }
-                };
-                request.setRequestHeader("Content-Type", contentType);
-                if (url.contains("localhost")) {
-                    request.setRequestHeader("Cache-Control", "max-age=0");
-                }
-                request.send(data);
+                    request.send(data);
+                });
             }
             let request: XMLHttpRequest = new XMLHttpRequest();
             let requestData = (typeof(data) !== "string") ? metron.web.querystringify(data, true) : data;
@@ -260,39 +258,39 @@ namespace metron {
                 , data: requestData
                 , async: async
                 , request: request
-                , send: function (): void {
-                    _send(request, requestData);
+                , send: async function (): Promise<Ajax> {
+                    return await _send(request, requestData);
                 }
             };
-            if (success != null || failure != null || always != null) {
-                self.send();
+            if (success != null || failure != null) {
+                return await self.send();
             }
             return self;
         }
-        export function get(url: string, params: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
-            return ajax(url, params, "GET", true, (contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, success, failure, always);
+        export async function get(url: string, params: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function): Promise<Ajax> {
+            return await ajax(url, params, "GET", true, (contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, success, failure);
         }
-        export function post(url: string, params: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
-            return ajax(url, params, "POST", true, (contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, success, failure, always);
+        export async function post(url: string, params: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function): Promise<Ajax> {
+            return await ajax(url, params, "POST", true, (contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, success, failure);
         }
-        export function postAll(url: string, params: any = {}, contentType: string = "application/json;charset=utf-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
-            return ajax(url, JSON.stringify({ "data": params }), "POST", true, (contentType != null) ? contentType : "application/json;charset=utf-8", dataType, success, failure, always);
+        export async function postAll(url: string, params: any = {}, contentType: string = "application/json;charset=utf-8", dataType?: string, success?: Function, failure?: Function): Promise<Ajax> {
+            return await ajax(url, JSON.stringify({ "data": params }), "POST", true, (contentType != null) ? contentType : "application/json;charset=utf-8", dataType, success, failure);
         }
-        export function put(url: string, params: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
-            return ajax(url, params, "PUT", true, (contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, success, failure, always);
+        export async function put(url: string, params: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function): Promise<Ajax> {
+            return await ajax(url, params, "PUT", true, (contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, success, failure);
         }
-        export function putAll(url: string, params: any = {}, contentType: string = "application/json;charset=utf-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
-            return ajax(url, JSON.stringify({ "data": params }), "PUT", true, (contentType != null) ? contentType : "application/json;charset=utf-8", dataType, success, failure, always);
+        export async function putAll(url: string, params: any = {}, contentType: string = "application/json;charset=utf-8", dataType?: string, success?: Function, failure?: Function): Promise<Ajax> {
+            return await ajax(url, JSON.stringify({ "data": params }), "PUT", true, (contentType != null) ? contentType : "application/json;charset=utf-8", dataType, success, failure);
         }
-        export function remove(url: string, params: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function, always?: Function): Ajax {
-            return ajax(url, params, "DELETE", true, (contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, function (data) {
+        export async function remove(url: string, params: any = {}, contentType: string = "application/x-www-form-urlencoded; charset=UTF-8", dataType?: string, success?: Function, failure?: Function): Promise<Ajax> {
+            return await ajax(url, params, "DELETE", true, (contentType != null) ? contentType : "application/x-www-form-urlencoded; charset=UTF-8", dataType, function (data) {
                 if (data != null && data instanceof Array && data.length > 0) {
                     success(data[0])
                 }
                 else {
                     success(data);
                 }
-            }, failure, always);
+            }, failure);
         }
     }
     export namespace observer {
