@@ -113,6 +113,35 @@ namespace metron {
                 throw 'Error: No document object found. Environment may not contain a DOM.';
             }
         }
+        export function hash(key?: string): string[] | any {
+            var hash = document.location.hash;
+            if (hash.substr(0, 1) == "#") {
+                hash = hash.substr(1);
+            }
+            if (hash.substr(0, 1) == "/") {
+                hash = hash.substr(1);
+            }
+            if (hash.length > 1) {
+                if (hash.indexOf("/") != -1) {
+                    try {
+                        hash = hash.split("/")[1];
+                    }
+                    catch (e) {
+                        console.log(`Error: Failed to parse hash value: ${e}`);
+                    }
+                }
+                try {
+                    const result = metron.tools.formatOptions(hash, metron.OptionTypes.QUERYSTRING);
+                    if(key != null) {
+                        return [result[key]];
+                    }
+                    return result;
+                }
+                catch(e) {
+                    console.log(`Error formatting has values: ${e}`);
+                }
+            }
+        }
         export function querystringify(obj: any, encode = false): string {
             return parseUrl("", obj, encode);
         }

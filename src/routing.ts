@@ -95,40 +95,17 @@ namespace metron {
             }
         }
         export function getRouteUrl(filters?: any): any {
-            var hash = document.location.hash;
-            if (hash.substr(0, 1) == "#") {
-                hash = hash.substr(1);
-            }
-            if (hash.substr(0, 1) == "/") {
-                hash = hash.substr(1);
-            }
-            if (hash.length > 1) {
-                if (hash.indexOf("/") != -1) {
-                    try {
-                        hash = hash.split("/")[1];
-                    }
-                    catch (e) {
-                        console.log(`Error: Failed to get routing. ${e}`);
-                    }
-                }
-                try {
-                    let result = metron.tools.formatOptions(hash, metron.OptionTypes.QUERYSTRING);
-                    if (filters != null) {
-                        for (let h in result) {
-                            if (result.hasOwnProperty(h)) {
-                                if (filters[h] != null) { //This should be checking for undefined.
-                                    delete result[h];
-                                }
-                            }
+            var result = metron.web.hash();
+            if (filters != null) {
+                for (let h in result) {
+                    if (result.hasOwnProperty(h)) {
+                        if (filters[h] != null) { //This should be checking for undefined.
+                            delete result[h];
                         }
                     }
-                    return result;
-                }
-                catch(e) {
-                    console.log(`Error formatting options in getRouteUrl(): ${e}`);
                 }
             }
-            return null;
+            return result;
         }
         export function getRouteName(): string {
             var hash = document.location.hash;
