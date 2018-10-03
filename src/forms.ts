@@ -2,19 +2,19 @@
 
 namespace metron {
     export class forms {
-        public static async bindAll(callback: Function): Promise<any> {
+        public static bindAll(callback: Function): void {
             let sections: NodeListOf<Element> = document.selectAll("[data-m-type='form']");
             for (let i = 0; i < sections.length; i++) {
                 let section: Element = <Element>sections[i];
                 if (section.attribute("data-m-autoload") == null || section.attribute("data-m-autoload") == "true") {
                     let model: string = section.attribute("data-m-model");
-                    let id: string = section.attribute("id");
-                    let gTypeName: string = (id != null) ? `${id}_${model}` : model;
+                    let mID: string = section.attribute("id");
+                    let gTypeName: string = (mID != null) ? `${mID}_${model}` : model;
                     if (metron.globals["forms"][gTypeName] == null) {
                         let f: form<any> = new form(model);
-                        f.id = id;
+                        f.id = mID;
                         f.gTypeName = gTypeName;
-                        await f.init();
+                        f.init();
                     }
                 }
             }
@@ -56,14 +56,14 @@ namespace metron {
                 }
             }
         }
-        public init(toggle: boolean = false): Promise<T> {
+        public init(toggle: boolean = false): form<T> {
             var self = this;
             self.hasLoaded = true;
             if (self._elem != null) {
                 self.pivot = self.attachPivot(self._elem);
                 self._name = self._elem.attribute("data-m-page");
                 let selects = self._elem.selectAll("select");
-                self.loadSelects(selects, async () => {
+                self.loadSelects(selects, () => {
                     let parameters: any;
                     let defaults: any;
                     let qs: string = <string><any>metron.web.querystring();
@@ -73,7 +73,7 @@ namespace metron {
                     if (metron.globals.firstLoad) {
                         parameters = metron.routing.getRouteUrl({"PageSize": 1, "PageIndex": 1, "_SortOrder": 1, "_SortDirection": 1}); ///This should send null values or by removed by default.
                     }
-                    await self.loadForm(parameters, defaults);
+                    self.loadForm(parameters, defaults);
                 });
                 let controlBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='controls']");
                 controlBlocks.each((idx: number, elem: Element) => {
