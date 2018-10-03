@@ -124,6 +124,16 @@ namespace metron {
                                     else {
                                         self._elem.selectAll("[data-m-segment='filters']").each((idx: number, elem: Element) => {
                                             self.clearFilters(elem);
+                                            for(let key in self.filters) {
+                                                if(self._filters.hasOwnProperty(key)) {
+                                                    self._filters[key] = null;
+                                                }
+                                            }
+                                            const qs: string = <string><any>metron.web.querystring();
+                                            if (qs != "") {
+                                                self._filters = metron.tools.formatOptions(qs, metron.OptionTypes.QUERYSTRING);
+                                            }
+                                            self.currentPageIndex = 1;
                                             self.callListing();
                                         });
                                     }
