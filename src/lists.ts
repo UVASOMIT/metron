@@ -297,7 +297,14 @@ namespace metron {
             self._elem.selectAll(`[data-m-action]`).each(function (idx: number, elem: Element) {
                 if (elem.attribute("data-m-action") != "edit" && elem.attribute("data-m-action") != "delete" && elem.attribute("data-m-action") != "sort" && elem.attribute("data-m-action") != "filter") { //Use an in/keys here
                     if (metron.globals.actions != null && metron.globals.actions[`${self.model.lower()}_${elem.attribute("data-m-action").lower()}`] != null) {
-                        elem.removeEvent("click").addEvent("click", function (e) {
+                        let ev: string;
+                        if(elem.nodeName.lower() === "a" || elem.nodeName.lower() === "button" || elem.nodeName.lower() === "div" || elem.nodeName.lower() === "span" || (elem.nodeName.lower() === "input" && (elem.attribute("type").lower() === "submit" || elem.attribute("type").lower() === "button"))) {
+                            ev = "click";
+                        }
+                        else {
+                            ev = "change";
+                        }
+                        elem.removeEvent(ev).addEvent(ev, function (e) {
                             e.preventDefault();
                             metron.globals.actions[`${self.model.lower()}_${elem.attribute("data-m-action").lower()}`](elem);
                         });
