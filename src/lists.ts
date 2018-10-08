@@ -144,6 +144,13 @@ namespace metron {
                                 break;
                             default:
                                 if (metron.globals.actions != null && metron.globals.actions[`${self.model.lower()}_${el.attribute("data-m-action").lower()}`] != null) {
+                                    let ev: string;
+                                    if(el.nodeName.lower() === "a" || el.nodeName.lower() === "button" || (el.nodeName.lower() === "input" && (el.attribute("type").lower() === "submit" || el.attribute("type").lower() === "button"))) {
+                                        ev = "click";
+                                    }
+                                    else {
+                                        ev = "change";
+                                    }
                                     el.addEvent("click", function (e) {
                                         e.preventDefault();
                                         metron.globals.actions[`${self.model.lower()}_${el.attribute("data-m-action").lower()}`]();
