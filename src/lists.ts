@@ -145,7 +145,7 @@ namespace metron {
                             default:
                                 if (metron.globals.actions != null && metron.globals.actions[`${self.model.lower()}_${el.attribute("data-m-action").lower()}`] != null) {
                                     let ev: string;
-                                    if(el.nodeName.lower() === "a" || el.nodeName.lower() === "button" || (el.nodeName.lower() === "input" && (el.attribute("type").lower() === "submit" || el.attribute("type").lower() === "button"))) {
+                                    if(el.nodeName.lower() === "a" || el.nodeName.lower() === "button" || el.nodeName.lower() === "div" || el.nodeName.lower() === "span" || (el.nodeName.lower() === "input" && (el.attribute("type").lower() === "submit" || el.attribute("type").lower() === "button"))) {
                                         ev = "click";
                                     }
                                     else {

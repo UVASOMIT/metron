@@ -48,7 +48,7 @@ namespace metron {
                 let a = el.attribute("data-m-action");
                 if(el.up("[data-m-segment='controls']") == null && el.up("[data-m-type='row']") == null) {
                     let ev: string;
-                    if(el.nodeName.lower() === "a" || el.nodeName.lower() === "button" || (el.nodeName.lower() === "input" && (el.attribute("type").lower() === "submit" || el.attribute("type").lower() === "button"))) {
+                    if(el.nodeName.lower() === "a" || el.nodeName.lower() === "button" || el.nodeName.lower() === "div" || el.nodeName.lower() === "span" || (el.nodeName.lower() === "input" && (el.attribute("type").lower() === "submit" || el.attribute("type").lower() === "button"))) {
                         ev = "click";
                     }
                     else {
