@@ -151,7 +151,7 @@ namespace metron {
                                     else {
                                         ev = "change";
                                     }
-                                    el.addEvent("click", function (e) {
+                                    el.addEvent(ev, function (e) {
                                         e.preventDefault();
                                         metron.globals.actions[`${self.model.lower()}_${el.attribute("data-m-action").lower()}`]();
                                     });
