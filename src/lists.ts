@@ -122,7 +122,7 @@ namespace metron {
                                         metron.globals.actions[`${self.model.lower()}_${el.attribute("data-m-action").lower()}`]();
                                     }
                                     else {
-                                        self._elem.selectAll("[data-m-segment='filters']").each((idx: number, elem: Element) => {
+                                        self._elem.selectAll("[data-m-segment='filters'],.custom-filter").each((idx: number, elem: Element) => {
                                             self.clearFilters(elem);
                                             for(let key in self.filters) {
                                                 if(self._filters.hasOwnProperty(key)) {
