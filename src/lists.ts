@@ -461,7 +461,7 @@ namespace metron {
                 else {
                     selector.show();
                 }
-                if (self._elem.selectOne(`[data-m-segment='recordcount']`) != null) {
+                if (self._elem.selectOne(`[data-m-segment='recordcount']`) != null && this.totalPageSize != null && this.totalPageSize > 0) {
                     (<Element>self._elem.selectOne(`[data-m-segment='recordcount']`)).innerHTML = `<label class="record-count">of ${this.totalPageSize} Pages (${totalCount} Total Records)</label>`;
                 }
             }
