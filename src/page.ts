@@ -79,7 +79,7 @@ namespace metron {
             elem.show();
         }
         public static clearFilters(selector: Element): void {
-            selector.selectAll("[data-m-action='filter']").each((idx: number, elem: Element) => {
+            selector.selectAll("[data-m-action='filter'],.custom-filter").each((idx: number, elem: Element) => {
                 try {
                     elem.val("");
                 }
