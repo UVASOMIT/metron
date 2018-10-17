@@ -359,7 +359,7 @@ namespace metron {
                     self._items[i].hide();
                 }
                 self._items[idx].show();
-                if(self._items[idx].attribute("data-m-page") != null) {
+                if(self._items[idx].attribute("data-m-page") != null && metron.globals.hashLoadedFromApplication) {
                     metron.routing.setRouteUrl(self._items[idx].attribute("data-m-page"), "", true);
                 }
                 self.init(self._items[idx]);
