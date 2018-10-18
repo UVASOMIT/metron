@@ -466,7 +466,7 @@ namespace metron {
                         self._elem.selectOne(`[data-m-segment='recordcount']`).innerHTML = `<label class="record-count">of ${this.totalPageSize} Pages (${totalCount} Total Records)</label>`;
                     }
                     else {
-                        self._elem.selectOne(`[data-m-segment='recordcount']`).hide();
+                        self._elem.selectOne(`[data-m-segment='recordcount']`).innerHTML = `<label class="record-count">No records found...</label>`;
                     }
                 }
             }
