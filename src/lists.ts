@@ -463,7 +463,8 @@ namespace metron {
                 }
                 if (self._elem.selectOne(`[data-m-segment='recordcount']`) != null) {
                     if(this.totalPageSize != null && this.totalPageSize > 0) {
-                        self._elem.selectOne(`[data-m-segment='recordcount']`).innerHTML = `<label class="record-count">of ${this.totalPageSize} Pages (${totalCount} Total Records)</label>`;
+                        let isOne = (this.totalPageSize === 1) ? "1 " : "";
+                        self._elem.selectOne(`[data-m-segment='recordcount']`).innerHTML = `<label class="record-count">${isOne}of ${this.totalPageSize} Pages (${totalCount} Total Records)</label>`;
                     }
                     else {
                         self._elem.selectOne(`[data-m-segment='recordcount']`).innerHTML = `<label class="record-count">No records found...</label>`;
