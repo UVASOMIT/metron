@@ -104,6 +104,10 @@ hr {
     clear: both;
     /*margin: auto 5rem auto 5rem;*/
 }
+[data-m-type='list']
+, [data-m-type='form'] {
+    margin: 5rem auto 5rem auto;
+}
 [data-m-type='markdown'] {
     display: none;
 }
