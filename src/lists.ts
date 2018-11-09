@@ -70,7 +70,13 @@ namespace metron {
                                     }
                                     else {
                                         if(self.pivot != null) {
-                                            (el.attribute("data-m-pivot") != null) ? self.pivot.exact(<any>el.attribute("data-m-pivot")) : self.pivot.next();
+                                            (el.attribute("data-m-pivot") != null)
+                                                ? self.pivot.exact(<any>el.attribute("data-m-pivot"))
+                                                : self.pivot.next((nextPage: string) => {
+                                                    if(nextPage != null) {
+                                                        metron.routing.setRouteUrl(nextPage, "", true);
+                                                    }
+                                                });
                                         }
                                         if(metron.globals["forms"][self.model] != null) {
                                             try {
@@ -237,7 +243,13 @@ namespace metron {
                     else {
                         let parameters = metron.tools.formatOptions(elem.attribute("data-m-primary"));
                         if(self.pivot != null) {
-                            (elem.attribute("data-m-pivot") != null) ? self.pivot.exact(<any>elem.attribute("data-m-pivot")) : self.pivot.next();
+                            (elem.attribute("data-m-pivot") != null)
+                                ? self.pivot.exact(<any>elem.attribute("data-m-pivot"))
+                                : self.pivot.next((nextPage: string) => {
+                                    if(nextPage != null) {
+                                        metron.routing.setRouteUrl(nextPage, metron.web.querystringify(parameters), true);
+                                    }
+                                });
                         }
                         if(metron.globals["forms"][self.model] != null) {
                             try {
