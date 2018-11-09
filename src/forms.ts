@@ -56,7 +56,7 @@ namespace metron {
                 }
             }
         }
-        public init(toggle: boolean = false): form<T> {
+        public init(): form<T> {
             var self = this;
             self.hasLoaded = true;
             if (self._elem != null) {
@@ -134,7 +134,13 @@ namespace metron {
                                     else {
                                         self.clearForm();
                                         if(self.pivot != null) { //Might want to use the history here and just go back. Pivoting this way is causing an entry in the history object.
-                                            (el.attribute("data-m-pivot") != null) ? self.pivot.exact(<any>el.attribute("data-m-pivot")) : self.pivot.previous();
+                                            (el.attribute("data-m-pivot") != null)
+                                                ? self.pivot.exact(<any>el.attribute("data-m-pivot"))
+                                                : self.pivot.previous((previousPage: string) => {
+                                                    if(previousPage != null) {
+                                                        metron.routing.setRouteUrl(previousPage, "", true);
+                                                    }
+                                                });
                                         }
                                         if (metron.globals["lists"][self.model] != null) {
                                             metron.globals["lists"][self.model].callListing();
@@ -168,7 +174,13 @@ namespace metron {
                 (<HTMLElement>elem).val(<string><any>data[<string><any>elem.attribute("name")]);
             });
             if(self.pivot != null) {
-                (pivotPosition != null) ? self.pivot.exact(pivotPosition) : self.pivot.previous();
+                (pivotPosition != null)
+                    ? self.pivot.exact(pivotPosition)
+                    : self.pivot.previous((previousPage: string) => {
+                        if(previousPage != null) {
+                            metron.routing.setRouteUrl(previousPage, "", true);
+                        }
+                    });
             }
             if (metron.globals["lists"][self.model] != null) {
                 try {
@@ -184,9 +196,9 @@ namespace metron {
         public loadForm(parameters?: any, defaults?: any): void {
             var self = this;
             self.clearForm();
-            if (!self._elem.isHidden() && self.shouldRoute(self.options)) {
-                metron.routing.setRouteUrl(self._name, metron.web.querystringify(parameters), true);
-            }
+            //if (!self._elem.isHidden() && self.shouldRoute(self.options)) {
+            //    metron.routing.setRouteUrl(self._name, metron.web.querystringify(parameters), true);
+            //}
             if (defaults != null) {
                 for (let prop in defaults) {
                     if (defaults.hasOwnProperty(prop) && defaults[prop] != null && document.selectOne(`#${self.model}_${prop}`) != null) {
