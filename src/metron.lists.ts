@@ -235,9 +235,11 @@ namespace metron {
                                 else {
                                     current.up(".row").drop();
                                 }
-                                self._elem.selectOne(`[data-m-action='undo']`).show();
+                                if (self._elem.selectOne(`[data-m-action='undo']`)) {
+                                    self._elem.selectOne(`[data-m-action='undo']`).show();
+                                }
                                 if ((<any>self).delete_m_inject != null) {
-                                    (<any>self).delete_m_inject();
+                                    (<any>self).delete_m_inject(data);
                                 }
                             });
                         }
