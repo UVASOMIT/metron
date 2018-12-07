@@ -113,8 +113,8 @@ function getElementValue(_self: any, val?: string): string {
                     }
                     break;
                 case "radio":
-                    let name: string = _self.attribute("name");
-                    let radios: NodeListOf<Element> = document.selectAll(`input[type='radio'][name='${name}']`);
+                    const name: string = _self.attribute("name");
+                    const radios: NodeListOf<Element> = document.selectAll(`input[type='radio'][name='${name}']`);
                     radios.each(function(idx: number, elem: Element) {
                         if(elem.attribute("value") == val) {
                             (<HTMLInputElement>elem).checked = true;
@@ -125,41 +125,41 @@ function getElementValue(_self: any, val?: string): string {
                     });
                     break;
                     case "date":
-                    let date: string = val;
-                    if (date.contains("T")) {
-                        date = date.slice(0, date.indexOf("T"));
-                    }
-                    if (metron.globals.requiresDateTimePolyfill && /\d{4}-\d{2}-\d{2}/g.test(val)) {
-                        this.value = `${date.slice(5, 7)}/${date.slice(8, 10)}/${date.slice(0, 4)}`;
-                    }
-                    else if (metron.globals.requiresDateTimePolyfill && /\d{2}\/\d{2}\/\d{4}/g.test(val)) {
-                        this.value = date;
-                    } else if (/\d{2}\/\d{2}\/\d{4}/g.test(val)) {
-                        this.value = `${date.slice(6, 10)}-${date.slice(0, 2)}-${date.slice(3, 5)}`;
-                    } else {
-                        this.value = date;
-                    }
+                        let date: string = val;
+                        if (date.contains("T")) {
+                            date = date.slice(0, date.indexOf("T"));
+                        }
+                        if (metron.globals.requiresDateTimePolyfill && /\d{4}-\d{2}-\d{2}/g.test(val)) {
+                            _self.value = `${date.slice(5, 7)}/${date.slice(8, 10)}/${date.slice(0, 4)}`;
+                        }
+                        else if (metron.globals.requiresDateTimePolyfill && /\d{2}\/\d{2}\/\d{4}/g.test(val)) {
+                            _self.value = date;
+                        } else if (/\d{2}\/\d{2}\/\d{4}/g.test(val)) {
+                            _self.value = `${date.slice(6, 10)}-${date.slice(0, 2)}-${date.slice(3, 5)}`;
+                        } else {
+                            _self.value = date;
+                        }
                     break;
                 case "time":
-                    let time: string = val;
+                    const time: string = val;
                     if (metron.globals.requiresDateTimePolyfill) {
                         if (/\d{2}:\d{2}:\d{2}/g.test(time)) {
                             let hour: number = Number(time.slice(0, 2));
-                            let period: string = hour > 11 ? "PM" : "AM";
+                            const period: string = hour > 11 ? "PM" : "AM";
                             hour = hour > 12 ? hour - 12 : hour;
-                            let hourStr: string = hour > 9 ? hour.toString() : "0" + hour.toString();
-                            this.value = `${hourStr}:${time.slice(3, 5)} ${period}`;
+                            const hourStr: string = hour > 9 ? hour.toString() : "0" + hour.toString();
+                            _self.value = `${hourStr}:${time.slice(3, 5)} ${period}`;
                         }
                         else {
-                            this.value = time;
+                            _self.value = time;
                         }
                     }
                     else {
                         if (/\d{2}:\d{2}:\d{2}/g.test(time)) {
-                            this.value = time.slice(0, 5);
+                            _self.value = time.slice(0, 5);
                         }
                         else {
-                            this.value = time;
+                            _self.value = time;
                         }
                     }
                     break;
@@ -196,13 +196,13 @@ function getElementValue(_self: any, val?: string): string {
                 case "checkbox":
                     return _self.checked;
                 case "radio":
-                    let name: string = _self.attribute("name");
+                    const name: string = _self.attribute("name");
                     return (<HTMLInputElement>document.selectOne(`input[type='radio'][name='${name}']:checked`) != null) ? (<HTMLInputElement>document.selectOne(`input[type='radio'][name='${name}']:checked`)).value : null;
                 case "time":
                     if (metron.globals.requiresDateTimePolyfill && /\d{2}:\d{2} \S{2}/g.test((<any>self).value)) {
-                        let period: string = _self.value.slice(6, 8);
-                        let hour: number = Number(_self.value.slice(0, 2));
-                        let hourStr: string = (period == "PM" && hour < 12) ? (hour + 12).toString() : hour.toString();
+                        const period: string = _self.value.slice(6, 8);
+                        const hour: number = Number(_self.value.slice(0, 2));
+                        const hourStr: string = (period == "PM" && hour < 12) ? (hour + 12).toString() : hour.toString();
                         return `${hourStr}:${_self.value.slice(3, 5)}:00`;
                     }
                     else {
