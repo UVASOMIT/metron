@@ -181,6 +181,13 @@ namespace metron {
                     });
                 }
             });
+            if (document.selectOne('[data-m-segment="filters"] input[name="Term"]')) {
+                (<HTMLInputElement>document.selectOne('[data-m-segment="filters"] input[name="Term"]')).addEvent("change", function (e) {
+                    if ((<HTMLButtonElement>document.selectOne('[data-m-segment="filters"] button[title="Search"]'))) {
+                        (<HTMLButtonElement>document.selectOne('[data-m-segment="filters"] button[title="Search"]')).click();
+                    }
+                });
+            }
             RSVP.all(promises).then(() => {
                 if ((<any>self).loadFilters_m_inject != null) {
                     (<any>self).loadFilters_m_inject();
