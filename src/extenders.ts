@@ -3,8 +3,7 @@ interface String {
     upper: () => string;
     ltrim: () => string;
     rtrim: () => string;
-    //trim: () => string;
-    normalize: () => string;
+    trim: () => string;
     startsWith: (part: string, pos?: number) => boolean;
     endsWith: (part: string, pos?: number) => boolean;
     capFirst: () => string;
@@ -235,10 +234,6 @@ String.prototype.ltrim = function (): string {
 
 String.prototype.rtrim = function (): string {
     return this.replace(/\s+$/, "");
-};
-
-String.prototype.normalize = function (): string {
-    return this.replace(/^\s*|\s(?=\s)|\s*$/g, "");
 };
 
 String.prototype.startsWith = function (part: string, pos?: number): boolean {

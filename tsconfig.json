@@ -1,16 +1,12 @@
 {
     "compileOnSave": true,
     "compilerOptions": {
-                "module": "amd", 
-                "target": "es5",
+                "module": "none", 
+                "target": "es6",
                 "outFile": "dist/gen/metron.js",
                 "sourceMap": true,
                 "declaration": true,
-                "removeComments": true,
-                "lib": ["dom"
-                    , "es2015.promise"
-                    , "es5"
-                ]
+                "removeComments": true
             },
     "files": [
         "src/extenders.ts",
