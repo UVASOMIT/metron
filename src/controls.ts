@@ -149,13 +149,13 @@ namespace metron {
             }
             if (!checkDateInputSupport() && typeof window.orientation === 'undefined') {
                 metron.globals.requiresDateTimePolyfill = true;
-                document.selectAll("input[type=date]").each((idx: number, elem: HTMLInputElement) => {
+                document.querySelectorAll("input[type=date]").each((idx: number, elem: HTMLInputElement) => {
                     elem.placeholder = "mm/dd/yyyy";
                     elem.addEventListener("keyup", (e) => {
                         elem.val(fillDateInput(elem.val(), e.keyCode));
                     });
                 });
-                document.selectAll("input[type=time]").each((idx: number, elem: HTMLInputElement) => {
+                document.querySelectorAll("input[type=time]").each((idx: number, elem: HTMLInputElement) => {
                     elem.placeholder = "--:-- --";
                     elem.addEventListener("keyup", (e) => {
                         elem.value = fillTimeInput(elem.val(), e.keyCode); // don't set elem.value with val extender here. elem.val(fillTimeInput(elem.val(), e.keyCode));
@@ -169,7 +169,7 @@ namespace metron {
                 p = <metron.controls.pivot>metron.globals["pivots"][name];
             }
             else {
-                p = new metron.controls.pivot(<HTMLElement>document.selectOne(`[data-m-type='pivot'][data-m-page='${name}']`));
+                p = new metron.controls.pivot(<HTMLElement>document.querySelector(`[data-m-type='pivot'][data-m-page='${name}']`));
                 metron.globals["pivots"][name] = p;
             }
             if(callback != null) {
@@ -179,14 +179,14 @@ namespace metron {
         }
         export class pivots {
             public static bindAll(callback?: Function): void {
-                const pivots : NodeListOf<Element> = document.selectAll("[data-m-type='pivot']");
+                const pivots : NodeListOf<Element> = document.querySelectorAll("[data-m-type='pivot']");
                 for (let i = 0; i < pivots.length; i++) {
                     const section: Element = <Element>pivots[i];
                     const page: string = section.attribute("data-m-page");
                     if (metron.globals["pivots"][page] == null) {
                         const p: pivot = new controls.pivot(<Element>section);
                         metron.globals["pivots"][page] = p;
-                        section.selectAll("[data-m-pivot]").each((idx: number, elem: Element) => {
+                        section.querySelectorAll("[data-m-pivot]").each((idx: number, elem: Element) => {
                             if(elem.up("[data-m-type='pivot']").attribute("data-m-page") == null || elem.up("[data-m-type='pivot']").attribute("data-m-page") === page) {
                                 elem.addEvent("click", (e) => {
                                     e.preventDefault();
@@ -215,11 +215,11 @@ namespace metron {
                 const self = this;
                 self._name = pivotCollection.attribute("data-m-page");
                 self._pivotContainer = pivotCollection;
-                self._nextButton = (nextButton != null) ? document.selectOne(`#${nextButton}`): self._pivotContainer.selectOne("[data-m-segment='controls'] [data-m-action='next']");
-                self._previousButton = (previousButton != null) ? document.selectOne(`#${previousButton}`): self._pivotContainer.selectOne("[data-m-segment='controls'] [data-m-action='previous']");
+                self._nextButton = (nextButton != null) ? document.querySelector(`#${nextButton}`): self._pivotContainer.querySelector("[data-m-segment='controls'] [data-m-action='next']");
+                self._previousButton = (previousButton != null) ? document.querySelector(`#${previousButton}`): self._pivotContainer.querySelector("[data-m-segment='controls'] [data-m-action='previous']");
 
                 if (self.displayIndex != null) {
-                    const itemList = self._pivotContainer.selectAll("[data-m-segment='pivot-item']");
+                    const itemList = self._pivotContainer.querySelectorAll("[data-m-segment='pivot-item']");
                     itemList.each(function (idx: number, elem: Element) {
                         if(elem.up("[data-m-type='pivot']").attribute("data-m-page") == null || elem.up("[data-m-type='pivot']").attribute("data-m-page") === self._name) {
                             self._items.push(elem);

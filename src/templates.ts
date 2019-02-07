@@ -23,7 +23,7 @@ namespace metron {
             }
             var doc = document.createElement((isTable ? "tbody" : "div"));
             doc.innerHTML = result;
-            doc.selectAll("[data-m-format]").each((idx: number, elem: HTMLElement) => {
+            doc.querySelectorAll("[data-m-format]").each((idx: number, elem: HTMLElement) => {
                 let options = (elem.attribute("data-m-options") != null) ? metron.tools.formatOptions(elem.attribute("data-m-options")) : null;
                 if (elem.firstElementChild == null) {
                     elem.innerText = format(elem.attribute("data-m-format"), elem.innerText, options);

@@ -15,7 +15,7 @@ namespace metron {
                 let nText: string = el.attribute("data-m-text");
                 let options: any = (el.attribute("data-m-options") != null) ? metron.tools.formatOptions(el.attribute("data-m-options")) : { };
                 return new Promise((resolve, reject) => {
-                    if (rli || (binding != null && node.selectAll("option").length <= 1)) {
+                    if (rli || (binding != null && node.querySelectorAll("option").length <= 1)) {
                         metron.web.get(`${metron.fw.getAPIURL(binding)}${metron.web.querystringify(options)}`, {}, null, "json", function (data: Array<any>) {
                             data.each(function (i: number, item: any) {
                                 node.append(`<option value="${item[key]}">${item[nText]}</option>`);
@@ -62,24 +62,24 @@ namespace metron {
             });
         }
         public static bindActions(): void {
-            page.loadActions(document.selectAll("[data-m-action]"));
+            page.loadActions(document.querySelectorAll("[data-m-action]"));
         }
         public static clearAlerts(selector: string) {
-            var elem = <HTMLElement>document.selectOne(selector);
+            var elem = <HTMLElement>document.querySelector(selector);
             elem.innerHTML = "";
             elem.removeClass("info").removeClass("warning").removeClass("danger").removeClass("success"); //Create a removeClasses() method
             elem.attribute("data-m-state", "hide");
             elem.hide();
         }
         public static showAlerts(selector: string, className: string, txt: string, jsn?: any, xml?: XMLDocument): void {
-            var elem = <HTMLElement>document.selectOne(selector);
+            var elem = <HTMLElement>document.querySelector(selector);
             elem.innerHTML = txt;
             elem.addClass(className);
             elem.attribute("data-m-state", "show");
             elem.show();
         }
         public static clearFilters(selector: Element): void {
-            selector.selectAll("[data-m-action='filter'],.custom-filter").each((idx: number, elem: Element) => {
+            selector.querySelectorAll("[data-m-action='filter'],.custom-filter").each((idx: number, elem: Element) => {
                 try {
                     elem.val("");
                 }
@@ -91,7 +91,7 @@ namespace metron {
         public get elem(): Element {
             if(this._elem == null) {
                 try {
-                    this._elem = document.selectOne("[data-m-root]");
+                    this._elem = document.querySelector("[data-m-root]");
                 }
                 catch(e) {
                     console.log(e);

@@ -1,7 +1,7 @@
 namespace metron {
     export class views {
         public static bindAll(): void {
-            let sections: NodeListOf<Element> = document.selectAll("[data-m-type='view']");
+            let sections: NodeListOf<Element> = document.querySelectorAll("[data-m-type='view']");
             for (let i = 0; i < sections.length; i++) {
                 let section: Element = <Element>sections[i];
                 if (section.attribute("data-m-autoload") == null || section.attribute("data-m-autoload") == "true") {
@@ -24,7 +24,7 @@ namespace metron {
         }
         public init(): view<T> {
             var self = this;
-            self._elem = (self.id != null) ? document.selectOne(`#${self.id}`) : document.selectOne(`[data-m-type='view'][data-m-model='${self.model}']`);
+            self._elem = (self.id != null) ? document.querySelector(`#${self.id}`) : document.querySelector(`[data-m-type='view'][data-m-model='${self.model}']`);
             if(self._elem != null) {
                 self.pivot = self.attachPivot(self._elem);
                 self._name = self._elem.attribute("[data-m-page]");
@@ -42,8 +42,8 @@ namespace metron {
                 }
                 self._elem.innerHTML = self.formatData(data, false);
                 for (let prop in data) {
-                    if(data.hasOwnProperty(prop) && data[prop] != null && document.selectOne(`#View_${self.model}_${prop}`) != null) {
-                        (<HTMLElement>document.selectOne(`#View_${self.model}_${prop}`)).innerText = <any>data[prop];
+                    if(data.hasOwnProperty(prop) && data[prop] != null && document.querySelector(`#View_${self.model}_${prop}`) != null) {
+                        (<HTMLElement>document.querySelector(`#View_${self.model}_${prop}`)).innerText = <any>data[prop];
                     }
                 }
             });

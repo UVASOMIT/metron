@@ -18,7 +18,7 @@ namespace metron {
         document.addEventListener("DOMContentLoaded", function (e) {
             metron.templates.master.loadMaster(document.documentElement.outerHTML).then(() => {
                 let proms = [];
-                document.selectAll("[data-m-include]").each((idx: number, elem: Element) => {
+                document.querySelectorAll("[data-m-include]").each((idx: number, elem: Element) => {
                     let prom = metron.templates.load(elem.attribute("data-m-include")).then(result => {
                         if (elem.attribute("data-m-type") != null && elem.attribute("data-m-type") == "markdown") {
                             (<HTMLElement>elem).innerHTML = metron.templates.markdown.toHTML(result);
@@ -31,7 +31,7 @@ namespace metron {
                     proms.push(prom);
                 });
                 Promise.all(proms).then(() => {
-                    document.selectAll("[data-m-type='markdown']").each((idx: number, elem: Element) => {
+                    document.querySelectorAll("[data-m-type='markdown']").each((idx: number, elem: Element) => {
                         if (elem.attribute("data-m-include") == null) {
                             (<HTMLElement>elem).innerHTML = metron.templates.markdown.toHTML((<HTMLElement>elem).innerHTML);
                             (<HTMLElement>elem).show();
@@ -93,12 +93,12 @@ namespace metron {
     /*
     export function load(segment: string, model: string, func: Function, name?: string) {
         if (name == null) {
-            if (document.selectOne(`[data-m-type="${segment}"][data-m-model="${model}"]`) != null) {
+            if (document.querySelector(`[data-m-type="${segment}"][data-m-model="${model}"]`) != null) {
                 func();
             }
         }
         else {
-            if (document.selectOne(`[data-m-type="${segment}"][data-m-model="${model}"][data-m-page="${name}"]`) != null) {
+            if (document.querySelector(`[data-m-type="${segment}"][data-m-model="${model}"][data-m-page="${name}"]`) != null) {
                 func();
             }
         }
@@ -115,7 +115,7 @@ namespace metron {
         }
         let h = () => {
             if(n !== undefined) {
-                let p = document.selectOne("[data-m-type='pivot']");
+                let p = document.querySelector("[data-m-type='pivot']");
                 if(p !== undefined) {
                     metron.controls.getPivot(p.attribute("data-m-page")).exact(n);
                 }
@@ -135,7 +135,7 @@ namespace metron {
     }
     export namespace fw {
         export function getApplicationRoot(page: string): string {
-            let root: string = (document.selectOne("body[data-m-root]") != null) ? `${document.selectOne("body[data-m-root]").attribute("data-m-root")}` : null;
+            let root: string = (document.querySelector("body[data-m-root]") != null) ? `${document.querySelector("body[data-m-root]").attribute("data-m-root")}` : null;
             if (root == null) {
                 root = metron.tools.getMatching(page, /\{\{m:root=\"(.*)\"\}\}/g);
             }
@@ -143,7 +143,7 @@ namespace metron {
             return root;
         }
         export function getApplicationName(page: string): string {
-            let appName: string = (document.selectOne("body[data-m-page]") != null) ? `${document.selectOne("body[data-m-page]").attribute("data-m-page")}` : null;
+            let appName: string = (document.querySelector("body[data-m-page]") != null) ? `${document.querySelector("body[data-m-page]").attribute("data-m-page")}` : null;
             if (appName == null) {
                 appName = metron.tools.getMatching(page, /\{\{m:page=\"(.*)\"\}\}/g);
             }
@@ -184,7 +184,7 @@ namespace metron {
                 if (metron.globals.autolists == null) {
                     metron.globals.autolists = {};
                 }
-                document.selectAll("[data-m-autocomplete]").each((idx: number, elem: Element) => {
+                document.querySelectorAll("[data-m-autocomplete]").each((idx: number, elem: Element) => {
                     let datalist: string[] = [];
                     let endpoint = elem.attribute("data-m-autocomplete");
                     let url: string = (endpoint.toLowerCase().startsWith("http")) ? endpoint : metron.fw.getAPIURL(endpoint);
@@ -214,7 +214,7 @@ namespace metron {
     window.onhashchange = function () { //Is this still needed with the new paging/routing implementation?
         if (!metron.globals.hashLoadedFromApplication) {
             let hasPivoted = false;
-            let section = document.selectOne("[data-m-type='pivot']");
+            let section = document.querySelector("[data-m-type='pivot']");
             if (section != null) {
                 let page = section.attribute("data-m-page");
                 if (page != null) {
@@ -236,7 +236,7 @@ namespace metron {
                 let route = elem.attribute("data-m-page");
                 let pivot = elem.up("[data-m-type='pivot']");
                 let pivotPageName = pivot.attribute("data-m-page");
-                elem.up("[data-m-type='pivot']").selectAll("[data-m-segment='pivot-item']").each((idx: number, el: Element) => {
+                elem.up("[data-m-type='pivot']").querySelectorAll("[data-m-segment='pivot-item']").each((idx: number, el: Element) => {
                     if(el.up("[data-m-type='pivot']").attribute("data-m-page") === pivotPageName) {
                         if (el.attribute("data-m-page") != route) {
                             el.hide();
@@ -249,14 +249,14 @@ namespace metron {
                 }
             }
         }
-        let wantsAutoload: boolean = ((document.selectOne("[data-m-autoload]") != null) && (document.selectOne("[data-m-autoload]").attribute("data-m-autoload") == "true"));
-        document.selectAll("[data-m-state='hide']").each((idx: number, elem: Element) => {
+        let wantsAutoload: boolean = ((document.querySelector("[data-m-autoload]") != null) && (document.querySelector("[data-m-autoload]").attribute("data-m-autoload") == "true"));
+        document.querySelectorAll("[data-m-state='hide']").each((idx: number, elem: Element) => {
             elem.hide();
         });
         metron.controls.pivots.bindAll(() => {
             let route = metron.routing.getRouteName();
             if (route != null) {
-                let page = document.selectOne(`[data-m-segment='pivot-item'][data-m-page="${route}"]`);
+                let page = document.querySelector(`[data-m-segment='pivot-item'][data-m-page="${route}"]`);
                 recursePivot(page);
             }
             metron.fw.loadOptionalFunctionality();
@@ -264,8 +264,8 @@ namespace metron {
                 metron.lists.bindAll(() => {
                     metron.forms.bindAll(() => {
                         metron.controls.polyfill();
-                        //metron.page.loadSelects(document.selectAll("select[data-m-binding]"));
-                        //metron.page.loadActions(document.selectAll("[data-m-action]"));
+                        //metron.page.loadSelects(document.querySelectorAll("select[data-m-binding]"));
+                        //metron.page.loadActions(document.querySelectorAll("[data-m-action]"));
                     });
                 });
             }

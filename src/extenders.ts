@@ -45,8 +45,8 @@ interface Object {
 }
 
 interface Document {
-    selectOne: (selector: string) => Element;
-    selectAll: (selector: string) => NodeListOf<Element>;
+    querySelector: (selector: string) => Element;
+    querySelectorAll: (selector: string) => NodeListOf<Element>;
     create: (html: string) => Element;
 }
 
@@ -70,8 +70,6 @@ interface Element {
     addClass: (className: string) => Element;
     removeClass: (className: string) => Element;
     asString: () => string;
-    selectOne: (selector: string) => Element;
-    selectAll: (selector: string) => NodeListOf<Element>;
     hasMatches: (selector: string) => boolean;
     up: (selector: string) => Element;
     isHidden: () => Boolean;
@@ -114,7 +112,7 @@ function getElementValue(_self: any, val?: string): string {
                     break;
                 case "radio":
                     const name: string = _self.attribute("name");
-                    const radios: NodeListOf<Element> = document.selectAll(`input[type='radio'][name='${name}']`);
+                    const radios: NodeListOf<Element> = document.querySelectorAll(`input[type='radio'][name='${name}']`);
                     radios.each(function(idx: number, elem: Element) {
                         if(elem.attribute("value") == val) {
                             (<HTMLInputElement>elem).checked = true;
@@ -197,7 +195,7 @@ function getElementValue(_self: any, val?: string): string {
                     return _self.checked;
                 case "radio":
                     const name: string = _self.attribute("name");
-                    return (<HTMLInputElement>document.selectOne(`input[type='radio'][name='${name}']:checked`) != null) ? (<HTMLInputElement>document.selectOne(`input[type='radio'][name='${name}']:checked`)).value : null;
+                    return (<HTMLInputElement>document.querySelector(`input[type='radio'][name='${name}']:checked`) != null) ? (<HTMLInputElement>document.querySelector(`input[type='radio'][name='${name}']:checked`)).value : null;
                 case "time":
                     if (metron.globals.requiresDateTimePolyfill && /\d{2}:\d{2} \S{2}/g.test((<any>self).value)) {
                         const period: string = _self.value.slice(6, 8);
@@ -505,14 +503,6 @@ Array.prototype.toObjectArray = function (objName: string): Array<any> {
     return dest;
 };
 
-Document.prototype.selectOne = function(selector: string): Element {
-    return document.querySelector(selector);
-};
-
-Document.prototype.selectAll = function(selector: string): NodeListOf<Element> {
-    return document.querySelectorAll(selector);
-};
-
 Document.prototype.create = function(html: string): Element {
     var placeholder = document.createElement("div");
     placeholder.innerHTML = html;
@@ -527,14 +517,6 @@ NodeList.prototype.each = function (callback: Function): void {
 
 NodeList.prototype.last = function (): Element {
     return this[this.length - 1];
-};
-
-Element.prototype.selectOne = function(selector: string): Element | HTMLElement {
-    return this.querySelector(selector);
-};
-
-Element.prototype.selectAll = function(selector: string): NodeListOf<Element> | NodeListOf<HTMLElement> {
-    return this.querySelectorAll(selector);
 };
 
 Element.prototype.attribute = function(name: string, value?: string): string & Element {

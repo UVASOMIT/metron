@@ -3,7 +3,7 @@
 namespace metron {
     export class forms {
         public static bindAll(callback: Function): void {
-            let sections: NodeListOf<Element> = document.selectAll("[data-m-type='form']");
+            let sections: NodeListOf<Element> = document.querySelectorAll("[data-m-type='form']");
             for (let i = 0; i < sections.length; i++) {
                 let section: Element = <Element>sections[i];
                 if (section.attribute("data-m-autoload") == null || section.attribute("data-m-autoload") == "true") {
@@ -35,7 +35,7 @@ namespace metron {
             self.id = (options != null) ? options.id : null;
             self.gTypeName = (options != null && options.id != null) ? `${options.id}_${model}` : model;
             metron.globals["forms"][self.gTypeName] = self;
-            self._elem = (self.id != null) ? document.selectOne(`#${self.id}`) : document.selectOne(`[data-m-type='form'][data-m-model='${self.model}']`);
+            self._elem = (self.id != null) ? document.querySelector(`#${self.id}`) : document.querySelector(`[data-m-type='form'][data-m-model='${self.model}']`);
         }
         private loadDefaults(): void {
             var self = this;
@@ -45,11 +45,11 @@ namespace metron {
                     for (let k in pair) {
                         if (pair.hasOwnProperty(k)) {
                             let v = pair[k];
-                            if ((<string>k).contains(`${self.model}_`) && document.selectOne(`#${k}`) != null) {
-                                (<HTMLElement>document.selectOne(`#${k}`)).val(v);
+                            if ((<string>k).contains(`${self.model}_`) && document.querySelector(`#${k}`) != null) {
+                                (<HTMLElement>document.querySelector(`#${k}`)).val(v);
                             }
-                            else if (!(<string>k).contains("_") && document.selectOne(`#${self.model}_${k}`) != null) {
-                                (<HTMLElement>document.selectOne(`#${self.model}_${k}`)).val(v);
+                            else if (!(<string>k).contains("_") && document.querySelector(`#${self.model}_${k}`) != null) {
+                                (<HTMLElement>document.querySelector(`#${self.model}_${k}`)).val(v);
                             }
                         }
                     }
@@ -62,7 +62,7 @@ namespace metron {
             if (self._elem != null) {
                 self.pivot = self.attachPivot(self._elem);
                 self._name = self._elem.attribute("data-m-page");
-                let selects = self._elem.selectAll("select");
+                let selects = self._elem.querySelectorAll("select");
                 self.loadSelects(selects, () => {
                     let parameters: any;
                     let defaults: any;
@@ -75,9 +75,9 @@ namespace metron {
                     }
                     self.loadForm(parameters, defaults);
                 });
-                let controlBlocks: NodeListOf<Element> = self._elem.selectAll("[data-m-segment='controls']");
+                let controlBlocks: NodeListOf<Element> = self._elem.querySelectorAll("[data-m-segment='controls']");
                 controlBlocks.each((idx: number, elem: Element) => {
-                    let actions = elem.selectAll("[data-m-action]");
+                    let actions = elem.querySelectorAll("[data-m-action]");
                     actions.each((indx: number, el: Element) => {
                         switch (el.attribute("data-m-action").lower()) {
                             case "save":
@@ -91,7 +91,7 @@ namespace metron {
                                         if (self.isValid()) {
                                             let parameters: any = {};
                                             let hasPrimary: boolean = false;
-                                            self.elem.selectAll("input, select, textarea").each(function (idx: number, elem: Element) {
+                                            self.elem.querySelectorAll("input, select, textarea").each(function (idx: number, elem: Element) {
                                                 parameters[<string>elem.attribute("name")] = (<HTMLElement>elem).val();
                                                 if (elem.attribute("data-m-autocomplete") != null && (<HTMLElement>elem).val() != "") {
                                                     parameters[<string>elem.attribute("name")] = metron.globals.autolists[(<HTMLInputElement>elem).attribute("id")][(<HTMLElement>elem).val()];
@@ -170,7 +170,7 @@ namespace metron {
         }
         public save(data: T, pivotPosition: number, saveElement: Element): void {
             var self = this;
-            self.elem.selectAll("[data-m-primary]").each((idx: number, elem: Element) => {
+            self.elem.querySelectorAll("[data-m-primary]").each((idx: number, elem: Element) => {
                 (<HTMLElement>elem).val(<string><any>data[<string><any>elem.attribute("name")]);
             });
             if(self.pivot != null) {
@@ -201,11 +201,11 @@ namespace metron {
             //}
             if (defaults != null) {
                 for (let prop in defaults) {
-                    if (defaults.hasOwnProperty(prop) && defaults[prop] != null && document.selectOne(`#${self.model}_${prop}`) != null) {
-                        if ((<Element>document.selectOne(`#${self.model}_${prop}`)).attribute("data-m-autocomplete") != null) {
-                            (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(<any>defaults[(<Element>document.selectOne(`#${self.model}_${prop}`)).attribute("data-m-display-text")]);
+                    if (defaults.hasOwnProperty(prop) && defaults[prop] != null && document.querySelector(`#${self.model}_${prop}`) != null) {
+                        if ((<Element>document.querySelector(`#${self.model}_${prop}`)).attribute("data-m-autocomplete") != null) {
+                            (<HTMLElement>document.querySelector(`#${self.model}_${prop}`)).val(<any>defaults[(<Element>document.querySelector(`#${self.model}_${prop}`)).attribute("data-m-display-text")]);
                         } else {
-                            (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(<any>defaults[prop]);
+                            (<HTMLElement>document.querySelector(`#${self.model}_${prop}`)).val(<any>defaults[prop]);
                         }
                     }
                 }
@@ -219,12 +219,12 @@ namespace metron {
                     //self._elem.innerHTML = self.formatData(data, false);
                     for (let prop in data) {
                         if (self.id == null) {
-                            if (data.hasOwnProperty(prop) && data[prop] != null && document.selectOne(`#${self.model}_${prop}`) != null) {
-                                (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(<any>data[prop]);
+                            if (data.hasOwnProperty(prop) && data[prop] != null && document.querySelector(`#${self.model}_${prop}`) != null) {
+                                (<HTMLElement>document.querySelector(`#${self.model}_${prop}`)).val(<any>data[prop]);
                             }
                         } else {
-                            if (data.hasOwnProperty(prop) && data[prop] != null && document.selectOne(`#${self.id} > fieldset > #${self.model}_${prop}`) != null) {
-                                (<HTMLElement>document.selectOne(`#${self.id} > fieldset > #${self.model}_${prop}`)).val(<any>data[prop]);
+                            if (data.hasOwnProperty(prop) && data[prop] != null && document.querySelector(`#${self.id} > fieldset > #${self.model}_${prop}`) != null) {
+                                (<HTMLElement>document.querySelector(`#${self.id} > fieldset > #${self.model}_${prop}`)).val(<any>data[prop]);
                             }
                         }
                     }
@@ -239,20 +239,20 @@ namespace metron {
         }
         public clearForm(selector?: string, callback?: Function): void {
             var self = this;
-            var f = (self._elem != null) ? self._elem : document.selectOne(selector);
-            document.selectAll(".error").each(function (idx, elem) {
+            var f = (self._elem != null) ? self._elem : document.querySelector(selector);
+            document.querySelectorAll(".error").each(function (idx, elem) {
                 (<HTMLElement>elem).removeClass("error");
             });
-            document.selectAll(".label-error").each(function (idx, elem) {
+            document.querySelectorAll(".label-error").each(function (idx, elem) {
                 (<HTMLElement>elem).removeClass("label-error");
             });
-            f.selectAll("input:not([data-m-ignore='true']), select:not([data-m-ignore='true'])").each(function (idx: number, elem: Element) {
+            f.querySelectorAll("input:not([data-m-ignore='true']), select:not([data-m-ignore='true'])").each(function (idx: number, elem: Element) {
                 (<HTMLElement>elem).val("");
             });
-            f.selectAll("textarea:not([data-m-ignore='true'])").each(function (idx: number, elem: Element) {
+            f.querySelectorAll("textarea:not([data-m-ignore='true'])").each(function (idx: number, elem: Element) {
                 (<HTMLElement>elem).val("");
             });
-            f.selectAll("input[type='checkbox']:not([data-m-ignore='true'])").each(function (idx: number, elem: Element) {
+            f.querySelectorAll("input[type='checkbox']:not([data-m-ignore='true'])").each(function (idx: number, elem: Element) {
                 (<HTMLElement>elem).val("");
             });
             self.clearAlerts();
@@ -268,25 +268,25 @@ namespace metron {
             var self = this;
             self.clearAlerts();
             var result = "";
-            var f = (self._elem != null) ? self._elem : document.selectOne(selector);
-            f.selectAll(".error").each(function (idx, elem) {
+            var f = (self._elem != null) ? self._elem : document.querySelector(selector);
+            f.querySelectorAll(".error").each(function (idx, elem) {
                 elem.removeClass("error");
             });
-            f.selectAll(".label-error").each(function (idx, elem) {
+            f.querySelectorAll(".label-error").each(function (idx, elem) {
                 elem.removeClass("label-error");
             });
             var isValid: boolean = true;
-            var required: NodeListOf<Element> = f.selectAll("[required='required']");
+            var required: NodeListOf<Element> = f.querySelectorAll("[required='required']");
             required.each(function (idx: number, elem: Element) {
                 try {
                     if ((<HTMLElement>elem).val() == null || (<HTMLElement>elem).val().trim() === "") {
                         isValid = false;
                         elem.addClass("error");
-                        if (f.selectOne(`label[for='${elem.attribute("id")}']`) != null) {
-                            f.selectOne(`label[for='${elem.attribute("id")}']`).addClass("label-error");
+                        if (f.querySelector(`label[for='${elem.attribute("id")}']`) != null) {
+                            f.querySelector(`label[for='${elem.attribute("id")}']`).addClass("label-error");
                         }
-                        if  (f.selectOne(`label[for='${elem.attribute("id")}']`) != null && (<HTMLElement>f.selectOne(`label[for='${elem.attribute("id")}']`)).innerText != "") {
-                            result += `<p>${(<HTMLElement>f.selectOne(`label[for='${elem.attribute("id")}']`)).innerText} is a required field.</p>`;
+                        if  (f.querySelector(`label[for='${elem.attribute("id")}']`) != null && (<HTMLElement>f.querySelector(`label[for='${elem.attribute("id")}']`)).innerText != "") {
+                            result += `<p>${(<HTMLElement>f.querySelector(`label[for='${elem.attribute("id")}']`)).innerText} is a required field.</p>`;
                         } else {
                             result += `<p>[${elem.attribute("name")}] is a required field.</p>`;
                         }
