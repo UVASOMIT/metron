@@ -2,7 +2,7 @@
   "name": "metronical.metron",
   "version": "3.0.0",
   "description": "A lightweight library and front-end framework utilizing data attributes",
-  "main": "./dist/gen/metron.js",
+  "main": "./dist/gen/index.js",
   "homepage": "https://github.com/metronical/metron",
   "dependencies": {
     "awesomplete": "^1.1.1",
@@ -12,12 +12,13 @@
   "devDependencies": {
     "@types/awesomplete": "^1.1.4",
     "@types/mocha": "^5.2.5",
+    "browserify": "^16.2.3",
+    "exorcist": "^1.0.1",
     "mocha": "^5.2.0",
-    "typescript": "^2.8.1",
-    "webpack": "^4.3.0"
+    "typescript": "^2.8.1"
   },
   "scripts": {
-    "build": "tsc -p ."
+    "build": "tsc -p ./tsconfig.json && browserify ./dist/gen/index.js --debug | exorcist ./dist/gen/metron.js.map > ./dist/gen/metron.js"
   },
   "repository": {
     "type": "git",
@@ -31,6 +32,8 @@
     "ajax",
     "spa"
   ],
-  "author": "Michael Szul <michael@szul.us>",
+  "contributors": [
+    "Michael Szul <michael@szul.us>"
+  ],
   "license": "MIT"
 }

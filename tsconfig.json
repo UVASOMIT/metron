@@ -1,29 +1,16 @@
 {
     "compileOnSave": true,
     "compilerOptions": {
-                "module": "none", 
+                "module": "umd", 
                 "target": "es6",
-                "outFile": "dist/gen/metron.js",
+                "outDir": "dist/gen",
                 "sourceMap": true,
                 "declaration": true,
-                "removeComments": true
+                "removeComments": true,
             },
-    "files": [
-        "src/extenders.ts",
-        "src/types.ts",
-        "src/metron.ts",
-        "src/controls.ts",
-        "src/storage.ts",
-        "src/tools.ts",
-        "src/page.ts",
-        "src/base.ts",
-        "src/routing.ts",
-        "src/framework.ts",
-        "src/lists.ts",
-        "src/forms.ts",
-        "src/views.ts",
-        "src/templates.ts"
-    ],
+            "include": [
+                "src/**/*"
+            ],
     "exclude": [
         "node_modules",
         "typings"

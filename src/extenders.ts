@@ -1,3 +1,5 @@
+declare const metron;
+
 interface String {
     lower: () => string;
     upper: () => string;
