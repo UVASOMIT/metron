@@ -3,8 +3,7 @@ interface String {
     upper: () => string;
     ltrim: () => string;
     rtrim: () => string;
-    //trim: () => string;
-    normalize: () => string;
+    trim: () => string;
     startsWith: (part: string, pos?: number) => boolean;
     endsWith: (part: string, pos?: number) => boolean;
     capFirst: () => string;
@@ -45,8 +44,8 @@ interface Object {
 }
 
 interface Document {
-    selectOne: (selector: string) => Element;
-    selectAll: (selector: string) => NodeListOf<Element>;
+    querySelector: (selector: string) => Element;
+    querySelectorAll: (selector: string) => NodeListOf<Element>;
     create: (html: string) => Element;
 }
 
@@ -70,8 +69,6 @@ interface Element {
     addClass: (className: string) => Element;
     removeClass: (className: string) => Element;
     asString: () => string;
-    selectOne: (selector: string) => Element;
-    selectAll: (selector: string) => NodeListOf<Element>;
     hasMatches: (selector: string) => boolean;
     up: (selector: string) => Element;
     isHidden: () => Boolean;
@@ -86,6 +83,8 @@ interface HTMLElement {
 interface XMLHttpRequest {
     responseJSON?: () => JSON;
 }
+
+const _handlers = { };
 
 function getElementValue(_self: any, val?: string): string {
     if(val != null) {
@@ -114,7 +113,7 @@ function getElementValue(_self: any, val?: string): string {
                     break;
                 case "radio":
                     const name: string = _self.attribute("name");
-                    const radios: NodeListOf<Element> = document.selectAll(`input[type='radio'][name='${name}']`);
+                    const radios: NodeListOf<Element> = document.querySelectorAll(`input[type='radio'][name='${name}']`);
                     radios.each(function(idx: number, elem: Element) {
                         if(elem.attribute("value") == val) {
                             (<HTMLInputElement>elem).checked = true;
@@ -129,12 +128,7 @@ function getElementValue(_self: any, val?: string): string {
                         if (date.contains("T")) {
                             date = date.slice(0, date.indexOf("T"));
                         }
-                        if (metron.globals.requiresDateTimePolyfill && /\d{4}-\d{2}-\d{2}/g.test(val)) {
-                            _self.value = `${date.slice(5, 7)}/${date.slice(8, 10)}/${date.slice(0, 4)}`;
-                        }
-                        else if (metron.globals.requiresDateTimePolyfill && /\d{2}\/\d{2}\/\d{4}/g.test(val)) {
-                            _self.value = date;
-                        } else if (/\d{2}\/\d{2}\/\d{4}/g.test(val)) {
+                        if (/\d{2}\/\d{2}\/\d{4}/g.test(val)) {
                             _self.value = `${date.slice(6, 10)}-${date.slice(0, 2)}-${date.slice(3, 5)}`;
                         } else {
                             _self.value = date;
@@ -142,25 +136,11 @@ function getElementValue(_self: any, val?: string): string {
                     break;
                 case "time":
                     const time: string = val;
-                    if (metron.globals.requiresDateTimePolyfill) {
-                        if (/\d{2}:\d{2}:\d{2}/g.test(time)) {
-                            let hour: number = Number(time.slice(0, 2));
-                            const period: string = hour > 11 ? "PM" : "AM";
-                            hour = hour > 12 ? hour - 12 : hour;
-                            const hourStr: string = hour > 9 ? hour.toString() : "0" + hour.toString();
-                            _self.value = `${hourStr}:${time.slice(3, 5)} ${period}`;
-                        }
-                        else {
-                            _self.value = time;
-                        }
+                    if (/\d{2}:\d{2}:\d{2}/g.test(time)) {
+                        _self.value = time.slice(0, 5);
                     }
                     else {
-                        if (/\d{2}:\d{2}:\d{2}/g.test(time)) {
-                            _self.value = time.slice(0, 5);
-                        }
-                        else {
-                            _self.value = time;
-                        }
+                        _self.value = time;
                     }
                     break;
                 default:
@@ -197,17 +177,9 @@ function getElementValue(_self: any, val?: string): string {
                     return _self.checked;
                 case "radio":
                     const name: string = _self.attribute("name");
-                    return (<HTMLInputElement>document.selectOne(`input[type='radio'][name='${name}']:checked`) != null) ? (<HTMLInputElement>document.selectOne(`input[type='radio'][name='${name}']:checked`)).value : null;
+                    return (<HTMLInputElement>document.querySelector(`input[type='radio'][name='${name}']:checked`) != null) ? (<HTMLInputElement>document.querySelector(`input[type='radio'][name='${name}']:checked`)).value : null;
                 case "time":
-                    if (metron.globals.requiresDateTimePolyfill && /\d{2}:\d{2} \S{2}/g.test((<any>self).value)) {
-                        const period: string = _self.value.slice(6, 8);
-                        const hour: number = Number(_self.value.slice(0, 2));
-                        const hourStr: string = (period == "PM" && hour < 12) ? (hour + 12).toString() : hour.toString();
-                        return `${hourStr}:${_self.value.slice(3, 5)}:00`;
-                    }
-                    else {
-                        return _self.value;
-                    }
+                    return _self.value;
                 default:
                     return _self.value;
             }
@@ -217,6 +189,13 @@ function getElementValue(_self: any, val?: string): string {
         }
     }
     return val;
+}
+
+function newGuid(): string {
+    function generateGUIDPart(): string {
+        return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+    }
+    return (generateGUIDPart() + generateGUIDPart() + "-" + generateGUIDPart() + "-" + generateGUIDPart() + "-" + generateGUIDPart() + "-" + generateGUIDPart() + generateGUIDPart() + generateGUIDPart());
 }
 
 String.prototype.lower = function (): string {
@@ -237,10 +216,6 @@ String.prototype.ltrim = function (): string {
 
 String.prototype.rtrim = function (): string {
     return this.replace(/\s+$/, "");
-};
-
-String.prototype.normalize = function (): string {
-    return this.replace(/^\s*|\s(?=\s)|\s*$/g, "");
 };
 
 String.prototype.startsWith = function (part: string, pos?: number): boolean {
@@ -505,14 +480,6 @@ Array.prototype.toObjectArray = function (objName: string): Array<any> {
     return dest;
 };
 
-Document.prototype.selectOne = function(selector: string): Element {
-    return document.querySelector(selector);
-};
-
-Document.prototype.selectAll = function(selector: string): NodeListOf<Element> {
-    return document.querySelectorAll(selector);
-};
-
 Document.prototype.create = function(html: string): Element {
     var placeholder = document.createElement("div");
     placeholder.innerHTML = html;
@@ -527,14 +494,6 @@ NodeList.prototype.each = function (callback: Function): void {
 
 NodeList.prototype.last = function (): Element {
     return this[this.length - 1];
-};
-
-Element.prototype.selectOne = function(selector: string): Element | HTMLElement {
-    return this.querySelector(selector);
-};
-
-Element.prototype.selectAll = function(selector: string): NodeListOf<Element> | NodeListOf<HTMLElement> {
-    return this.querySelectorAll(selector);
 };
 
 Element.prototype.attribute = function(name: string, value?: string): string & Element {
@@ -609,13 +568,13 @@ Element.prototype.removeEvent = function (event: string): Element {
     if (this.id == "")
         return this;
 
-    if (metron.globals.handlers[this.id])
+    if (_handlers[this.id])
     {
-        if (metron.globals.handlers[this.id][event])
+        if (_handlers[this.id][event])
         {
-            for (var i = 0; i < metron.globals.handlers[this.id][event].length; i++)
-                this.removeEventListener(event, metron.globals.handlers[this.id][event][i]);
-            metron.globals.handlers[this.id][event].empty();
+            for (var i = 0; i < _handlers[this.id][event].length; i++)
+                this.removeEventListener(event, _handlers[this.id][event][i]);
+            _handlers[this.id][event].empty();
         }
     }
     return this;
@@ -627,15 +586,15 @@ Element.prototype.addEvent = function (event: string, callback: Function, overwr
     }
     this.addEventListener(event, callback);
     if (this.id == "") {
-        this.id = metron.guid.newGuid();
+        this.id = newGuid();
     }
-    if (!metron.globals.handlers[this.id]) {
-        metron.globals.handlers[this.id] = {};
+    if (!_handlers[this.id]) {
+        _handlers[this.id] = {};
     }
-    if (!metron.globals.handlers[this.id][event]) {
-        metron.globals.handlers[this.id][event] = [];
+    if (!_handlers[this.id][event]) {
+        _handlers[this.id][event] = [];
     }
-    metron.globals.handlers[this.id][event].push(callback);
+    _handlers[this.id][event].push(callback);
     return this;
 };
 
