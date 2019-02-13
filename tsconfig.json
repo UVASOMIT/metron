@@ -6,7 +6,7 @@
                 "outDir": "dist/gen",
                 "sourceMap": true,
                 "declaration": true,
-                "removeComments": true,
+                "removeComments": true
             },
             "include": [
                 "src/**/*"
