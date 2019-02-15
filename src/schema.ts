@@ -81,6 +81,8 @@ export class m {
         actions: {}
         , forms: {}
         , lists: {}
+        , views: {}
+        , templates: {}
         , pivots: {}
         , handlers: {}
         , pager: {

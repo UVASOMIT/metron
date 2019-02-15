@@ -4,16 +4,6 @@
     "showOutput": "always",
     "tasks": [
         {
-            "taskName": "grunt",
-            "command": "grunt",
-            "args": ["default"],
-            "problemMatcher": [
-                "$lessCompile",
-                "$jshint"
-            ],
-            "isShellCommand": true
-        },
-        {
             "taskName": "TypeScript",
             "problemMatcher": "$tsc",
             "command": "tsc",
