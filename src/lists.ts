@@ -407,10 +407,17 @@ export class list<T> extends base<T> {
         }
     }
     public clearTable(selector: Element): void {
-        var self = this;
+        const self = this;
         if (String.isNullOrEmpty(self._template)) {
+            const t: Element = selector.up("[data-m-page]");
             try {
-                self._template = (<HTMLElement>selector.querySelector("[data-m-type='table-body'] [data-m-action='repeat']")).outerHTML;
+                if(t != null) {
+                    self._template = m.globals.templates[t.attribute("data-m-page")];
+                }
+                if(self._template == null) {
+                    self._template = (<HTMLElement>selector.querySelector("[data-m-type='table-body'] [data-m-action='repeat']")).outerHTML;
+                    m.globals.templates[t.attribute("data-m-page")] = self._template;
+                }
             }
             catch(e) {
                 console.log(`DOM has no element that matches the selector "${selector} [data-m-type='table-body'] [data-m-action='repeat']": ${e}`);
