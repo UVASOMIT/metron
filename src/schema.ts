@@ -62,6 +62,7 @@ export enum Event {
     , EDIT = 13
     , DELETE = 14
     , CANCEL = 15
+    , SAVING = 16
 }
 export const LIST = "list";
 export const LOOKUP = "lookup";

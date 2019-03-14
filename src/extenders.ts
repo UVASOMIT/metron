@@ -184,8 +184,22 @@ function getElementValue(_self: any, val?: string): string {
                     return _self.value;
             }
         }
-        else if(_self.nodeName.lower() == "select") {
-            return _self.options[_self.selectedIndex].value;
+        else if (_self.nodeName.lower() == "select") {
+            if (_self.selectedIndex == -1) {
+                return null;
+            } else {
+                if (_self.multiple) {
+                    let values: string = "";
+                    for (let i = 0; i < _self.options.length; i++) {
+                        if (_self.options[i].selected) {
+                            values += `${_self.options[i].value};`;
+                        }
+                    }
+                    return values.slice(0, -1);
+                } else {
+                    return _self.options[_self.selectedIndex].value;
+                }
+            }
         }
     }
     return val;

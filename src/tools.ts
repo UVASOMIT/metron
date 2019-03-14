@@ -137,6 +137,8 @@ export module tools {
                 return "delete";
             case Event.CANCEL:
                 return "cancel";
+            case Event.SAVING:
+                return "saving";
             default:
                 throw new Error("Error: Invalid enum.");
         }

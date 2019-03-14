@@ -90,6 +90,9 @@ export class form<T> extends base<T> {
                                     m.globals.actions[`${self.model.lower()}_${el.attribute("data-m-action").lower()}`]();
                                 }
                                 else {
+                                    if ((<any>self).saving_m_inject != null) {
+                                        (<any>self).saving_m_inject();
+                                    }
                                     if (self.isValid()) {
                                         let parameters: any = {};
                                         let hasPrimary: boolean = false;
