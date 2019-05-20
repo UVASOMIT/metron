@@ -220,11 +220,19 @@ export class form<T> extends base<T> {
                 for (let prop in data) {
                     if (self.id == null) {
                         if (data.hasOwnProperty(prop) && data[prop] != null && document.querySelector(`#${self.model}_${prop}`) != null) {
-                            (<HTMLElement>document.querySelector(`#${self.model}_${prop}`)).val(<any>data[prop]);
+                            if ((<Element>document.querySelector(`#${self.model}_${prop}`)).attribute("data-m-autocomplete") != null) {
+                                (<HTMLElement>document.querySelector(`#${self.model}_${prop}`)).val(<any>data[(<Element>document.querySelector(`#${self.model}_${prop}`)).attribute("data-m-display-text")]);
+                            } else {
+                                (<HTMLElement>document.querySelector(`#${self.model}_${prop}`)).val(<any>data[prop]);
+                            }
                         }
                     } else {
                         if (data.hasOwnProperty(prop) && data[prop] != null && document.querySelector(`#${self.id} > fieldset > #${self.model}_${prop}`) != null) {
-                            (<HTMLElement>document.querySelector(`#${self.id} > fieldset > #${self.model}_${prop}`)).val(<any>data[prop]);
+                            if ((<Element>document.querySelector(`#${self.model}_${prop}`)).attribute("data-m-autocomplete") != null) {
+                                (<HTMLElement>document.querySelector(`#${self.id} > fieldset > #${self.model}_${prop}`)).val(<any>data[(<Element>document.querySelector(`#${self.model}_${prop}`)).attribute("data-m-display-text")]);
+                            } else {
+                                (<HTMLElement>document.querySelector(`#${self.id} > fieldset > #${self.model}_${prop}`)).val(<any>data[prop]);
+                            }
                         }
                     }
                 }
