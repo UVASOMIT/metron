@@ -205,11 +205,19 @@ namespace metron {
                     for (let prop in data) {
                         if (self.id == null) {
                             if (data.hasOwnProperty(prop) && data[prop] != null && document.selectOne(`#${self.model}_${prop}`) != null) {
-                                (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(<any>data[prop]);
+                                if ((<Element>document.selectOne(`#${self.model}_${prop}`)).attribute("data-m-autocomplete") != null) {
+                                    (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(<any>data[(<Element>document.selectOne(`#${self.model}_${prop}`)).attribute("data-m-display-text")]);
+                                } else {
+                                    (<HTMLElement>document.selectOne(`#${self.model}_${prop}`)).val(<any>data[prop]);
+                                }
                             }
                         } else {
                             if (data.hasOwnProperty(prop) && data[prop] != null && document.selectOne(`#${self.id} > fieldset > #${self.model}_${prop}`) != null) {
-                                (<HTMLElement>document.selectOne(`#${self.id} > fieldset > #${self.model}_${prop}`)).val(<any>data[prop]);
+                                if ((<Element>document.selectOne(`#${self.model}_${prop}`)).attribute("data-m-autocomplete") != null) {
+                                    (<HTMLElement>document.selectOne(`#${self.id} > fieldset > #${self.model}_${prop}`)).val(<any>data[(<Element>document.selectOne(`#${self.model}_${prop}`)).attribute("data-m-display-text")]);
+                                } else {
+                                    (<HTMLElement>document.selectOne(`#${self.id} > fieldset > #${self.model}_${prop}`)).val(<any>data[prop]);
+                                }
                             }
                         }
                     }
