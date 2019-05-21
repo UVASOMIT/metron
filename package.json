@@ -1,6 +1,6 @@
 {
   "name": "metronical.metron",
-  "version": "2.9.10",
+  "version": "2.9.11",
   "description": "A lightweight library and front-end framework utilizing data attributes",
   "main": "./dist/gen/metron.js",
   "homepage": "https://github.com/metronical/metron",
