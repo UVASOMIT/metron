@@ -117,32 +117,39 @@ export function ifQuerystring(callback: Function): void {
 }
 export function loadOptionalFunctionality(): void {
     if (typeof Awesomplete !== undefined) {
-        if (m.globals.autolists == null) {
-            m.globals.autolists = {};
-        }
         document.querySelectorAll("[data-m-autocomplete]").each((idx: number, elem: Element) => {
-            let datalist: string[] = [];
             let endpoint = elem.attribute("data-m-autocomplete");
             let url: string = (endpoint.toLowerCase().startsWith("http")) ? endpoint : routing.getAPIURL(endpoint);
-            web.get(`${url}${web.querystringify({ IsActive: true, _SortOrder: elem.attribute("data-m-search-text"), _SortDirection: "ASC" })}`, null, null, "json", (result) => {
-                if (result != null) {
-                    for (var a in result) {
-                        if (result.hasOwnProperty(a)) {
-                            if (result[a][elem.attribute("data-m-search-text")] != null) {
-                                datalist.push(result[a][elem.attribute("data-m-search-text")]);
-                                if (!m.globals.autolists[(<HTMLInputElement>elem).attribute("id")]) {
-                                    m.globals.autolists[(<HTMLInputElement>elem).attribute("id")] = {};
-                                }
-                                if (!m.globals.autolists[(<HTMLInputElement>elem).attribute("id")][result[a][elem.attribute("data-m-search-text")]]) {
-                                    m.globals.autolists[(<HTMLInputElement>elem).attribute("id")][result[a][elem.attribute("data-m-search-text")]] = {};
-                                }
-                                m.globals.autolists[(<HTMLInputElement>elem).attribute("id")][result[a][elem.attribute("data-m-search-text")]] = result[a][elem.attribute("data-m-val")];
-                            }
-                        }
+            let awesome = new Awesomplete(elem, {
+                minChars: 1,
+                sort: false,
+                maxItems: 15,
+                replace: function (item) {
+                    if (elem.attribute("data-m-search-hidden-store") != '') {
+                        this.input.value = item.label;
+                        (<HTMLInputElement>document.querySelector(`#${elem.attribute("data-m-search-hidden-store")}`)).val(item.value);
+                        (<HTMLInputElement>document.querySelector(`#${elem.attribute("data-m-search-hidden-store")}`)).dispatchEvent(new Event("change"));
+                    } else {
+                        this.input.value = item.value;
                     }
                 }
-                new Awesomplete(elem, { minChars: 0, list: datalist, sort: false, maxItems: 20 });
-            })
+            });
+            elem.addEvent("keyup", function (e) {
+                web.get(`${url}${web.querystringify({ IsActive: true, Search: this.val() })}`, null, null, "json", (result) => {
+                    let list = [];
+                    if (result != null) {  
+                        for (var a in result) {
+                            if (result.hasOwnProperty(a)) {
+                                if (result[a][elem.attribute("data-m-search-text")] != null) {
+                                    var item = { label: result[a][elem.attribute("data-m-search-text")], value: result[a][elem.attribute("data-m-search-value")] };
+                                    list.push(item);
+                                }
+                            }
+                        }
+                        awesome.list = list;
+                    }
+                });
+            });
         });
     }
 }

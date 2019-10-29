@@ -204,11 +204,7 @@ export class form<T> extends base<T> {
         if (defaults != null) {
             for (let prop in defaults) {
                 if (defaults.hasOwnProperty(prop) && defaults[prop] != null && document.querySelector(`#${self.model}_${prop}`) != null) {
-                    if ((<Element>document.querySelector(`#${self.model}_${prop}`)).attribute("data-m-autocomplete") != null) {
-                        (<HTMLElement>document.querySelector(`#${self.model}_${prop}`)).val(<any>defaults[(<Element>document.querySelector(`#${self.model}_${prop}`)).attribute("data-m-display-text")]);
-                    } else {
-                        (<HTMLElement>document.querySelector(`#${self.model}_${prop}`)).val(<any>defaults[prop]);
-                    }
+                    (<HTMLElement>document.querySelector(`#${self.model}_${prop}`)).val(<any>defaults[prop]);
                 }
             }
         }
@@ -220,19 +216,11 @@ export class form<T> extends base<T> {
                 for (let prop in data) {
                     if (self.id == null) {
                         if (data.hasOwnProperty(prop) && data[prop] != null && document.querySelector(`#${self.model}_${prop}`) != null) {
-                            if ((<Element>document.querySelector(`#${self.model}_${prop}`)).attribute("data-m-autocomplete") != null) {
-                                (<HTMLElement>document.querySelector(`#${self.model}_${prop}`)).val(<any>data[(<Element>document.querySelector(`#${self.model}_${prop}`)).attribute("data-m-display-text")]);
-                            } else {
-                                (<HTMLElement>document.querySelector(`#${self.model}_${prop}`)).val(<any>data[prop]);
-                            }
+                            (<HTMLElement>document.querySelector(`#${self.model}_${prop}`)).val(<any>data[prop]);
                         }
                     } else {
                         if (data.hasOwnProperty(prop) && data[prop] != null && document.querySelector(`#${self.id} > fieldset > #${self.model}_${prop}`) != null) {
-                            if ((<Element>document.querySelector(`#${self.model}_${prop}`)).attribute("data-m-autocomplete") != null) {
-                                (<HTMLElement>document.querySelector(`#${self.id} > fieldset > #${self.model}_${prop}`)).val(<any>data[(<Element>document.querySelector(`#${self.model}_${prop}`)).attribute("data-m-display-text")]);
-                            } else {
-                                (<HTMLElement>document.querySelector(`#${self.id} > fieldset > #${self.model}_${prop}`)).val(<any>data[prop]);
-                            }
+                            (<HTMLElement>document.querySelector(`#${self.id} > fieldset > #${self.model}_${prop}`)).val(<any>data[prop]);
                         }
                     }
                 }
