@@ -3,7 +3,7 @@
   "version": "3.2.2",
   "description": "A lightweight library and front-end framework utilizing data attributes",
   "main": "./dist/gen/index.js",
-  "homepage": "https://github.com/metronical/metron",
+  "homepage": "https://github.com/metronical/metron#v3",
   "dependencies": {
     "awesomplete": "^1.1.1",
     "es6-promise": "^4.2.4",
@@ -20,12 +20,12 @@
     "typescript": "^2.8.1"
   },
   "scripts": {
-    "build": "tsc -p ./tsconfig.json",
+    "build": "tsc",
     "test-circular": "madge --circular ./dist/gen/metron.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/metronical/metron.git"
+    "url": "https://github.com/metronical/metron.git#v3"
   },
   "bugs": {
     "url": "https://github.com/metronical/metron/issues"
@@ -36,7 +36,8 @@
     "spa"
   ],
   "contributors": [
-    "Michael Szul <michael@szul.us>"
+    "Michael Szul <michael@szul.us>",
+    "Thomas Lynch"
   ],
   "license": "MIT"
 }
