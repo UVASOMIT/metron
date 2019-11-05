@@ -125,7 +125,7 @@ export function loadOptionalFunctionality(): void {
                 sort: false,
                 maxItems: 15,
                 replace: function (item) {
-                    if (elem.attribute("data-m-search-hidden-store") != '') {
+                    if (elem.attribute("data-m-search-hidden-store") != null && elem.attribute("data-m-search-hidden-store") != '') {
                         this.input.value = item.label;
                         (<HTMLInputElement>document.querySelector(`#${elem.attribute("data-m-search-hidden-store")}`)).val(item.value);
                         (<HTMLInputElement>document.querySelector(`#${elem.attribute("data-m-search-hidden-store")}`)).dispatchEvent(new Event("change"));
