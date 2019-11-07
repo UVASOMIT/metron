@@ -98,11 +98,6 @@ export class form<T> extends base<T> {
                                         let hasPrimary: boolean = false;
                                         self.elem.querySelectorAll("input, select, textarea").each(function (idx: number, elem: Element) {
                                             parameters[<string>elem.attribute("name")] = (<HTMLElement>elem).val();
-                                            if (elem.attribute("data-m-autocomplete") != null && (<HTMLElement>elem).val() != "") {
-                                                parameters[<string>elem.attribute("name")] = m.globals.autolists[(<HTMLInputElement>elem).attribute("id")][(<HTMLElement>elem).val()];
-                                            } else {
-                                                parameters[<string>elem.attribute("name")] = (<HTMLElement>elem).val();
-                                            }
                                             if (elem.attribute("data-m-primary") != null && elem.attribute("data-m-primary").toBool() && (<HTMLElement>elem).val() != "") {
                                                 hasPrimary = true;
                                             }
