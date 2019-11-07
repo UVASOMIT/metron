@@ -37,7 +37,9 @@
   ],
   "contributors": [
     "Michael Szul <michael@szul.us>",
-    "Thomas Lynch"
+    "Bill Ahern <william.ahern@gmail.com>",
+    "Tom Lynch <TomJLynch@gmail.com>",
+    "Ashish Pathak <ashish@ashish.codes>"
   ],
   "license": "MIT"
 }
