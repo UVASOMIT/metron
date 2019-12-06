@@ -288,7 +288,9 @@ export class list<T> extends base<T> {
                             else {
                                 current.up(".row").drop();
                             }
-                            self._elem.querySelector(`[data-m-action='undo']`).show();
+                            if (self._elem.querySelector(`[data-m-action='undo']`)) {
+                                self._elem.querySelector(`[data-m-action='undo']`).show();
+                            }
                             if ((<any>self).delete_m_inject != null) {
                                 (<any>self).delete_m_inject();
                             }
