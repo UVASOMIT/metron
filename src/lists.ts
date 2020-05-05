@@ -488,8 +488,8 @@ export class list<T> extends base<T> {
             }
             if (self._elem.querySelector(`[data-m-segment='recordcount']`) != null) {
                 if(this.totalPageSize != null && this.totalPageSize > 0) {
-                    let isOne = (this.totalPageSize === 1) ? "1 " : "";
-                    self._elem.querySelector(`[data-m-segment='recordcount']`).innerHTML = `<label class="record-count">${isOne}of ${this.totalPageSize} Pages (${totalCount} Total Records)</label>`;
+                    let isOne = (this.totalPageSize === 1) ? "1" : this.currentPageIndex;
+                    self._elem.querySelector(`[data-m-segment='recordcount']`).innerHTML = `<label class="record-count">${isOne} of ${this.totalPageSize} Pages (${totalCount} Total Records)</label>`;
                 }
                 else {
                     self._elem.querySelector(`[data-m-segment='recordcount']`).innerHTML = `<label class="record-count">No records found...</label>`;
