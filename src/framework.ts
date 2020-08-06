@@ -134,7 +134,7 @@ export function loadOptionalFunctionality(): void {
                     }
                 }
             });
-            elem.addEvent("keyup", function (e) {
+            elem.removeEvent("keyup").addEvent("keyup", function (e) {
                 web.get(`${url}${web.querystringify({ IsActive: true, Search: this.val() })}`, null, null, "json", (result) => {
                     let list = [];
                     if (result != null) {  
