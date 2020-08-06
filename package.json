@@ -1,5 +1,5 @@
 {
-  "name": "@uvasomit/metron",
+  "name": "metronical.metron",
   "version": "3.3.1",
   "description": "A lightweight library and front-end framework utilizing data attributes",
   "main": "./dist/gen/index.js",
